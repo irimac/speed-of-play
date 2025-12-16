@@ -53,9 +53,11 @@ class _ManualScheduler extends SessionScheduler {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('SessionController', () {
     test('transitions from countdown to active and emits stimuli', () {
-      final scheduler = _ManualScheduler((_) {});
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
       final preset = SessionPreset.defaults().copyWith(
         countdownSec: 2,
         roundDurationSec: 4,
@@ -66,7 +68,12 @@ void main() {
       final controller = SessionController(
         preset: preset,
         audioPlayer: _NoopAudioPlayer(),
-        scheduler: scheduler,
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
       );
       controller.start();
 
@@ -83,7 +90,7 @@ void main() {
     });
 
     test('ends after configured rounds without rest', () {
-      final scheduler = _ManualScheduler((_) {});
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
       final preset = SessionPreset.defaults().copyWith(
         countdownSec: 0,
         roundDurationSec: 2,
@@ -95,12 +102,17 @@ void main() {
       final controller = SessionController(
         preset: preset,
         audioPlayer: _NoopAudioPlayer(),
-        scheduler: scheduler,
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
       );
       controller.start();
       expect(controller.snapshot.phase, SessionPhase.active);
 
-      scheduler.tick(2); // complete round
+      scheduler.tick(3); // complete round (>= roundDurationSec)
       expect(controller.snapshot.phase, SessionPhase.end);
       expect(controller.result, isNotNull);
       expect(controller.result!.roundsCompleted, 1);

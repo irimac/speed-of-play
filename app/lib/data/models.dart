@@ -196,44 +196,44 @@ class Palette {
 
   static const defaultPaletteId = 'sunrise';
 
-  static final palettes = <String, Palette>{
+  static const Map<String, Palette> palettes = {
     'sunrise': Palette(
       id: 'sunrise',
       label: 'Sunrise',
-      colors: const [
+      colors: [
         Color(0xFFFE4A49),
         Color(0xFF2AB7CA),
         Color(0xFFFED766),
         Color(0xFF009FB7),
       ],
-      countdownColor: const Color(0xFF222831),
-      restColor: const Color(0xFF393E46),
+      countdownColor: Color(0xFF222831),
+      restColor: Color(0xFF393E46),
       textColor: Colors.white,
     ),
     'field': Palette(
       id: 'field',
       label: 'Field',
-      colors: const [
+      colors: [
         Color(0xFF00A878),
         Color(0xFF005377),
         Color(0xFFE4572E),
         Color(0xFF17BEBB),
       ],
-      countdownColor: const Color(0xFF07393C),
-      restColor: const Color(0xFF1B512D),
+      countdownColor: Color(0xFF07393C),
+      restColor: Color(0xFF1B512D),
       textColor: Colors.white,
     ),
     'contrast': Palette(
       id: 'contrast',
       label: 'Contrast',
-      colors: const [
+      colors: [
         Color(0xFFFFD23F),
         Color(0xFFEE4266),
         Color(0xFF3CBBB1),
         Color(0xFF2A1E5C),
       ],
-      countdownColor: const Color(0xFF1E1E24),
-      restColor: const Color(0xFF2E2E38),
+      countdownColor: Color(0xFF1E1E24),
+      restColor: Color(0xFF2E2E38),
       textColor: Colors.white,
     ),
   };

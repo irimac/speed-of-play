@@ -7,6 +7,7 @@ Date: 2025-12-16
 - Foundations and core UX are implemented in the app: scheduler, session controller, presets/history storage, and all screens (Launch/Main/Settings/Session/End/History).
 - Reliability/polish are partial: atomic history writes exist; audio assets now match expected format; UI mojibake fixed; Settings/Main preset refresh fixed. No automated tests or CI yet.
 - Release prep not started.
+- Tests now passing locally (`flutter test`); analyzer was near-clean after palette fixes—recheck and push to confirm CI.
 
 ## Milestones
 - [x] M1 - Foundations: scheduler, controller, storage, preset persistence.
@@ -45,7 +46,7 @@ Date: 2025-12-16
 ### QA & Tooling
 - [ ] Smoke tests: controller timing, preset encode/decode, history repo write/read. (models encode/decode, CSV, randomInRange, and controller phase tests added)
 - [x] Manual QA checklist (rotation, pause/resume, reset, end-save-export, history delete/export).
-- [ ] CI: format/lint/test (`flutter analyze`, `flutter test`). (workflow added)
+- [ ] CI: format/lint/test (`flutter analyze`, `flutter test`). (workflow added; needs green run)
 
 ## Risks & Mitigations
 - Timing drift or missed ticks -> use monotonic clock, emit only on integer boundaries, add dev logging (partial; logging not added).

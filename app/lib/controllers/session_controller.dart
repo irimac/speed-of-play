@@ -12,7 +12,9 @@ class SessionController extends ChangeNotifier {
   SessionController({
     required this.preset,
     AudioCuePlayer? audioPlayer,
-    SessionScheduler? scheduler,
+    SessionScheduler Function(void Function(int secondSinceStart))? schedulerBuilder,
+    Future<void> Function()? wakelockEnable,
+    Future<void> Function()? wakelockDisable,
   })  : _audio = audioPlayer ?? AudioCuePlayer(),
         _rng = Random(preset.rngSeed) {
     _snapshot = SessionSnapshot(
@@ -26,13 +28,17 @@ class SessionController extends ChangeNotifier {
       isPaused: true,
       isLastRound: preset.rounds == 1,
     );
-    _scheduler = scheduler ?? SessionScheduler(onAlignedSecond: _handleAlignedSecond);
+    _scheduler = (schedulerBuilder ?? (cb) => SessionScheduler(onAlignedSecond: cb))(_handleAlignedSecond);
+    _wakelockEnable = wakelockEnable ?? WakelockPlus.enable;
+    _wakelockDisable = wakelockDisable ?? WakelockPlus.disable;
   }
 
   final SessionPreset preset;
   late final SessionScheduler _scheduler;
   final Random _rng;
   final AudioCuePlayer _audio;
+  late final Future<void> Function() _wakelockEnable;
+  late final Future<void> Function() _wakelockDisable;
   late SessionSnapshot _snapshot;
   int _roundIndex = 0;
   int _secondsIntoPhase = 0;
@@ -62,7 +68,7 @@ class SessionController extends ChangeNotifier {
       _emitStimulus(force: true);
     }
     _scheduler.start();
-    WakelockPlus.enable();
+    _invokeWakelock(_wakelockEnable);
     _updateSnapshot();
   }
 
@@ -91,7 +97,7 @@ class SessionController extends ChangeNotifier {
     _paused = true;
     _isRunning = false;
     _finalResult = null;
-    WakelockPlus.disable();
+    _invokeWakelock(_wakelockDisable);
     _snapshot = SessionSnapshot(
       phase: _phase,
       secondsIntoPhase: 0,
@@ -130,7 +136,7 @@ class SessionController extends ChangeNotifier {
       _scheduler.pause();
       _finalResult = _buildResult();
       _isRunning = false;
-      WakelockPlus.disable();
+      _invokeWakelock(_wakelockDisable);
     } else {
       _phase = SessionPhase.rest;
       _secondsIntoPhase = 0;
@@ -146,7 +152,7 @@ class SessionController extends ChangeNotifier {
     _scheduler.pause();
     _paused = true;
     _isRunning = false;
-    WakelockPlus.disable();
+    _invokeWakelock(_wakelockDisable);
     _finalResult = _buildResult();
     notifyListeners();
     return _finalResult!;
@@ -276,5 +282,17 @@ class SessionController extends ChangeNotifier {
       isLastRound: _roundIndex >= preset.rounds - 1,
     );
     notifyListeners();
+  }
+
+  void _invokeWakelock(Future<void> Function() toggle) {
+    unawaited(
+      Future<void>(() async {
+        try {
+          await toggle();
+        } catch (_) {
+          // Swallow platform errors in environments where wakelock channels are unavailable (e.g., tests).
+        }
+      }),
+    );
   }
 }
