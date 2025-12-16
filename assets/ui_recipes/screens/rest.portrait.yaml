@@ -1,0 +1,39 @@
+meta:
+  screen: rest
+  orientation: portrait
+  artboard:
+    w: 768
+    h: 1024
+  viewport:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  notes: Rest (portrait).
+uses:
+- use: SessionChromePortrait
+  idPrefix: chrome.
+  props:
+    topFill: '@colors.barLight'
+    bottomFill: '@colors.barLight'
+    roundText: Round 2 / 5
+    timeText: 00:15/01:00
+    bottomText: 00:45
+- use: RestRing
+  idPrefix: body.
+  props:
+    x: 174
+    y: 294
+    size: 420
+    strokeWidth: 26
+    secondsText: '15'
+elements:
+- id: bg
+  type: rect
+  frame:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  style:
+    fill: '@colors.bgLight'

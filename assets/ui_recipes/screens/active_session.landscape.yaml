@@ -1,0 +1,50 @@
+meta:
+  screen: active_session
+  orientation: landscape
+  artboard:
+    w: 768
+    h: 1024
+  viewport:
+    x: 0
+    y: 224
+    w: 768
+    h: 576
+  notes: Active session (landscape in viewport).
+uses:
+- use: SessionChromeLandscape
+  idPrefix: chrome.
+  props:
+    topFill: '@colors.activeBar'
+    bottomFill: '@colors.activeBottom'
+    roundText: Round 2 / 5
+    timeText: 00:15/01:00
+    bottomText: 00:45
+- use: BigCenterNumber
+  idPrefix: body.
+  props:
+    x: 0
+    y: 288
+    w: 768
+    h: 440
+    text: '7'
+    fontSize: 260
+    color: '#FFD400'
+elements:
+- id: bg
+  type: rect
+  frame:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  style:
+    fill: '@colors.bgLight'
+- id: viewportBg
+  type: rect
+  frame:
+    x: 0
+    y: 224
+    w: 768
+    h: 576
+  style:
+    fill: '@colors.activeBg'

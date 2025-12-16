@@ -1,0 +1,105 @@
+meta:
+  screen: summary
+  orientation: portrait
+  artboard:
+    w: 768
+    h: 1024
+  viewport:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  notes: Summary (portrait) draft. Chrome reused; roundLabel repurposed as title.
+uses:
+- use: SessionChromePortrait
+  idPrefix: chrome.
+  props:
+    topFill: '@colors.barLight'
+    bottomFill: '@colors.barLight'
+    roundText: Session Complete
+    timeText: ''
+    bottomText: ''
+- use: PrimaryButton
+  idPrefix: cta1.
+  props:
+    x: 124
+    y: 720
+    w: 520
+    h: 96
+    label: RESTART
+    fill: '@colors.buttonGreen'
+    radius: 48
+    tap: session.restart
+- use: PrimaryButton
+  idPrefix: cta2.
+  props:
+    x: 124
+    y: 830
+    w: 520
+    h: 80
+    label: BACK TO MENU
+    fill: '@colors.buttonGreenDark'
+    radius: 40
+    tap: nav.backToMenu
+elements:
+- id: bg
+  type: rect
+  frame:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  style:
+    fill: '@colors.bgLight'
+- id: stat1
+  type: text
+  frame:
+    x: 64
+    y: 190
+    w: 640
+    h: 60
+  text: 'Rounds completed: 5/5'
+  style:
+    fontSize: 32
+    fontWeight: 700
+    color: '@colors.textDark'
+    align: left
+- id: stat2
+  type: text
+  frame:
+    x: 64
+    y: 260
+    w: 640
+    h: 60
+  text: 'Total active time: 05:00'
+  style:
+    fontSize: 32
+    fontWeight: 700
+    color: '@colors.textDark'
+    align: left
+- id: stat3
+  type: text
+  frame:
+    x: 64
+    y: 330
+    w: 640
+    h: 60
+  text: 'Total rest time: 01:00'
+  style:
+    fontSize: 32
+    fontWeight: 700
+    color: '@colors.textDark'
+    align: left
+- id: stat4
+  type: text
+  frame:
+    x: 64
+    y: 400
+    w: 640
+    h: 60
+  text: 'Colors used: 4'
+  style:
+    fontSize: 32
+    fontWeight: 700
+    color: '@colors.textDark'
+    align: left
