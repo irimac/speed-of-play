@@ -1,6 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/foundation.dart';
 
 /// Emits aligned “second” ticks derived from a monotonic [Stopwatch].
 class SessionScheduler {
@@ -61,5 +60,10 @@ class SessionScheduler {
     _disposed = true;
     _ticker.dispose();
     _stopwatch.stop();
+  }
+
+  @visibleForTesting
+  void debugEmitSecond(int secondSinceStart) {
+    _onAlignedSecond(secondSinceStart);
   }
 }

@@ -5,7 +5,7 @@ ThemeData buildAppTheme() {
   return ThemeData(
     colorScheme: ColorScheme.fromSeed(
       seedColor: const Color(0xFF2AB7CA),
-      background: baseColor,
+      surface: baseColor,
       brightness: Brightness.dark,
     ),
     scaffoldBackgroundColor: baseColor,

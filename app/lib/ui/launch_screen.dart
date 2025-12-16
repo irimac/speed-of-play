@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../data/models.dart';
 import 'main_screen.dart';
 
 class LaunchScreen extends StatefulWidget {

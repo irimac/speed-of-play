@@ -179,13 +179,13 @@ class _RestIndicator extends StatelessWidget {
       children: [
         SizedBox(
           width: 180,
-          height: 180,
-          child: CircularProgressIndicator(
-            value: total == 0 ? 0 : seconds / total,
-            strokeWidth: 8,
-            backgroundColor: Colors.white.withOpacity(0.3),
-          ),
+        height: 180,
+        child: CircularProgressIndicator(
+          value: total == 0 ? 0 : seconds / total,
+          strokeWidth: 8,
+          backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
         ),
+      ),
         const SizedBox(height: 16),
         Text('$seconds s', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
       ],
@@ -209,7 +209,7 @@ class _PauseOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black.withOpacity(0.75),
+      color: const Color.fromRGBO(0, 0, 0, 0.75),
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),

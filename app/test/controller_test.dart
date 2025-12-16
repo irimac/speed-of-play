@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speed_of_play/controllers/session_controller.dart';
 import 'package:speed_of_play/data/models.dart';
@@ -49,24 +47,8 @@ class _ManualScheduler extends SessionScheduler {
     if (!_running) return;
     for (var i = 0; i < step; i++) {
       _seconds += 1;
-      onAlignedSecond(_seconds);
+      debugEmitSecond(_seconds);
     }
-  }
-}
-
-class _TestController extends SessionController {
-  _TestController({
-    required SessionPreset preset,
-    required _ManualScheduler scheduler,
-  }) : super(
-          preset: preset,
-          audioPlayer: _NoopAudioPlayer(),
-        ) {
-    // Override the scheduler used internally.
-    // ignore: invalid_use_of_visible_for_testing_member
-    // ignore: invalid_use_of_protected_member
-    // ignore: unnecessary_this
-    this._scheduler = scheduler;
   }
 }
 
@@ -81,7 +63,11 @@ void main() {
         restDurationSec: 0,
         rngSeed: 1, // deterministic
       );
-      final controller = _TestController(preset: preset, scheduler: scheduler);
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: _NoopAudioPlayer(),
+        scheduler: scheduler,
+      );
       controller.start();
 
       expect(controller.snapshot.phase, SessionPhase.countdown);
@@ -106,7 +92,11 @@ void main() {
         rounds: 1,
         rngSeed: 2,
       );
-      final controller = _TestController(preset: preset, scheduler: scheduler);
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: _NoopAudioPlayer(),
+        scheduler: scheduler,
+      );
       controller.start();
       expect(controller.snapshot.phase, SessionPhase.active);
 

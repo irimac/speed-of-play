@@ -110,6 +110,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           icon: const Icon(Icons.ios_share),
                           label: const Text('Export CSV'),
                           onPressed: () async {
+                            final messenger = ScaffoldMessenger.of(context);
                             final repo = context.read<SessionHistoryRepository>();
                             final all = await repo.loadHistory();
                             final sessions =
@@ -117,7 +118,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             if (sessions.isEmpty) return;
                             final file = await repo.exportCsv(sessions);
                             if (!mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            messenger.showSnackBar(
                               SnackBar(content: Text('CSV saved to ${file.path}')),
                             );
                           },
@@ -133,4 +134,3 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 }
-

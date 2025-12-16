@@ -14,3 +14,4 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Added CI workflow (`.github/workflows/ci.yml`) running analyze + test for `app/`.
 - Added `randomInRange` boundary test to models suite.
 - Added SessionController smoke tests with manual scheduler and noop audio (`app/test/controller_test.dart`).
+- Injected testable scheduler into SessionController, fixed analyzer warnings (deprecated API uses, unused imports, dropdown initialValue), and adjusted colors/opacity usage for lint clean runs.

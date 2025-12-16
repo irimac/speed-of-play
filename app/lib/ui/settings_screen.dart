@@ -110,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            value: _preset.paletteId,
+            initialValue: _preset.paletteId,
             decoration: const InputDecoration(labelText: 'Palette'),
             items: Palette.palettes.values
                 .map(

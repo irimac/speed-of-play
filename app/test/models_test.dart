@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speed_of_play/data/models.dart';
 
@@ -14,7 +16,7 @@ void main() {
 
   group('SessionPreset', () {
     test('encodes and decodes symmetrically', () {
-      const preset = SessionPreset.defaults();
+      final preset = SessionPreset.defaults();
       final json = preset.toJson();
       final roundTrip = SessionPreset.fromJson(json);
 

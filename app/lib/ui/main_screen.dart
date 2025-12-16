@@ -110,7 +110,7 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white.withOpacity(0.05),
+      color: const Color.fromRGBO(255, 255, 255, 0.05),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -203,5 +203,4 @@ class _InfoRow extends StatelessWidget {
     );
   }
 }
-
 

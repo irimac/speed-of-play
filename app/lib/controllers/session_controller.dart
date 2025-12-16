@@ -12,6 +12,7 @@ class SessionController extends ChangeNotifier {
   SessionController({
     required this.preset,
     AudioCuePlayer? audioPlayer,
+    SessionScheduler? scheduler,
   })  : _audio = audioPlayer ?? AudioCuePlayer(),
         _rng = Random(preset.rngSeed) {
     _snapshot = SessionSnapshot(
@@ -25,7 +26,7 @@ class SessionController extends ChangeNotifier {
       isPaused: true,
       isLastRound: preset.rounds == 1,
     );
-    _scheduler = SessionScheduler(onAlignedSecond: _handleAlignedSecond);
+    _scheduler = scheduler ?? SessionScheduler(onAlignedSecond: _handleAlignedSecond);
   }
 
   final SessionPreset preset;
@@ -226,9 +227,11 @@ class SessionController extends ChangeNotifier {
     Color color;
     do {
       color = palette.colors[_rng.nextInt(palette.colors.length)];
+      // ignore: deprecated_member_use
     } while (!force && _lastStimulus != null && _lastStimulus!.colorId == color.value.toRadixString(16));
     final stimulus = Stimulus(
       timestampMs: DateTime.now().millisecondsSinceEpoch,
+      // ignore: deprecated_member_use
       colorId: color.value.toRadixString(16),
       number: number,
     );
