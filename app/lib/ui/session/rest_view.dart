@@ -5,10 +5,16 @@ class RestView extends StatelessWidget {
     super.key,
     required this.secondsRemaining,
     required this.totalSeconds,
+    required this.indicatorSize,
+    required this.strokeWidth,
+    required this.backgroundColor,
   });
 
   final int secondsRemaining;
   final int totalSeconds;
+  final double indicatorSize;
+  final double strokeWidth;
+  final Color backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -18,12 +24,12 @@ class RestView extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
-          width: 180,
-          height: 180,
+          width: indicatorSize,
+          height: indicatorSize,
           child: CircularProgressIndicator(
             value: progress,
-            strokeWidth: 8,
-            backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
+            strokeWidth: strokeWidth,
+            backgroundColor: backgroundColor,
           ),
         ),
         const SizedBox(height: 16),

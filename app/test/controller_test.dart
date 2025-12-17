@@ -70,6 +70,27 @@ class _CountingAudio extends AudioCuePlayer {
   }
 }
 
+class _RecordingAudio extends AudioCuePlayer {
+  final List<String> log = [];
+  bool loaded = false;
+
+  @override
+  Future<void> ensureLoaded() async {
+    loaded = true;
+    log.add('load');
+  }
+
+  @override
+  Future<void> playRoundStart() async {
+    log.add('roundStart');
+  }
+
+  @override
+  Future<void> playTick() async {
+    log.add('tick');
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -431,6 +452,72 @@ void main() {
       expect(controller.snapshot.phase, SessionPhase.active);
       expect(controller.snapshot.isPaused, isTrue);
       expect(audio.roundStarts, 0);
+    });
+
+    test('audio preload and cues sequence for countdown to active', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final audio = _RecordingAudio();
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 2,
+        roundDurationSec: 2,
+        restDurationSec: 0,
+        changeIntervalSec: 2,
+        rounds: 1,
+        rngSeed: 8,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: audio,
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      expect(audio.loaded, isTrue);
+      expect(audio.log, contains('load'));
+
+      scheduler.tick(); // countdown tick
+      scheduler.tick(); // countdown -> active triggers round start
+
+      expect(audio.log, ['load', 'tick', 'tick', 'roundStart']);
+    });
+
+    test('audio stays silent while paused skip/resume', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final audio = _RecordingAudio();
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 0,
+        roundDurationSec: 2,
+        restDurationSec: 2,
+        changeIntervalSec: 1,
+        rounds: 2,
+        rngSeed: 10,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: audio,
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      scheduler.tick(); // active tick, no audio expected
+      expect(audio.log, ['load']);
+
+      controller.pause();
+      controller.skipForward(); // active -> rest with silent transition
+      controller.resume();
+      scheduler.tick(); // rest tick, no audio expected
+
+      expect(audio.log, ['load']);
     });
 
     test('tiny number range still progresses without infinite loop', () {

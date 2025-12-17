@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../controllers/session_controller.dart';
 import '../../data/models.dart';
+import '../styles/app_tokens.dart';
+import '../styles/session_styles.dart';
 
 class PauseOverlay extends StatelessWidget {
   const PauseOverlay({
@@ -10,32 +12,34 @@ class PauseOverlay extends StatelessWidget {
     required this.onDismiss,
     required this.controller,
     required this.onFinish,
+    required this.styles,
   });
 
   final SessionSnapshot snapshot;
   final VoidCallback onDismiss;
   final SessionController controller;
   final VoidCallback onFinish;
+  final SessionStyles styles;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color.fromRGBO(0, 0, 0, 0.75),
+      color: styles.overlayScrimColor,
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: styles.overlayPadding,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
+            constraints: BoxConstraints(maxWidth: styles.overlayMaxWidth),
             child: Material(
-              color: Colors.grey.shade900,
-              borderRadius: BorderRadius.circular(16),
+              color: styles.overlayCardColor,
+              borderRadius: BorderRadius.circular(AppTokens.cornerL),
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: styles.overlayPadding,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Paused', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 16),
+                    Text('Paused', style: styles.overlayTitleStyle),
+                    const SizedBox(height: AppTokens.spacingM),
                     _OverlayButton(
                       icon: Icons.play_arrow,
                       label: 'Continue',

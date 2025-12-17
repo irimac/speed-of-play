@@ -23,6 +23,8 @@ Purpose: capture the “why” behind key design and implementation choices so f
 - **End navigation overlay guard**: Session UI stops rendering when the controller reaches `end`, avoiding overlay flashes during navigation to the summary screen.
 - **Tests for invariants**: Added coverage for pause/skip/resume across phases, reset idempotency, and tiny ranges to guard core session behaviors.
 - **Phase-specific session views**: Session UI is composed of per-phase widgets (countdown/active/rest) and a shared pause overlay to keep layout modular while preserving behavior.
+- **Shared styles**: Introduced `AppTokens` and `SessionStyles` so session views use centralized spacing/typography/indicator sizing instead of hardcoded values.
+- **Audio sequencing tests**: Recording audio fakes validate preload order, countdown tick gating, round-start cues on phase transition, and silence during paused skip/resume.
 
 ## Persistence & storage
 - **Atomic history writes**: temp file then rename to avoid corrupting history on crash.

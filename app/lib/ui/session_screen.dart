@@ -8,6 +8,7 @@ import 'session/active_round_view.dart';
 import 'session/countdown_view.dart';
 import 'session/pause_overlay.dart';
 import 'session/rest_view.dart';
+import 'styles/session_styles.dart';
 
 class SessionScreen extends StatefulWidget {
   const SessionScreen({super.key});
@@ -66,6 +67,7 @@ class _SessionScreenState extends State<SessionScreen> {
             if (snapshot.phase == SessionPhase.end) {
               return const SizedBox.shrink();
             }
+            final styles = SessionStyles.defaults(Theme.of(context));
             final colors = Palette.resolve(ctrl.preset.paletteId);
             Color background;
             if (snapshot.phase == SessionPhase.countdown) {
@@ -75,8 +77,6 @@ class _SessionScreenState extends State<SessionScreen> {
             } else {
               background = snapshot.currentColor ?? colors.colors.first;
             }
-            final textTheme = Theme.of(context).textTheme;
-            final numberStyle = textTheme.displayLarge ?? const TextStyle(fontSize: 180, fontWeight: FontWeight.bold);
             final restTotal = snapshot.secondsIntoPhase + snapshot.secondsRemainingInPhase;
             return Stack(
               fit: StackFit.expand,
@@ -86,24 +86,25 @@ class _SessionScreenState extends State<SessionScreen> {
                   color: background,
                   child: SafeArea(
                     child: Padding(
-                      padding: const EdgeInsets.all(24),
+                      padding: styles.screenPadding,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _SessionHeader(snapshot: snapshot),
+                          _SessionHeader(snapshot: snapshot, styles: styles),
                           Expanded(
                             child: Center(
                               child: _buildPhaseView(
                                 snapshot: snapshot,
                                 colors: colors,
-                                numberStyle: numberStyle,
+                                numberStyle: styles.numberTextStyle,
                                 restTotal: restTotal,
                                 outdoorBoost: ctrl.preset.outdoorBoost,
+                                styles: styles,
                               ),
                             ),
                           ),
                           const SizedBox(height: 24),
-                          const Text('Double-tap to pause', textAlign: TextAlign.center),
+                          Text('Double-tap to pause', textAlign: TextAlign.center, style: styles.hintTextStyle),
                         ],
                       ),
                     ),
@@ -114,6 +115,7 @@ class _SessionScreenState extends State<SessionScreen> {
                     snapshot: snapshot,
                     onDismiss: ctrl.resume,
                     controller: ctrl,
+                    styles: styles,
                     onFinish: () {
                       final result = ctrl.finishEarly();
                       _navigatedToEnd = true;
@@ -137,6 +139,7 @@ class _SessionScreenState extends State<SessionScreen> {
     required TextStyle numberStyle,
     required int restTotal,
     required bool outdoorBoost,
+    required SessionStyles styles,
   }) {
     if (snapshot.phase == SessionPhase.countdown) {
       return CountdownView(
@@ -148,6 +151,9 @@ class _SessionScreenState extends State<SessionScreen> {
       return RestView(
         secondsRemaining: snapshot.secondsRemainingInPhase,
         totalSeconds: restTotal,
+        indicatorSize: styles.restIndicatorSize,
+        strokeWidth: styles.restStrokeWidth,
+        backgroundColor: styles.restIndicatorBackground,
       );
     }
     return ActiveRoundView(
@@ -158,9 +164,10 @@ class _SessionScreenState extends State<SessionScreen> {
 }
 
 class _SessionHeader extends StatelessWidget {
-  const _SessionHeader({required this.snapshot});
+  const _SessionHeader({required this.snapshot, required this.styles});
 
   final SessionSnapshot snapshot;
+  final SessionStyles styles;
 
   @override
   Widget build(BuildContext context) {
@@ -170,8 +177,8 @@ class _SessionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Round ${snapshot.roundIndex + 1}/${snapshot.roundsTotal}', style: const TextStyle(fontSize: 24)),
-        Text(timerText, style: const TextStyle(fontSize: 20)),
+        Text('Round ${snapshot.roundIndex + 1}/${snapshot.roundsTotal}', style: styles.headerRoundTextStyle),
+        Text(timerText, style: styles.headerTimerTextStyle),
       ],
     );
   }
