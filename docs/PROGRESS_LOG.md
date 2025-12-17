@@ -33,3 +33,4 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Stimulus timestamps switched to session-relative seconds to avoid wall-clock drift; JSON parsing remains backward compatible.
 - Session UI skips rendering when phase is `end` to prevent pause overlay flashes during navigation.
 - Risk log documented in `docs/RISKS.md`; tiny-range stimulus repeat marked acceptable; wakelock behavior during pauses noted for future decision.
+- Added invariant tests (pause/skip/resume across phases, reset round vs session idempotency, tiny number ranges) and simplified stimulus repeat logic to allow repeats when ranges are size 1. Analyzer warning cleaned up; tests remain green.

@@ -74,6 +74,114 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('SessionController', () {
+    test('pause -> skip -> resume from countdown enters active and ticks', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 2,
+        roundDurationSec: 3,
+        restDurationSec: 1,
+        changeIntervalSec: 1,
+        rounds: 2,
+        rngSeed: 11,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: _NoopAudioPlayer(),
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      controller.pause();
+      controller.skipForward();
+      expect(controller.snapshot.phase, SessionPhase.active);
+      expect(controller.snapshot.isPaused, isTrue);
+
+      controller.resume();
+      expect(controller.snapshot.isPaused, isFalse);
+      expect(controller.snapshot.secondsIntoPhase, 0);
+
+      scheduler.tick(); // should start ticking active
+      expect(controller.snapshot.secondsIntoPhase, 1);
+      expect(controller.snapshot.phase, SessionPhase.active);
+    });
+
+    test('pause -> skip -> resume from active enters rest and ticks', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 0,
+        roundDurationSec: 2,
+        restDurationSec: 2,
+        changeIntervalSec: 1,
+        rounds: 2,
+        rngSeed: 12,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: _NoopAudioPlayer(),
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      scheduler.tick(); // 1s into active
+      controller.pause();
+      controller.skipForward();
+
+      expect(controller.snapshot.phase, SessionPhase.rest);
+      expect(controller.snapshot.isPaused, isTrue);
+      expect(controller.snapshot.secondsIntoPhase, 0);
+
+      controller.resume();
+      scheduler.tick();
+      expect(controller.snapshot.secondsIntoPhase, 1);
+      expect(controller.snapshot.phase, SessionPhase.rest);
+    });
+
+    test('pause -> skip -> resume from rest enters next active and ticks', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 0,
+        roundDurationSec: 2,
+        restDurationSec: 2,
+        changeIntervalSec: 1,
+        rounds: 2,
+        rngSeed: 13,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: _NoopAudioPlayer(),
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      scheduler.tick(1); // complete active
+      scheduler.tick(1); // 1s into rest
+      expect(controller.snapshot.phase, SessionPhase.rest);
+
+      controller.pause();
+      controller.skipForward();
+      expect(controller.snapshot.phase, SessionPhase.active);
+      expect(controller.snapshot.roundIndex, 1);
+
+      controller.resume();
+      scheduler.tick();
+      expect(controller.snapshot.secondsIntoPhase, 1);
+      expect(controller.snapshot.phase, SessionPhase.active);
+    });
     test('transitions from countdown to active and emits stimuli', () {
       _ManualScheduler scheduler = _ManualScheduler((_) {});
       final preset = SessionPreset.defaults().copyWith(
@@ -176,6 +284,55 @@ void main() {
       expect(controller.snapshot.isPaused, isTrue);
     });
 
+    test('reset round vs reset session are idempotent and scoped', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 2,
+        roundDurationSec: 3,
+        restDurationSec: 2,
+        changeIntervalSec: 1,
+        rounds: 2,
+        rngSeed: 9,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: _NoopAudioPlayer(),
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      scheduler.tick(2); // finish countdown -> active
+      expect(controller.snapshot.phase, SessionPhase.active);
+
+      controller.resetRound();
+      expect(controller.snapshot.roundIndex, 0);
+      controller.resetRound(); // idempotent
+      expect(controller.snapshot.roundIndex, 0);
+      expect(controller.snapshot.currentNumber, isNotNull);
+      expect(controller.snapshot.phase, SessionPhase.active);
+
+      controller.resume();
+      scheduler.tick(3); // finish active -> rest
+      expect(controller.snapshot.phase, SessionPhase.rest);
+      controller.resetRound(); // during rest moves to next active
+      expect(controller.snapshot.phase, SessionPhase.active);
+      expect(controller.snapshot.roundIndex, 1);
+      controller.resetRound(); // idempotent second call
+      expect(controller.snapshot.roundIndex, 1);
+
+      controller.resetSession();
+      expect(controller.snapshot.phase, SessionPhase.countdown);
+      expect(controller.snapshot.roundIndex, 0);
+      controller.resetSession(); // idempotent
+      expect(controller.snapshot.phase, SessionPhase.countdown);
+      expect(controller.snapshot.roundIndex, 0);
+    });
+
     test('skipping from rest keeps elapsed rest time in totals', () {
       _ManualScheduler scheduler = _ManualScheduler((_) {});
       final preset = SessionPreset.defaults().copyWith(
@@ -274,6 +431,39 @@ void main() {
       expect(controller.snapshot.phase, SessionPhase.active);
       expect(controller.snapshot.isPaused, isTrue);
       expect(audio.roundStarts, 0);
+    });
+
+    test('tiny number range still progresses without infinite loop', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 0,
+        roundDurationSec: 2,
+        restDurationSec: 0,
+        changeIntervalSec: 1,
+        rounds: 1,
+        numberMin: 5,
+        numberMax: 5,
+        rngSeed: 6,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: _NoopAudioPlayer(),
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      final first = controller.snapshot.currentNumber;
+      scheduler.tick(); // change interval triggers emit with same number
+      final second = controller.snapshot.currentNumber;
+
+      expect(first, 5);
+      expect(second, 5);
+      expect(controller.snapshot.phase, SessionPhase.active);
     });
   });
 }

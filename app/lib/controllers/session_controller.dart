@@ -245,19 +245,21 @@ class SessionController extends ChangeNotifier {
 
   void _emitStimulus({bool force = false}) {
     int number;
+    final canAvoidRepeatNumber = preset.numberMax > preset.numberMin;
     do {
       number = randomInRange(_rng, preset.numberMin, preset.numberMax);
-    } while (!force && _lastStimulus != null && _lastStimulus!.number == number);
+    } while (!force && _lastStimulus != null && canAvoidRepeatNumber && _lastStimulus!.number == number);
     final palette = Palette.resolve(preset.paletteId);
     Color color;
+    final canAvoidRepeatColor = palette.colors.length > 1;
+    String colorId;
     do {
       color = palette.colors[_rng.nextInt(palette.colors.length)];
-      // ignore: deprecated_member_use
-    } while (!force && _lastStimulus != null && _lastStimulus!.colorId == color.value.toRadixString(16));
+      colorId = color.value.toRadixString(16); // ignore: deprecated_member_use
+    } while (!force && _lastStimulus != null && canAvoidRepeatColor && _lastStimulus!.colorId == colorId);
     final stimulus = Stimulus(
       timestampSec: _elapsedSeconds,
-      // ignore: deprecated_member_use
-      colorId: color.value.toRadixString(16),
+      colorId: colorId, // ignore: deprecated_member_use
       number: number,
     );
     _lastStimulus = stimulus;

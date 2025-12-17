@@ -21,6 +21,7 @@ Purpose: capture the “why” behind key design and implementation choices so f
 - **Controller as single source**: Session screen pulls preset and state from controller; removes duplicate preset copies and prevents divergence after edits.
 - **Rest/countdown timing from snapshot**: Displays remaining time based on controller state, not preset literals, so UI reflects pauses/skips accurately.
 - **End navigation overlay guard**: Session UI stops rendering when the controller reaches `end`, avoiding overlay flashes during navigation to the summary screen.
+- **Tests for invariants**: Added coverage for pause/skip/resume across phases, reset idempotency, and tiny ranges to guard core session behaviors.
 
 ## Persistence & storage
 - **Atomic history writes**: temp file then rename to avoid corrupting history on crash.
