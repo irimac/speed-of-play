@@ -35,10 +35,14 @@ class SessionStyles {
 
   factory SessionStyles.defaults(ThemeData theme, {bool largeSessionText = false}) {
     final textTheme = theme.textTheme;
-    final double numberSize = largeSessionText ? 220 : 180;
+    final double numberSize = largeSessionText ? 240 : 180;
+    final baseNumberStyle = (textTheme.displayLarge ?? const TextStyle()).copyWith(
+      fontSize: numberSize,
+      fontWeight: FontWeight.bold,
+    );
     return SessionStyles(
       screenPadding: AppTokens.screenPadding,
-      numberTextStyle: textTheme.displayLarge ?? TextStyle(fontSize: numberSize, fontWeight: FontWeight.bold),
+      numberTextStyle: baseNumberStyle,
       headerRoundTextStyle: const TextStyle(fontSize: 24),
       headerTimerTextStyle: const TextStyle(fontSize: 20),
       restIndicatorSize: 180,
