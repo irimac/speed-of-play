@@ -84,7 +84,7 @@ class _SpeedOfPlayAppState extends State<SpeedOfPlayApp> {
               return MaterialPageRoute(
                 builder: (_) => ChangeNotifierProvider(
                   create: (_) => SessionController(preset: preset),
-                  child: SessionScreen(preset: preset),
+                  child: const SessionScreen(),
                 ),
               );
             case EndScreen.routeName:

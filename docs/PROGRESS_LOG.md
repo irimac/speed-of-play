@@ -21,3 +21,10 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Flattened palette const usage (static const map with non-redundant entries) to resolve lingering analyzer hints.
 - Updated controller tests to initialize bindings and loosen end-of-round tick to avoid false negatives.
 - Guarded wakelock calls for test environments, injected scheduler builder + no-op wakelock hooks, and achieved all tests passing (`flutter test`).
+
+## 2025-12-18
+- Session controller pause/overlay wiring moved to controller state; UI now renders overlay whenever paused and uses snapshot timings (countdown/rest) instead of preset copies.
+- Skip-forward semantics implemented across countdown/active/rest (remains paused; advances to rest/next/finish as appropriate) with tick audio gated to countdown only.
+- Results now use real elapsed and per-round durations captured from ticks; wakelock handled only via injected enable/disable at start/end.
+- Removed duplicate preset plumbing from SessionScreen route; controller is sole source.
+- Added controller tests covering skipForward paths and real metrics; `flutter test` green.

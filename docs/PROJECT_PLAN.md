@@ -5,9 +5,10 @@ Date: 2025-12-16
 
 ## Status Snapshot
 - Foundations and core UX are implemented in the app: scheduler, session controller, presets/history storage, and all screens (Launch/Main/Settings/Session/End/History).
-- Reliability/polish are partial: atomic history writes exist; audio assets now match expected format; UI mojibake fixed; Settings/Main preset refresh fixed. No automated tests or CI yet.
+- Reliability/polish improved: atomic history writes exist; audio assets now match expected format; UI mojibake fixed; Settings/Main preset refresh fixed; pause overlay now derives from controller state; skip-forward semantics cover countdown/active/rest; tick audio limited to countdown; results use real elapsed/per-round durations.
 - Release prep not started.
-- Tests now passing locally (`flutter test`); analyzer was near-clean after palette fixes—recheck and push to confirm CI.
+- Tests now passing locally (`flutter test`); controller/models suites cover transitions/skip/results; CI workflow exists but needs a green run after recent changes.
+- Design rationale is captured in `docs/DECISIONS.md` for future reference.
 
 ## Milestones
 - [x] M1 - Foundations: scheduler, controller, storage, preset persistence.
@@ -18,10 +19,10 @@ Date: 2025-12-16
 ## Workstreams & Tasks
 ### Timing & State
 - [x] Aligned-second `SessionScheduler` (monotonic clock, pause/resume boundary hold).
-- [x] `SessionController` phases (countdown, active, rest, end), stimulus generation with no immediate repeat, stimuli log.
-- [x] Audio cues preload + tick/round-start playback.
+- [x] `SessionController` phases (countdown, active, rest, end), stimulus generation with no immediate repeat, stimuli log, accurate elapsed/per-round metrics.
+- [x] Audio cues preload + tick/round-start playback (tick gated to countdown).
 - [ ] Mute toggle (stretch).
-- [x] Wakelock during active sessions; disable on end/reset.
+- [x] Wakelock during active sessions; disable on end/reset (via injected hooks).
 
 ### Data & Persistence
 - [x] Models: `SessionPreset`, `Stimulus`, `SessionResult` with JSON/CSV helpers.
@@ -34,7 +35,7 @@ Date: 2025-12-16
 - [x] Launch splash auto-transition (~1.5s). (Audio prewarm not implemented.)
 - [x] Main: preset summary card, palette swatches, actions (Play/Settings/History), responsive layout.
 - [x] Settings: rounds, durations, interval, number range, palette select, outdoor boost, countdown toggle + seconds, RNG seed toggle/input.
-- [x] Session: countdown/active/rest UIs, per-phase backgrounds, large number, rest progress, double-tap pause overlay with continue/reset/skip/finish.
+- [x] Session: countdown/active/rest UIs, per-phase backgrounds, large number, rest progress, double-tap pause overlay with continue/reset/skip/finish driven by controller state.
 - [x] End: summary, per-round list, Save to History, End to Main.
 - [x] History: newest-first list, multi-select, delete, export CSV, empty state.
 
@@ -44,7 +45,7 @@ Date: 2025-12-16
 - [ ] Optimize animations/transitions/perf; prewarm audio to reduce first-play latency.
 
 ### QA & Tooling
-- [ ] Smoke tests: controller timing, preset encode/decode, history repo write/read. (models encode/decode, CSV, randomInRange, and controller phase tests added)
+- [ ] Smoke tests: controller timing, preset encode/decode, history repo write/read. (models encode/decode, CSV, randomInRange, controller transitions/skip/result tests added)
 - [x] Manual QA checklist (rotation, pause/resume, reset, end-save-export, history delete/export).
 - [ ] CI: format/lint/test (`flutter analyze`, `flutter test`). (workflow added; needs green run)
 
@@ -55,6 +56,6 @@ Date: 2025-12-16
 - Outdoor readability -> palette contrast validation and outdoor boost option (boost exists; contrast audit pending).
 
 ## Near-Term Focus
-- Add smoke tests and a manual QA checklist; wire a minimal CI task.
+- Finish CI/analyzer green run and add history repository coverage.
 - Optional: add mute toggle and audio prewarm; consider session-progress persistence if needed.
 - Do an accessibility/contrast pass and perf sanity check for session screen.

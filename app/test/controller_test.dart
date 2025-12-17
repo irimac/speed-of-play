@@ -117,5 +117,78 @@ void main() {
       expect(controller.result, isNotNull);
       expect(controller.result!.roundsCompleted, 1);
     });
+
+    test('skipForward works across countdown/active/rest and stays paused', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 2,
+        roundDurationSec: 4,
+        changeIntervalSec: 1,
+        restDurationSec: 2,
+        rounds: 2,
+        rngSeed: 3,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: _NoopAudioPlayer(),
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      controller.pause();
+      controller.skipForward(); // countdown -> active
+      expect(controller.snapshot.phase, SessionPhase.active);
+      expect(controller.snapshot.isPaused, isTrue);
+
+      controller.resume();
+      scheduler.tick(2); // run part of the round
+      controller.pause();
+      controller.skipForward(); // active -> rest
+      expect(controller.snapshot.phase, SessionPhase.rest);
+      expect(controller.snapshot.isPaused, isTrue);
+
+      controller.skipForward(); // rest -> next active
+      expect(controller.snapshot.phase, SessionPhase.active);
+      expect(controller.snapshot.roundIndex, 1);
+      expect(controller.snapshot.isPaused, isTrue);
+    });
+
+    test('result uses actual elapsed time and per-round durations', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 1,
+        roundDurationSec: 3,
+        changeIntervalSec: 1,
+        restDurationSec: 1,
+        rounds: 2,
+        rngSeed: 4,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: _NoopAudioPlayer(),
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      scheduler.tick(); // countdown completes -> active starts
+      scheduler.tick(3); // first round complete (3s)
+      scheduler.tick(); // rest complete (1s)
+      scheduler.tick(2); // two seconds into second round
+
+      final result = controller.finishEarly();
+      expect(result.roundsCompleted, 2);
+      expect(result.perRoundDurationsSec, [3, 2]);
+      expect(result.totalElapsedSec, 7); // 1 countdown + 3 + 1 rest + 2 active
+    });
   });
 }

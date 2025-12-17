@@ -6,18 +6,15 @@ import '../data/models.dart';
 import 'end_screen.dart';
 
 class SessionScreen extends StatefulWidget {
-  const SessionScreen({super.key, required this.preset});
+  const SessionScreen({super.key});
 
   static const routeName = '/session';
-
-  final SessionPreset preset;
 
   @override
   State<SessionScreen> createState() => _SessionScreenState();
 }
 
 class _SessionScreenState extends State<SessionScreen> {
-  bool _showOverlay = false;
   bool _navigatedToEnd = false;
   late final SessionController _controller;
 
@@ -54,27 +51,29 @@ class _SessionScreenState extends State<SessionScreen> {
     return Scaffold(
       body: GestureDetector(
         onDoubleTap: () {
-          _controller.pause();
-          setState(() => _showOverlay = true);
+          if (!_controller.snapshot.isPaused && _controller.snapshot.phase != SessionPhase.end) {
+            _controller.pause();
+          }
         },
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Consumer<SessionController>(
-              builder: (context, ctrl, _) {
-                final snapshot = ctrl.snapshot;
-                final colors = Palette.resolve(widget.preset.paletteId);
-                Color background;
-                if (snapshot.phase == SessionPhase.countdown) {
-                  background = colors.countdownColor;
-                } else if (snapshot.phase == SessionPhase.rest) {
-                  background = colors.restColor;
-                } else {
-                  background = snapshot.currentColor ?? colors.colors.first;
-                }
-                final textTheme = Theme.of(context).textTheme;
-                final numberStyle = textTheme.displayLarge ?? const TextStyle(fontSize: 180, fontWeight: FontWeight.bold);
-                return AnimatedContainer(
+        child: Consumer<SessionController>(
+          builder: (context, ctrl, _) {
+            final snapshot = ctrl.snapshot;
+            final colors = Palette.resolve(ctrl.preset.paletteId);
+            Color background;
+            if (snapshot.phase == SessionPhase.countdown) {
+              background = colors.countdownColor;
+            } else if (snapshot.phase == SessionPhase.rest) {
+              background = colors.restColor;
+            } else {
+              background = snapshot.currentColor ?? colors.colors.first;
+            }
+            final textTheme = Theme.of(context).textTheme;
+            final numberStyle = textTheme.displayLarge ?? const TextStyle(fontSize: 180, fontWeight: FontWeight.bold);
+            final restTotal = snapshot.secondsIntoPhase + snapshot.secondsRemainingInPhase;
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
                   color: background,
                   child: SafeArea(
@@ -89,12 +88,12 @@ class _SessionScreenState extends State<SessionScreen> {
                               child: snapshot.phase == SessionPhase.rest
                                   ? _RestIndicator(
                                       seconds: snapshot.secondsRemainingInPhase,
-                                      total: widget.preset.restDurationSec,
+                                      total: restTotal,
                                     )
                                   : FittedBox(
                                       child: Text(
                                         _buildDisplayText(snapshot),
-                                        style: numberStyle.copyWith(color: colors.boostedTextColor(widget.preset.outdoorBoost)),
+                                        style: numberStyle.copyWith(color: colors.boostedTextColor(ctrl.preset.outdoorBoost)),
                                       ),
                                     ),
                             ),
@@ -105,15 +104,11 @@ class _SessionScreenState extends State<SessionScreen> {
                       ),
                     ),
                   ),
-                );
-              },
-            ),
-            if (_showOverlay)
-              Consumer<SessionController>(
-                builder: (context, ctrl, _) {
-                  return _PauseOverlay(
-                    snapshot: ctrl.snapshot,
-                    onDismiss: _handleResume,
+                ),
+                if (snapshot.isPaused && snapshot.phase != SessionPhase.end)
+                  _PauseOverlay(
+                    snapshot: snapshot,
+                    onDismiss: ctrl.resume,
                     controller: ctrl,
                     onFinish: () {
                       final result = ctrl.finishEarly();
@@ -123,10 +118,10 @@ class _SessionScreenState extends State<SessionScreen> {
                         arguments: result,
                       );
                     },
-                  );
-                },
-              ),
-          ],
+                  ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -134,15 +129,11 @@ class _SessionScreenState extends State<SessionScreen> {
 
   String _buildDisplayText(SessionSnapshot snapshot) {
     if (snapshot.phase == SessionPhase.countdown) {
-      final remaining = (widget.preset.countdownSec - snapshot.secondsIntoPhase).clamp(0, widget.preset.countdownSec);
-      return '-$remaining';
+      final remaining = snapshot.secondsRemainingInPhase;
+      final safeRemaining = remaining < 0 ? 0 : remaining;
+      return '-$safeRemaining';
     }
     return snapshot.currentNumber?.toString() ?? '--';
-  }
-
-  void _handleResume() {
-    _controller.resume();
-    setState(() => _showOverlay = false);
   }
 }
 
@@ -179,13 +170,13 @@ class _RestIndicator extends StatelessWidget {
       children: [
         SizedBox(
           width: 180,
-        height: 180,
-        child: CircularProgressIndicator(
-          value: total == 0 ? 0 : seconds / total,
-          strokeWidth: 8,
-          backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
+          height: 180,
+          child: CircularProgressIndicator(
+            value: total == 0 ? 0 : seconds / total,
+            strokeWidth: 8,
+            backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
+          ),
         ),
-      ),
         const SizedBox(height: 16),
         Text('$seconds s', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
       ],
@@ -247,11 +238,9 @@ class _PauseOverlay extends StatelessWidget {
                     _OverlayButton(
                       icon: Icons.skip_next,
                       label: 'Skip Forward',
-                      onPressed: snapshot.phase == SessionPhase.active
-                          ? () {
-                              controller.skipForward();
-                            }
-                          : null,
+                      onPressed: () {
+                        controller.skipForward();
+                      },
                     ),
                     _OverlayButton(
                       icon: Icons.flag,

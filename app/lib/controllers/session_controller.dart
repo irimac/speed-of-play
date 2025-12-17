@@ -17,20 +17,10 @@ class SessionController extends ChangeNotifier {
     Future<void> Function()? wakelockDisable,
   })  : _audio = audioPlayer ?? AudioCuePlayer(),
         _rng = Random(preset.rngSeed) {
-    _snapshot = SessionSnapshot(
-      phase: preset.countdownSec > 0 ? SessionPhase.countdown : SessionPhase.active,
-      secondsIntoPhase: 0,
-      secondsRemainingInPhase: preset.countdownSec,
-      roundIndex: 0,
-      roundsTotal: preset.rounds,
-      currentNumber: null,
-      currentColor: null,
-      isPaused: true,
-      isLastRound: preset.rounds == 1,
-    );
     _scheduler = (schedulerBuilder ?? (cb) => SessionScheduler(onAlignedSecond: cb))(_handleAlignedSecond);
     _wakelockEnable = wakelockEnable ?? WakelockPlus.enable;
     _wakelockDisable = wakelockDisable ?? WakelockPlus.disable;
+    _resetState(startPaused: true);
   }
 
   final SessionPreset preset;
@@ -42,7 +32,9 @@ class SessionController extends ChangeNotifier {
   late SessionSnapshot _snapshot;
   int _roundIndex = 0;
   int _secondsIntoPhase = 0;
+  int _elapsedSeconds = 0;
   SessionPhase _phase = SessionPhase.countdown;
+  final List<int> _roundDurations = [];
   final List<Stimulus> _stimuli = [];
   bool _isRunning = false;
   bool _paused = true;
@@ -55,21 +47,42 @@ class SessionController extends ChangeNotifier {
 
   void start() {
     if (_isRunning) return;
-    _isRunning = true;
-    _paused = false;
-    _phase = preset.countdownSec > 0 ? SessionPhase.countdown : SessionPhase.active;
-    _secondsIntoPhase = 0;
-    _roundIndex = 0;
-    _phaseDuration = _phase == SessionPhase.countdown ? preset.countdownSec : preset.roundDurationSec;
-    _stimuli.clear();
-    _finalResult = null;
+    _resetState(startPaused: false);
     unawaited(_audio.ensureLoaded());
-    if (_phase == SessionPhase.active) {
-      _emitStimulus(force: true);
-    }
     _scheduler.start();
     _invokeWakelock(_wakelockEnable);
     _updateSnapshot();
+  }
+
+  void _resetState({required bool startPaused}) {
+    _isRunning = !startPaused;
+    _paused = startPaused;
+    _phase = preset.countdownSec > 0 ? SessionPhase.countdown : SessionPhase.active;
+    _secondsIntoPhase = 0;
+    _elapsedSeconds = 0;
+    _roundIndex = 0;
+    _phaseDuration = _phase == SessionPhase.countdown ? preset.countdownSec : preset.roundDurationSec;
+    _stimuli.clear();
+    _roundDurations.clear();
+    _lastStimulus = null;
+    _finalResult = null;
+    _snapshot = SessionSnapshot(
+      phase: _phase,
+      secondsIntoPhase: 0,
+      secondsRemainingInPhase: _phaseDuration ?? 0,
+      roundIndex: 0,
+      roundsTotal: preset.rounds,
+      currentNumber: null,
+      currentColor: null,
+      isPaused: _paused,
+      isLastRound: preset.rounds == 1,
+    );
+    if (_phase == SessionPhase.active) {
+      _emitStimulus(force: true);
+    }
+    if (startPaused) {
+      _scheduler.pause();
+    }
   }
 
   void pause() {
@@ -80,36 +93,22 @@ class SessionController extends ChangeNotifier {
   }
 
   void resume() {
-    if (!_paused) return;
+    if (!_paused || _phase == SessionPhase.end) return;
     _paused = false;
-    _scheduler.resume();
+    if (_isRunning) {
+      _scheduler.resume();
+    } else {
+      _isRunning = true;
+      _scheduler.start();
+      _invokeWakelock(_wakelockEnable);
+    }
     _updateSnapshot();
   }
 
   void resetSession() {
     _scheduler.pause();
-    _roundIndex = 0;
-    _secondsIntoPhase = 0;
-    _phase = preset.countdownSec > 0 ? SessionPhase.countdown : SessionPhase.active;
-    _phaseDuration = _phase == SessionPhase.countdown ? preset.countdownSec : preset.roundDurationSec;
-    _stimuli.clear();
-    _lastStimulus = null;
-    _paused = true;
-    _isRunning = false;
-    _finalResult = null;
-    _invokeWakelock(_wakelockDisable);
-    _snapshot = SessionSnapshot(
-      phase: _phase,
-      secondsIntoPhase: 0,
-      secondsRemainingInPhase: _phaseDuration ?? 0,
-      roundIndex: 0,
-      roundsTotal: preset.rounds,
-      currentNumber: null,
-      currentColor: null,
-      isPaused: true,
-      isLastRound: preset.rounds == 1,
-    );
-    notifyListeners();
+    _resetState(startPaused: true);
+    _updateSnapshot();
   }
 
   void resetRound() {
@@ -117,43 +116,66 @@ class SessionController extends ChangeNotifier {
       resetSession();
       return;
     }
+    if (_secondsIntoPhase > 0) {
+      _elapsedSeconds = (_elapsedSeconds - _secondsIntoPhase).clamp(0, _elapsedSeconds).toInt();
+    }
+    if (_phase == SessionPhase.rest && _roundIndex < preset.rounds - 1) {
+      _roundIndex += 1;
+    }
     _secondsIntoPhase = 0;
     _phase = SessionPhase.active;
     _phaseDuration = preset.roundDurationSec;
     _paused = true;
     _scheduler.pause();
+    _isRunning = false;
     _finalResult = null;
     _emitStimulus(force: true);
     _updateSnapshot();
   }
 
   void skipForward() {
-    if (_phase != SessionPhase.active) return;
-    final isLastRound = _roundIndex >= preset.rounds - 1;
-    if (isLastRound) {
-      _phase = SessionPhase.end;
-      _paused = true;
-      _scheduler.pause();
-      _finalResult = _buildResult();
-      _isRunning = false;
-      _invokeWakelock(_wakelockDisable);
-    } else {
-      _phase = SessionPhase.rest;
-      _secondsIntoPhase = 0;
-      _phaseDuration = preset.restDurationSec;
-      _paused = true;
-      _scheduler.pause();
+    if (_phase == SessionPhase.end) return;
+    _paused = true;
+    _scheduler.pause();
+    if (_phase == SessionPhase.countdown) {
+      _enterActiveRound(emitStimulus: true);
+      _updateSnapshot();
+      return;
     }
-    _updateSnapshot();
+    if (_phase == SessionPhase.active) {
+      _recordActiveRoundDuration();
+      final isLastRound = _roundIndex >= preset.rounds - 1;
+      if (isLastRound) {
+        _endSession();
+      } else if (preset.restDurationSec == 0) {
+        _roundIndex += 1;
+        _enterActiveRound(emitStimulus: true);
+      } else {
+        _phase = SessionPhase.rest;
+        _secondsIntoPhase = 0;
+        _phaseDuration = preset.restDurationSec;
+      }
+      _updateSnapshot();
+      return;
+    }
+    if (_phase == SessionPhase.rest) {
+      final isBeforeLastRound = _roundIndex < preset.rounds - 1;
+      if (isBeforeLastRound) {
+        _roundIndex += 1;
+        _enterActiveRound(emitStimulus: true);
+      } else {
+        _endSession();
+      }
+      _updateSnapshot();
+    }
   }
 
   SessionResult finishEarly() {
-    _phase = SessionPhase.end;
-    _scheduler.pause();
-    _paused = true;
-    _isRunning = false;
-    _invokeWakelock(_wakelockDisable);
-    _finalResult = _buildResult();
+    if (_phase == SessionPhase.active) {
+      _recordActiveRoundDuration();
+    }
+    _endSession();
+    _updateSnapshot();
     notifyListeners();
     return _finalResult!;
   }
@@ -166,8 +188,11 @@ class SessionController extends ChangeNotifier {
   }
 
   void _handleAlignedSecond(int secondSinceStart) {
-    if (_paused) return;
-    unawaited(_audio.playTick());
+    if (_paused || _phase == SessionPhase.end) return;
+    if (_phase == SessionPhase.countdown) {
+      unawaited(_audio.playTick());
+    }
+    _elapsedSeconds += 1;
     _secondsIntoPhase += 1;
     if (_phase == SessionPhase.countdown) {
       if (_secondsIntoPhase >= (preset.countdownSec)) {
@@ -189,14 +214,10 @@ class SessionController extends ChangeNotifier {
   }
 
   void _advanceFromActive() {
+    _recordActiveRoundDuration();
     final isLastRound = _roundIndex >= preset.rounds - 1;
     if (isLastRound) {
-      _phase = SessionPhase.end;
-      _scheduler.pause();
-      _paused = true;
-      _isRunning = false;
-      WakelockPlus.disable();
-      _finalResult = _buildResult();
+      _endSession();
     } else {
       if (preset.restDurationSec == 0) {
         _roundIndex += 1;
@@ -249,26 +270,41 @@ class SessionController extends ChangeNotifier {
     );
   }
 
-  SessionResult _buildResult() {
-    var completedRounds = _roundIndex;
-    if (_phase == SessionPhase.end) {
-      completedRounds = _roundIndex + 1;
+  void _recordActiveRoundDuration() {
+    final duration = _secondsIntoPhase.clamp(0, preset.roundDurationSec);
+    if (_roundDurations.length > _roundIndex) {
+      _roundDurations[_roundIndex] = duration;
+    } else {
+      _roundDurations.add(duration);
     }
-    final roundsInt = completedRounds.clamp(0, preset.rounds).toInt();
-    final perRound = List<int>.filled(roundsInt, preset.roundDurationSec);
+  }
+
+  SessionResult _buildResult() {
+    final roundsInt = _roundDurations.length.clamp(0, preset.rounds).toInt();
+    final perRound = List<int>.from(_roundDurations.take(roundsInt));
     return SessionResult(
       completedAt: DateTime.now(),
       presetSnapshot: preset,
       roundsCompleted: roundsInt,
       perRoundDurationsSec: perRound,
-      totalElapsedSec: roundsInt * preset.roundDurationSec,
+      totalElapsedSec: _elapsedSeconds,
       stimuli: List.unmodifiable(_stimuli),
     );
   }
 
+  void _endSession() {
+    _phase = SessionPhase.end;
+    _scheduler.pause();
+    _paused = true;
+    _isRunning = false;
+    _finalResult = _buildResult();
+    _invokeWakelock(_wakelockDisable);
+  }
+
   void _updateSnapshot() {
-    final secondsRemaining =
-        (_phaseDuration ?? 0) - _secondsIntoPhase >= 0 ? (_phaseDuration ?? 0) - _secondsIntoPhase : 0;
+    final phaseDuration = _phaseDuration ?? 0;
+    final remainingRaw = phaseDuration - _secondsIntoPhase;
+    final secondsRemaining = remainingRaw >= 0 ? remainingRaw : 0;
     final palette = Palette.resolve(preset.paletteId);
     _snapshot = _snapshot.copyWith(
       phase: _phase,
