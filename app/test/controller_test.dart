@@ -52,6 +52,24 @@ class _ManualScheduler extends SessionScheduler {
   }
 }
 
+class _CountingAudio extends AudioCuePlayer {
+  int roundStarts = 0;
+  int ticks = 0;
+
+  @override
+  Future<void> ensureLoaded() async {}
+
+  @override
+  Future<void> playRoundStart() async {
+    roundStarts++;
+  }
+
+  @override
+  Future<void> playTick() async {
+    ticks++;
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -158,6 +176,42 @@ void main() {
       expect(controller.snapshot.isPaused, isTrue);
     });
 
+    test('skipping from rest keeps elapsed rest time in totals', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 0,
+        roundDurationSec: 2,
+        changeIntervalSec: 1,
+        restDurationSec: 5,
+        rounds: 2,
+        rngSeed: 7,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: _NoopAudioPlayer(),
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      scheduler.tick(2); // complete first active
+      scheduler.tick(3); // 3s into rest
+      expect(controller.snapshot.phase, SessionPhase.rest);
+
+      controller.pause();
+      controller.skipForward(); // rest -> next active, keep rest time
+
+      expect(controller.snapshot.phase, SessionPhase.active);
+      expect(controller.snapshot.isPaused, isTrue);
+      final result = controller.finishEarly();
+      expect(result.roundsCompleted, 1);
+      expect(result.totalElapsedSec, 5); // 2 active + 3 rest elapsed
+    });
+
     test('result uses actual elapsed time and per-round durations', () {
       _ManualScheduler scheduler = _ManualScheduler((_) {});
       final preset = SessionPreset.defaults().copyWith(
@@ -186,9 +240,40 @@ void main() {
       scheduler.tick(2); // two seconds into second round
 
       final result = controller.finishEarly();
-      expect(result.roundsCompleted, 2);
-      expect(result.perRoundDurationsSec, [3, 2]);
+      expect(result.roundsCompleted, 1); // only first active completed
+      expect(result.perRoundDurationsSec, [3]);
       expect(result.totalElapsedSec, 7); // 1 countdown + 3 + 1 rest + 2 active
+    });
+
+    test('skipForward while paused does not play round-start audio', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final audio = _CountingAudio();
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 2,
+        roundDurationSec: 4,
+        restDurationSec: 2,
+        changeIntervalSec: 1,
+        rounds: 2,
+        rngSeed: 5,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: audio,
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      controller.pause();
+      controller.skipForward(); // countdown -> active while paused
+
+      expect(controller.snapshot.phase, SessionPhase.active);
+      expect(controller.snapshot.isPaused, isTrue);
+      expect(audio.roundStarts, 0);
     });
   });
 }

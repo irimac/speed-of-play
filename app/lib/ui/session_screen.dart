@@ -67,6 +67,9 @@ class _SessionScreenState extends State<SessionScreen> {
             } else {
               background = snapshot.currentColor ?? colors.colors.first;
             }
+            if (snapshot.phase == SessionPhase.end) {
+              return const SizedBox.shrink();
+            }
             final textTheme = Theme.of(context).textTheme;
             final numberStyle = textTheme.displayLarge ?? const TextStyle(fontSize: 180, fontWeight: FontWeight.bold);
             final restTotal = snapshot.secondsIntoPhase + snapshot.secondsRemainingInPhase;

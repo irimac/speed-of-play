@@ -105,24 +105,24 @@ class SessionPreset {
 
 class Stimulus {
   Stimulus({
-    required this.timestampMs,
+    required this.timestampSec,
     required this.colorId,
     required this.number,
   });
 
-  final int timestampMs;
+  final int timestampSec;
   final String colorId;
   final int number;
 
   Map<String, dynamic> toJson() => {
-        'timestampMs': timestampMs,
+        'timestampSec': timestampSec,
         'colorId': colorId,
         'number': number,
       };
 
   factory Stimulus.fromJson(Map<String, dynamic> json) {
     return Stimulus(
-      timestampMs: json['timestampMs'] as int,
+      timestampSec: (json['timestampSec'] ?? json['timestampMs']) as int,
       colorId: json['colorId'] as String,
       number: json['number'] as int,
     );

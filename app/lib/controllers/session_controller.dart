@@ -138,18 +138,17 @@ class SessionController extends ChangeNotifier {
     _paused = true;
     _scheduler.pause();
     if (_phase == SessionPhase.countdown) {
-      _enterActiveRound(emitStimulus: true);
+      _enterActiveRound(emitStimulus: true, playAudio: false);
       _updateSnapshot();
       return;
     }
     if (_phase == SessionPhase.active) {
-      _recordActiveRoundDuration();
       final isLastRound = _roundIndex >= preset.rounds - 1;
       if (isLastRound) {
         _endSession();
       } else if (preset.restDurationSec == 0) {
         _roundIndex += 1;
-        _enterActiveRound(emitStimulus: true);
+        _enterActiveRound(emitStimulus: true, playAudio: false);
       } else {
         _phase = SessionPhase.rest;
         _secondsIntoPhase = 0;
@@ -162,7 +161,7 @@ class SessionController extends ChangeNotifier {
       final isBeforeLastRound = _roundIndex < preset.rounds - 1;
       if (isBeforeLastRound) {
         _roundIndex += 1;
-        _enterActiveRound(emitStimulus: true);
+        _enterActiveRound(emitStimulus: true, playAudio: false);
       } else {
         _endSession();
       }
@@ -171,9 +170,6 @@ class SessionController extends ChangeNotifier {
   }
 
   SessionResult finishEarly() {
-    if (_phase == SessionPhase.active) {
-      _recordActiveRoundDuration();
-    }
     _endSession();
     _updateSnapshot();
     notifyListeners();
@@ -214,7 +210,7 @@ class SessionController extends ChangeNotifier {
   }
 
   void _advanceFromActive() {
-    _recordActiveRoundDuration();
+    _recordCompletedRound();
     final isLastRound = _roundIndex >= preset.rounds - 1;
     if (isLastRound) {
       _endSession();
@@ -235,14 +231,16 @@ class SessionController extends ChangeNotifier {
     _enterActiveRound(emitStimulus: true);
   }
 
-  void _enterActiveRound({required bool emitStimulus}) {
+  void _enterActiveRound({required bool emitStimulus, bool playAudio = true}) {
     _phase = SessionPhase.active;
     _phaseDuration = preset.roundDurationSec;
     _secondsIntoPhase = 0;
     if (emitStimulus) {
       _emitStimulus(force: true);
     }
-    unawaited(_audio.playRoundStart());
+    if (playAudio) {
+      unawaited(_audio.playRoundStart());
+    }
   }
 
   void _emitStimulus({bool force = false}) {
@@ -257,7 +255,7 @@ class SessionController extends ChangeNotifier {
       // ignore: deprecated_member_use
     } while (!force && _lastStimulus != null && _lastStimulus!.colorId == color.value.toRadixString(16));
     final stimulus = Stimulus(
-      timestampMs: DateTime.now().millisecondsSinceEpoch,
+      timestampSec: _elapsedSeconds,
       // ignore: deprecated_member_use
       colorId: color.value.toRadixString(16),
       number: number,
@@ -270,7 +268,7 @@ class SessionController extends ChangeNotifier {
     );
   }
 
-  void _recordActiveRoundDuration() {
+  void _recordCompletedRound() {
     final duration = _secondsIntoPhase.clamp(0, preset.roundDurationSec);
     if (_roundDurations.length > _roundIndex) {
       _roundDurations[_roundIndex] = duration;

@@ -9,6 +9,7 @@ Date: 2025-12-16
 - Release prep not started.
 - Tests now passing locally (`flutter test`); controller/models suites cover transitions/skip/results; CI workflow exists but needs a green run after recent changes.
 - Design rationale is captured in `docs/DECISIONS.md` for future reference.
+- Risk log is tracked in `docs/RISKS.md` for ongoing mitigation.
 
 ## Milestones
 - [x] M1 - Foundations: scheduler, controller, storage, preset persistence.

@@ -37,8 +37,8 @@ void main() {
     test('encodes and decodes symmetrically', () {
       final preset = SessionPreset.defaults();
       final stimuli = [
-        Stimulus(timestampMs: 1, colorId: 'ff0000', number: 3),
-        Stimulus(timestampMs: 2, colorId: '00ff00', number: 7),
+        Stimulus(timestampSec: 1, colorId: 'ff0000', number: 3),
+        Stimulus(timestampSec: 2, colorId: '00ff00', number: 7),
       ];
       final result = SessionResult(
         completedAt: DateTime.parse('2024-01-01T12:00:00Z'),

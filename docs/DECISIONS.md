@@ -11,7 +11,7 @@ Purpose: capture the “why” behind key design and implementation choices so f
 - **Pause overlay driven by controller state**: UI shows overlay whenever `snapshot.isPaused` so pause state and controls can’t diverge from the controller.
 - **Skip-forward semantics**: Skip from countdown enters active; from active moves to rest or finish (records round duration); from rest jumps to next active or finish. Keeps user actions deterministic and matches session flow spec.
 - **Stimulus rules**: No immediate repeat for number/color; optional RNG seed for QA. Reduces adaptation to repeats and supports reproducible tests.
-- **Metrics from real time**: Results use accumulated elapsed seconds and per-round durations captured on ticks (including skips/early finish). Avoids preset multiplication that could misreport partial rounds.
+- **Metrics from real time**: Results use accumulated elapsed seconds and per-round durations captured on ticks (including skips/early finish). Avoids preset multiplication that could misreport partial rounds. Stimulus timestamps are stored as session-relative seconds for monotonic, drift-free logs.
 
 ## Audio & wakefulness
 - **Tick audio gated to countdown**: Countdown is the only phase needing per-second ticks; avoids noise during active/rest while keeping the main cadence.
@@ -20,6 +20,7 @@ Purpose: capture the “why” behind key design and implementation choices so f
 ## UI choices
 - **Controller as single source**: Session screen pulls preset and state from controller; removes duplicate preset copies and prevents divergence after edits.
 - **Rest/countdown timing from snapshot**: Displays remaining time based on controller state, not preset literals, so UI reflects pauses/skips accurately.
+- **End navigation overlay guard**: Session UI stops rendering when the controller reaches `end`, avoiding overlay flashes during navigation to the summary screen.
 
 ## Persistence & storage
 - **Atomic history writes**: temp file then rename to avoid corrupting history on crash.
