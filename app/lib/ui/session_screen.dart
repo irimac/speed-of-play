@@ -4,6 +4,10 @@ import 'package:provider/provider.dart';
 import '../controllers/session_controller.dart';
 import '../data/models.dart';
 import 'end_screen.dart';
+import 'session/active_round_view.dart';
+import 'session/countdown_view.dart';
+import 'session/pause_overlay.dart';
+import 'session/rest_view.dart';
 
 class SessionScreen extends StatefulWidget {
   const SessionScreen({super.key});
@@ -51,13 +55,17 @@ class _SessionScreenState extends State<SessionScreen> {
     return Scaffold(
       body: GestureDetector(
         onDoubleTap: () {
-          if (!_controller.snapshot.isPaused && _controller.snapshot.phase != SessionPhase.end) {
+          final snapshot = _controller.snapshot;
+          if (!snapshot.isPaused && snapshot.phase != SessionPhase.end) {
             _controller.pause();
           }
         },
         child: Consumer<SessionController>(
           builder: (context, ctrl, _) {
             final snapshot = ctrl.snapshot;
+            if (snapshot.phase == SessionPhase.end) {
+              return const SizedBox.shrink();
+            }
             final colors = Palette.resolve(ctrl.preset.paletteId);
             Color background;
             if (snapshot.phase == SessionPhase.countdown) {
@@ -66,9 +74,6 @@ class _SessionScreenState extends State<SessionScreen> {
               background = colors.restColor;
             } else {
               background = snapshot.currentColor ?? colors.colors.first;
-            }
-            if (snapshot.phase == SessionPhase.end) {
-              return const SizedBox.shrink();
             }
             final textTheme = Theme.of(context).textTheme;
             final numberStyle = textTheme.displayLarge ?? const TextStyle(fontSize: 180, fontWeight: FontWeight.bold);
@@ -88,17 +93,13 @@ class _SessionScreenState extends State<SessionScreen> {
                           _SessionHeader(snapshot: snapshot),
                           Expanded(
                             child: Center(
-                              child: snapshot.phase == SessionPhase.rest
-                                  ? _RestIndicator(
-                                      seconds: snapshot.secondsRemainingInPhase,
-                                      total: restTotal,
-                                    )
-                                  : FittedBox(
-                                      child: Text(
-                                        _buildDisplayText(snapshot),
-                                        style: numberStyle.copyWith(color: colors.boostedTextColor(ctrl.preset.outdoorBoost)),
-                                      ),
-                                    ),
+                              child: _buildPhaseView(
+                                snapshot: snapshot,
+                                colors: colors,
+                                numberStyle: numberStyle,
+                                restTotal: restTotal,
+                                outdoorBoost: ctrl.preset.outdoorBoost,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -109,7 +110,7 @@ class _SessionScreenState extends State<SessionScreen> {
                   ),
                 ),
                 if (snapshot.isPaused && snapshot.phase != SessionPhase.end)
-                  _PauseOverlay(
+                  PauseOverlay(
                     snapshot: snapshot,
                     onDismiss: ctrl.resume,
                     controller: ctrl,
@@ -130,13 +131,29 @@ class _SessionScreenState extends State<SessionScreen> {
     );
   }
 
-  String _buildDisplayText(SessionSnapshot snapshot) {
+  Widget _buildPhaseView({
+    required SessionSnapshot snapshot,
+    required Palette colors,
+    required TextStyle numberStyle,
+    required int restTotal,
+    required bool outdoorBoost,
+  }) {
     if (snapshot.phase == SessionPhase.countdown) {
-      final remaining = snapshot.secondsRemainingInPhase;
-      final safeRemaining = remaining < 0 ? 0 : remaining;
-      return '-$safeRemaining';
+      return CountdownView(
+        remainingSeconds: snapshot.secondsRemainingInPhase,
+        textStyle: numberStyle.copyWith(color: colors.boostedTextColor(outdoorBoost)),
+      );
     }
-    return snapshot.currentNumber?.toString() ?? '--';
+    if (snapshot.phase == SessionPhase.rest) {
+      return RestView(
+        secondsRemaining: snapshot.secondsRemainingInPhase,
+        totalSeconds: restTotal,
+      );
+    }
+    return ActiveRoundView(
+      displayText: snapshot.currentNumber?.toString() ?? '--',
+      textStyle: numberStyle.copyWith(color: colors.boostedTextColor(outdoorBoost)),
+    );
   }
 }
 
@@ -156,132 +173,6 @@ class _SessionHeader extends StatelessWidget {
         Text('Round ${snapshot.roundIndex + 1}/${snapshot.roundsTotal}', style: const TextStyle(fontSize: 24)),
         Text(timerText, style: const TextStyle(fontSize: 20)),
       ],
-    );
-  }
-}
-
-class _RestIndicator extends StatelessWidget {
-  const _RestIndicator({required this.seconds, required this.total});
-
-  final int seconds;
-  final int total;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 180,
-          height: 180,
-          child: CircularProgressIndicator(
-            value: total == 0 ? 0 : seconds / total,
-            strokeWidth: 8,
-            backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text('$seconds s', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
-}
-
-class _PauseOverlay extends StatelessWidget {
-  const _PauseOverlay({
-    required this.snapshot,
-    required this.onDismiss,
-    required this.controller,
-    required this.onFinish,
-  });
-
-  final SessionSnapshot snapshot;
-  final VoidCallback onDismiss;
-  final SessionController controller;
-  final VoidCallback onFinish;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: const Color.fromRGBO(0, 0, 0, 0.75),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: Material(
-              color: Colors.grey.shade900,
-              borderRadius: BorderRadius.circular(16),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('Paused', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 16),
-                    _OverlayButton(
-                      icon: Icons.play_arrow,
-                      label: 'Continue',
-                      onPressed: onDismiss,
-                    ),
-                    _OverlayButton(
-                      icon: Icons.refresh,
-                      label: 'Reset Session',
-                      onPressed: () {
-                        controller.resetSession();
-                      },
-                    ),
-                    _OverlayButton(
-                      icon: Icons.replay,
-                      label: 'Reset Round',
-                      onPressed: () {
-                        controller.resetRound();
-                      },
-                    ),
-                    _OverlayButton(
-                      icon: Icons.skip_next,
-                      label: 'Skip Forward',
-                      onPressed: () {
-                        controller.skipForward();
-                      },
-                    ),
-                    _OverlayButton(
-                      icon: Icons.flag,
-                      label: 'Finish Session',
-                      onPressed: onFinish,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OverlayButton extends StatelessWidget {
-  const _OverlayButton({
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-        onPressed: onPressed,
-        icon: Icon(icon),
-        label: Text(label),
-      ),
     );
   }
 }

@@ -36,7 +36,7 @@ Date: 2025-12-16
 - [x] Launch splash auto-transition (~1.5s). (Audio prewarm not implemented.)
 - [x] Main: preset summary card, palette swatches, actions (Play/Settings/History), responsive layout.
 - [x] Settings: rounds, durations, interval, number range, palette select, outdoor boost, countdown toggle + seconds, RNG seed toggle/input.
-- [x] Session: countdown/active/rest UIs, per-phase backgrounds, large number, rest progress, double-tap pause overlay with continue/reset/skip/finish driven by controller state.
+- [x] Session: countdown/active/rest UIs, per-phase backgrounds, large number, rest progress, double-tap pause overlay with continue/reset/skip/finish driven by controller state; phase views and pause overlay are modular widgets.
 - [x] End: summary, per-round list, Save to History, End to Main.
 - [x] History: newest-first list, multi-select, delete, export CSV, empty state.
 
