@@ -26,6 +26,7 @@ Purpose: capture the “why” behind key design and implementation choices so f
 - **Shared styles**: Introduced `AppTokens` and `SessionStyles` so session views use centralized spacing/typography/indicator sizing instead of hardcoded values.
 - **Audio sequencing tests**: Recording audio fakes validate preload order, countdown tick gating, round-start cues on phase transition, and silence during paused skip/resume.
 - **Accessibility toggles**: Settings include large session text and high-contrast palette; styles and palette resolution respond to these flags while persisting in presets.
+- **Large text behavior**: Large session text meaningfully increases session number/countdown size using style overrides (not just a boolean flag).
 
 ## Persistence & storage
 - **Atomic history writes**: temp file then rename to avoid corrupting history on crash.
