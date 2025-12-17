@@ -249,7 +249,10 @@ class SessionController extends ChangeNotifier {
     do {
       number = randomInRange(_rng, preset.numberMin, preset.numberMax);
     } while (!force && _lastStimulus != null && canAvoidRepeatNumber && _lastStimulus!.number == number);
-    final palette = Palette.resolve(preset.paletteId);
+    final palette = Palette.resolveWithContrast(
+      preset.paletteId,
+      highContrast: preset.highContrastPalette,
+    );
     Color color;
     final canAvoidRepeatColor = palette.colors.length > 1;
     String colorId;
@@ -305,7 +308,10 @@ class SessionController extends ChangeNotifier {
     final phaseDuration = _phaseDuration ?? 0;
     final remainingRaw = phaseDuration - _secondsIntoPhase;
     final secondsRemaining = remainingRaw >= 0 ? remainingRaw : 0;
-    final palette = Palette.resolve(preset.paletteId);
+    final palette = Palette.resolveWithContrast(
+      preset.paletteId,
+      highContrast: preset.highContrastPalette,
+    );
     _snapshot = _snapshot.copyWith(
       phase: _phase,
       secondsIntoPhase: _secondsIntoPhase,

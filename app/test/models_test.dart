@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speed_of_play/data/models.dart';
+import 'package:speed_of_play/services/storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   group('randomInRange', () {
@@ -30,6 +32,8 @@ void main() {
       expect(roundTrip.countdownSec, preset.countdownSec);
       expect(roundTrip.outdoorBoost, preset.outdoorBoost);
       expect(roundTrip.rngSeed, preset.rngSeed);
+      expect(roundTrip.largeSessionText, preset.largeSessionText);
+      expect(roundTrip.highContrastPalette, preset.highContrastPalette);
     });
   });
 
@@ -81,6 +85,22 @@ void main() {
         csv,
         contains('abc,2024-01-01T12:00:00.000Z,2,90,${preset.paletteId},"45|45"'),
       );
+    });
+
+    test('PresetStore persistence includes accessibility flags', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final store = PresetStore(prefs);
+
+      final preset = SessionPreset.defaults().copyWith(
+        largeSessionText: true,
+        highContrastPalette: true,
+      );
+      await store.save(preset);
+
+      final loaded = store.currentPreset;
+      expect(loaded.largeSessionText, isTrue);
+      expect(loaded.highContrastPalette, isTrue);
     });
   });
 }

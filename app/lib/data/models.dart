@@ -19,6 +19,8 @@ class SessionPreset {
     required this.paletteId,
     required this.countdownSec,
     required this.outdoorBoost,
+    required this.largeSessionText,
+    required this.highContrastPalette,
     this.rngSeed,
   });
 
@@ -31,6 +33,8 @@ class SessionPreset {
   final String paletteId;
   final int countdownSec;
   final bool outdoorBoost;
+  final bool largeSessionText;
+  final bool highContrastPalette;
   final int? rngSeed;
 
   factory SessionPreset.defaults() {
@@ -44,6 +48,8 @@ class SessionPreset {
       paletteId: Palette.defaultPaletteId,
       countdownSec: 5,
       outdoorBoost: false,
+      largeSessionText: false,
+      highContrastPalette: false,
       rngSeed: null,
     );
   }
@@ -58,6 +64,8 @@ class SessionPreset {
     String? paletteId,
     int? countdownSec,
     bool? outdoorBoost,
+    bool? largeSessionText,
+    bool? highContrastPalette,
     int? rngSeed,
   }) {
     return SessionPreset(
@@ -70,6 +78,8 @@ class SessionPreset {
       paletteId: paletteId ?? this.paletteId,
       countdownSec: countdownSec ?? this.countdownSec,
       outdoorBoost: outdoorBoost ?? this.outdoorBoost,
+      largeSessionText: largeSessionText ?? this.largeSessionText,
+      highContrastPalette: highContrastPalette ?? this.highContrastPalette,
       rngSeed: rngSeed ?? this.rngSeed,
     );
   }
@@ -84,6 +94,8 @@ class SessionPreset {
         'paletteId': paletteId,
         'countdownSec': countdownSec,
         'outdoorBoost': outdoorBoost,
+        'largeSessionText': largeSessionText,
+        'highContrastPalette': highContrastPalette,
         'rngSeed': rngSeed,
       };
 
@@ -98,6 +110,8 @@ class SessionPreset {
       paletteId: json['paletteId'] as String,
       countdownSec: json['countdownSec'] as int,
       outdoorBoost: json['outdoorBoost'] as bool? ?? false,
+      largeSessionText: json['largeSessionText'] as bool? ?? false,
+      highContrastPalette: json['highContrastPalette'] as bool? ?? false,
       rngSeed: json['rngSeed'] as int?,
     );
   }
@@ -240,6 +254,13 @@ class Palette {
 
   static Palette resolve(String id) {
     return palettes[id] ?? palettes[defaultPaletteId]!;
+  }
+
+  static Palette resolveWithContrast(String id, {required bool highContrast}) {
+    if (highContrast && palettes.containsKey('contrast')) {
+      return palettes['contrast']!;
+    }
+    return resolve(id);
   }
 
   Color boostedTextColor(bool outdoorBoost) {

@@ -67,8 +67,14 @@ class _SessionScreenState extends State<SessionScreen> {
             if (snapshot.phase == SessionPhase.end) {
               return const SizedBox.shrink();
             }
-            final styles = SessionStyles.defaults(Theme.of(context));
-            final colors = Palette.resolve(ctrl.preset.paletteId);
+            final styles = SessionStyles.defaults(
+              Theme.of(context),
+              largeSessionText: ctrl.preset.largeSessionText,
+            );
+            final colors = Palette.resolveWithContrast(
+              ctrl.preset.paletteId,
+              highContrast: ctrl.preset.highContrastPalette,
+            );
             Color background;
             if (snapshot.phase == SessionPhase.countdown) {
               background = colors.countdownColor;

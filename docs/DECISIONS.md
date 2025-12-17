@@ -25,6 +25,7 @@ Purpose: capture the “why” behind key design and implementation choices so f
 - **Phase-specific session views**: Session UI is composed of per-phase widgets (countdown/active/rest) and a shared pause overlay to keep layout modular while preserving behavior.
 - **Shared styles**: Introduced `AppTokens` and `SessionStyles` so session views use centralized spacing/typography/indicator sizing instead of hardcoded values.
 - **Audio sequencing tests**: Recording audio fakes validate preload order, countdown tick gating, round-start cues on phase transition, and silence during paused skip/resume.
+- **Accessibility toggles**: Settings include large session text and high-contrast palette; styles and palette resolution respond to these flags while persisting in presets.
 
 ## Persistence & storage
 - **Atomic history writes**: temp file then rename to avoid corrupting history on crash.

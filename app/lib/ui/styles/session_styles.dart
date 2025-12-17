@@ -33,11 +33,12 @@ class SessionStyles {
   final EdgeInsets overlayPadding;
   final TextStyle hintTextStyle;
 
-  factory SessionStyles.defaults(ThemeData theme) {
+  factory SessionStyles.defaults(ThemeData theme, {bool largeSessionText = false}) {
     final textTheme = theme.textTheme;
+    final double numberSize = largeSessionText ? 220 : 180;
     return SessionStyles(
       screenPadding: AppTokens.screenPadding,
-      numberTextStyle: textTheme.displayLarge ?? const TextStyle(fontSize: 180, fontWeight: FontWeight.bold),
+      numberTextStyle: textTheme.displayLarge ?? TextStyle(fontSize: numberSize, fontWeight: FontWeight.bold),
       headerRoundTextStyle: const TextStyle(fontSize: 24),
       headerTimerTextStyle: const TextStyle(fontSize: 20),
       restIndicatorSize: 180,

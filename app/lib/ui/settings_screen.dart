@@ -132,6 +132,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onChanged: (value) => _updatePreset(_preset.copyWith(outdoorBoost: value)),
           ),
           SwitchListTile(
+            title: const Text('Large session text'),
+            value: _preset.largeSessionText,
+            onChanged: (value) => _updatePreset(_preset.copyWith(largeSessionText: value)),
+          ),
+          SwitchListTile(
+            title: const Text('High contrast palette'),
+            value: _preset.highContrastPalette,
+            onChanged: (value) => _updatePreset(_preset.copyWith(highContrastPalette: value)),
+          ),
+          SwitchListTile(
             title: const Text('Countdown'),
             value: _showCountdown,
             onChanged: (value) {

@@ -36,3 +36,4 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Added invariant tests (pause/skip/resume across phases, reset round vs session idempotency, tiny number ranges) and simplified stimulus repeat logic to allow repeats when ranges are size 1. Analyzer warning cleaned up; tests remain green.
 - Refactored `session_screen` into phase-specific widgets (`countdown_view`, `active_round_view`, `rest_view`) plus shared `pause_overlay` without behavior changes; tests still green.
 - Added session style tokens (`ui/styles/app_tokens.dart`) and `session_styles.dart`; session views now consume shared styles instead of hardcoded values. Added recording audio tests to verify preload and cue sequence and silence while paused.
+- Added accessibility toggles to settings (large session text, high contrast palette) with persistence and palette/style wiring; model persistence tests updated.
