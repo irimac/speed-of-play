@@ -1,0 +1,98 @@
+meta:
+  screen: pause_overlay
+  orientation: landscape
+  artboard:
+    w: 768
+    h: 1024
+  viewport:
+    x: 0
+    y: 224
+    w: 768
+    h: 576
+  notes: Pause overlay (landscape) with centered action column.
+uses:
+  - use: PrimaryButton
+    idPrefix: actions.resume.
+    props:
+      x: 124
+      y: 320
+      w: 520
+      h: 80
+      label: CONTINUE
+      fill: '@colors.buttonGreen'
+      radius: 44
+      tap: session.resume
+  - use: PrimaryButton
+    idPrefix: actions.resetSession.
+    props:
+      x: 124
+      y: 416
+      w: 520
+      h: 80
+      label: RESET SESSION
+      fill: '@colors.buttonGreenDark'
+      radius: 44
+      tap: session.resetSession
+  - use: PrimaryButton
+    idPrefix: actions.resetRound.
+    props:
+      x: 124
+      y: 512
+      w: 520
+      h: 80
+      label: RESET ROUND
+      fill: '@colors.buttonGreenDark'
+      radius: 44
+      tap: session.resetRound
+  - use: PrimaryButton
+    idPrefix: actions.skip.
+    props:
+      x: 124
+      y: 608
+      w: 520
+      h: 80
+      label: SKIP FORWARD
+      fill: '@colors.buttonGreenDark'
+      radius: 44
+      tap: session.skipForward
+  - use: PrimaryButton
+    idPrefix: actions.finish.
+    props:
+      x: 124
+      y: 704
+      w: 520
+      h: 80
+      label: FINISH SESSION
+      fill: '@colors.buttonGreen'
+      radius: 44
+      tap: session.finish
+elements:
+  - id: overlay
+    type: rect
+    frame: { x: 0, y: 0, w: 768, h: 1024 }
+    style: { fill: '#000000CC' }
+  - id: card
+    type: rect
+    frame: { x: 64, y: 260, w: 640, h: 540 }
+    style:
+      fill: '#FFFFFF'
+      radius: 28
+  - id: title
+    type: text
+    frame: { x: 124, y: 292, w: 520, h: 64 }
+    text: Paused
+    style:
+      fontSize: 44
+      fontWeight: 900
+      color: '@colors.textDark'
+      align: center
+      lineHeight: 50
+  - id: hint
+    type: text
+    frame: { x: 124, y: 352, w: 520, h: 40 }
+    text: Double-tap to resume
+    style:
+      fontSize: 22
+      fontWeight: 600
+      color: '@colors.textMid'
+      align: center

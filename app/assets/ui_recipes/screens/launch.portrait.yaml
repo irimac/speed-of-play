@@ -1,0 +1,60 @@
+meta:
+  screen: launch
+  orientation: portrait
+  artboard:
+    w: 768
+    h: 1024
+  viewport:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  notes: Launch (portrait).
+uses: []
+elements:
+- id: bg
+  type: rect
+  frame:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  style:
+    fill: '@colors.bgLight'
+- id: logo
+  type: image
+  asset: assets/logo_ball.png
+  frame:
+    x: 264
+    y: 250
+    w: 240
+    h: 240
+- id: title
+  type: text
+  frame:
+    x: 96
+    y: 505
+    w: 576
+    h: 240
+  text: 'Football
+
+    Training'
+  style:
+    fontSize: 86
+    fontWeight: 900
+    color: '@colors.textDark'
+    align: center
+    lineHeight: 88
+- id: loading
+  type: text
+  frame:
+    x: 0
+    y: 910
+    w: 768
+    h: 60
+  text: Loading...
+  style:
+    fontSize: 40
+    fontWeight: 600
+    color: '@colors.textMid'
+    align: center

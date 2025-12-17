@@ -1,0 +1,26 @@
+version: 2
+artboard: { w: 768, h: 1024 }
+
+viewports:
+  portrait:  { x: 0, y: 0,   w: 768, h: 1024 }
+  landscape: { x: 0, y: 224, w: 768, h: 576 }
+
+layout:
+  portrait:  { pad: 32, topBarH: 96, bottomBarH: 112 }
+  landscape: { pad: 24, topBarH: 64, bottomBarH: 72 }
+
+colors:
+  bgLight: "#F5F5F5"
+  barLight: "#CFCFCF"
+  textDark: "#111111"
+  textMid: "#444444"
+
+  activeBg: "#2FA64A"
+  activeBar: "#6AD07A"
+  activeBottom: "#7FDB90"
+
+  buttonGreen: "#2E8E43"
+  buttonGreenDark: "#1F6E33"
+
+  ringTrack: "#C9C9C9"
+  ringProgress: "#333333"

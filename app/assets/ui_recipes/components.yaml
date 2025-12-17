@@ -1,0 +1,87 @@
+version: 1
+components:
+
+  SessionChromePortrait:
+    description: "Top bar + bottom bar + round/time labels + bottom timer (portrait)."
+    params: [topFill, bottomFill, roundText, timeText, bottomText]
+    elements:
+      - { id: topBar, type: rect, frame: { x: 0, y: 0, w: 768, h: 96 }, style: { fill: "${topFill}" } }
+      - { id: bottomBar, type: rect, frame: { x: 0, y: 912, w: 768, h: 112 }, style: { fill: "${bottomFill}" } }
+      - { id: roundLabel, type: text, frame: { x: 32, y: 22, w: 420, h: 52 }, text: "${roundText}",
+          style: { fontSize: 44, fontWeight: 800, color: "@colors.textDark", align: left } }
+      - { id: timeLabel, type: text, frame: { x: 516, y: 30, w: 220, h: 36 }, text: "${timeText}",
+          style: { fontSize: 26, fontWeight: 700, color: "@colors.textDark", align: right } }
+      - { id: bottomTimer, type: text, frame: { x: 0, y: 936, w: 768, h: 64 }, text: "${bottomText}",
+          style: { fontSize: 52, fontWeight: 900, color: "@colors.textDark", align: center } }
+
+  SessionChromeLandscape:
+    description: "Top bar + bottom bar + labels + bottom timer (landscape viewport)."
+    params: [topFill, bottomFill, roundText, timeText, bottomText]
+    elements:
+      - { id: topBar, type: rect, frame: { x: 0, y: 224, w: 768, h: 64 }, style: { fill: "${topFill}" } }
+      - { id: bottomBar, type: rect, frame: { x: 0, y: 728, w: 768, h: 72 }, style: { fill: "${bottomFill}" } }
+      - { id: roundLabel, type: text, frame: { x: 24, y: 234, w: 360, h: 44 }, text: "${roundText}",
+          style: { fontSize: 28, fontWeight: 800, color: "@colors.textDark", align: left, lineHeight: 32 } }
+      - { id: timeLabel, type: text, frame: { x: 504, y: 236, w: 240, h: 40 }, text: "${timeText}",
+          style: { fontSize: 28, fontWeight: 800, color: "@colors.textDark", align: right, lineHeight: 32 } }
+      - { id: bottomTimer, type: text, frame: { x: 0, y: 740, w: 768, h: 48 }, text: "${bottomText}",
+          style: { fontSize: 28, fontWeight: 800, color: "@colors.textDark", align: center, lineHeight: 32 } }
+
+  TopNavMenuPortrait:
+    description: "Transparent top region with Exit (left) and Settings (right) icons."
+    params: [exitTap, settingsTap]
+    elements:
+      - { id: topNavSpace, type: rect, frame: { x: 0, y: 0, w: 768, h: 96 }, style: { fill: "transparent" } }
+      - { id: exitIcon, type: icon, asset: "icon:exit_to_app", frame: { x: 32, y: 24, w: 48, h: 48 }, style: { color: "@colors.textDark" }, onTap: "${exitTap}" }
+      - { id: settingsIcon, type: icon, asset: "icon:settings", frame: { x: 688, y: 24, w: 48, h: 48 }, style: { color: "@colors.textDark" }, onTap: "${settingsTap}" }
+
+  TopNavMenuLandscape:
+    description: "Transparent top region inside landscape viewport with Exit and Settings icons."
+    params: [exitTap, settingsTap]
+    elements:
+      - { id: topNavSpace, type: rect, frame: { x: 0, y: 224, w: 768, h: 64 }, style: { fill: "transparent" } }
+      - { id: exitIcon, type: icon, asset: "icon:exit_to_app", frame: { x: 24, y: 236, w: 40, h: 40 }, style: { color: "@colors.textDark" }, onTap: "${exitTap}" }
+      - { id: settingsIcon, type: icon, asset: "icon:settings", frame: { x: 704, y: 236, w: 40, h: 40 }, style: { color: "@colors.textDark" }, onTap: "${settingsTap}" }
+
+  PrimaryButton:
+    description: "Rounded primary button."
+    params: [x, y, w, h, label, fill, radius, tap]
+    elements:
+      - id: btn
+        type: button
+        frame: { x: "${x}", y: "${y}", w: "${w}", h: "${h}" }
+        text: "${label}"
+        style:
+          fill: "${fill}"
+          radius: "${radius}"
+          textStyle: { fontSize: 40, fontWeight: 900, color: "#FFFFFF" }
+        onTap: "${tap}"
+
+  CenterLogo:
+    description: "Centered logo image."
+    params: [x, y, size, asset]
+    elements:
+      - { id: logo, type: image, asset: "${asset}", frame: { x: "${x}", y: "${y}", w: "${size}", h: "${size}" } }
+
+  CenterTwoLineTitle:
+    description: "Centered two-line title."
+    params: [x, y, w, h, text, fontSize, lineHeight]
+    elements:
+      - { id: title, type: text, frame: { x: "${x}", y: "${y}", w: "${w}", h: "${h}" }, text: "${text}",
+          style: { fontSize: "${fontSize}", fontWeight: 900, color: "@colors.textDark", align: center, lineHeight: "${lineHeight}" } }
+
+  BigCenterNumber:
+    description: "Center number occupying main content region."
+    params: [x, y, w, h, text, fontSize, color]
+    elements:
+      - { id: bigNumber, type: text, frame: { x: "${x}", y: "${y}", w: "${w}", h: "${h}" }, text: "${text}",
+          style: { fontSize: "${fontSize}", fontWeight: 900, color: "${color}", align: center, valign: middle } }
+
+  RestRing:
+    description: "Progress ring with center number."
+    params: [x, y, size, strokeWidth, secondsText]
+    elements:
+      - { id: restRing, type: progress_ring, frame: { x: "${x}", y: "${y}", w: "${size}", h: "${size}" },
+          style: { trackColor: "@colors.ringTrack", progressColor: "@colors.ringProgress", strokeWidth: "${strokeWidth}" } }
+      - { id: restNumber, type: text, frame: { x: "${x}", y: "${y}", w: "${size}", h: "${size}" }, text: "${secondsText}",
+          style: { fontSize: 120, fontWeight: 900, color: "@colors.textDark", align: center, valign: middle } }

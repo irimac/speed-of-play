@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../controllers/session_controller.dart';
 import '../data/models.dart';
 import 'end_screen.dart';
+import 'widgets/recipe_renderer/recipe_renderer.dart';
+import 'widgets/recipe_renderer/recipe_actions.dart';
 
 class SessionScreen extends StatefulWidget {
   const SessionScreen({super.key, required this.preset});
@@ -63,47 +65,51 @@ class _SessionScreenState extends State<SessionScreen> {
             Consumer<SessionController>(
               builder: (context, ctrl, _) {
                 final snapshot = ctrl.snapshot;
+                final screen = snapshot.phase == SessionPhase.countdown
+                    ? 'countdown'
+                    : snapshot.phase == SessionPhase.rest
+                        ? 'rest'
+                        : 'active_session';
                 final colors = Palette.resolve(widget.preset.paletteId);
-                Color background;
-                if (snapshot.phase == SessionPhase.countdown) {
-                  background = colors.countdownColor;
-                } else if (snapshot.phase == SessionPhase.rest) {
-                  background = colors.restColor;
-                } else {
-                  background = snapshot.currentColor ?? colors.colors.first;
-                }
-                final textTheme = Theme.of(context).textTheme;
-                final numberStyle = textTheme.displayLarge ?? const TextStyle(fontSize: 180, fontWeight: FontWeight.bold);
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  color: background,
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _SessionHeader(snapshot: snapshot),
-                          Expanded(
-                            child: Center(
-                              child: snapshot.phase == SessionPhase.rest
-                                  ? _RestIndicator(
-                                      seconds: snapshot.secondsRemainingInPhase,
-                                      total: widget.preset.restDurationSec,
-                                    )
-                                  : FittedBox(
-                                      child: Text(
-                                        _buildDisplayText(snapshot),
-                                        style: numberStyle.copyWith(color: colors.boostedTextColor(widget.preset.outdoorBoost)),
-                                      ),
-                                    ),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          const Text('Double-tap to pause', textAlign: TextAlign.center),
-                        ],
-                      ),
-                    ),
+                final bgColor = snapshot.phase == SessionPhase.countdown
+                    ? colors.countdownColor
+                    : snapshot.phase == SessionPhase.rest
+                        ? colors.restColor
+                        : snapshot.currentColor ?? colors.colors.first;
+                final roundText = 'Round ${snapshot.roundIndex + 1} / ${snapshot.roundsTotal}';
+                final currentPhaseTotal = snapshot.phase == SessionPhase.active
+                    ? widget.preset.roundDurationSec
+                    : snapshot.phase == SessionPhase.rest
+                        ? widget.preset.restDurationSec
+                        : widget.preset.countdownSec;
+                final timeText =
+                    'Time: ${_formatTime(snapshot.secondsIntoPhase)} / ${_formatTime(currentPhaseTotal)}';
+                final sessionElapsed = _computeSessionElapsed(snapshot);
+                final bottomText = 'Session Time: ${_formatTime(sessionElapsed)}';
+                final overrides = <String, String>{
+                  'chrome.roundLabel': roundText,
+                  'chrome.timeLabel': timeText,
+                  'chrome.bottomTimer': bottomText,
+                  'body.bigNumber': _buildDisplayText(snapshot),
+                  'body.restNumber': snapshot.secondsRemainingInPhase.toString(),
+                };
+                final colorOverrides = <String, Color>{
+                  'bg': bgColor,
+                };
+                final progressOverrides = <String, double>{
+                  'body.restRing': widget.preset.restDurationSec == 0
+                      ? 0
+                      : snapshot.secondsRemainingInPhase / widget.preset.restDurationSec,
+                };
+                return RecipeRenderer(
+                  screen: screen,
+                  textOverrides: overrides,
+                  colorOverrides: colorOverrides,
+                  progressOverrides: progressOverrides,
+                  onAction: (action) => RecipeActions.handle(
+                    context,
+                    action,
+                    sessionController: ctrl,
                   ),
                 );
               },
@@ -111,17 +117,26 @@ class _SessionScreenState extends State<SessionScreen> {
             if (_showOverlay)
               Consumer<SessionController>(
                 builder: (context, ctrl, _) {
-                  return _PauseOverlay(
-                    snapshot: ctrl.snapshot,
-                    onDismiss: _handleResume,
-                    controller: ctrl,
-                    onFinish: () {
-                      final result = ctrl.finishEarly();
-                      _navigatedToEnd = true;
-                      Navigator.of(context).pushReplacementNamed(
-                        EndScreen.routeName,
-                        arguments: result,
+                  return RecipeRenderer(
+                    screen: 'pause_overlay',
+                    onAction: (action) async {
+                      if (action == 'session.finish') {
+                        final result = ctrl.finishEarly();
+                        _navigatedToEnd = true;
+                        if (!mounted) return;
+                        await Navigator.of(context).pushReplacementNamed(
+                          EndScreen.routeName,
+                          arguments: result,
+                        );
+                        return;
+                      }
+                      await RecipeActions.handle(
+                        context,
+                        action,
+                        sessionController: ctrl,
                       );
+                      if (!mounted) return;
+                      setState(() => _showOverlay = false);
                     },
                   );
                 },
@@ -140,156 +155,27 @@ class _SessionScreenState extends State<SessionScreen> {
     return snapshot.currentNumber?.toString() ?? '--';
   }
 
-  void _handleResume() {
-    _controller.resume();
-    setState(() => _showOverlay = false);
+  int _computeSessionElapsed(SessionSnapshot snapshot) {
+    final countdown = widget.preset.countdownSec;
+    final round = widget.preset.roundDurationSec;
+    final rest = widget.preset.restDurationSec;
+    switch (snapshot.phase) {
+      case SessionPhase.countdown:
+        return snapshot.secondsIntoPhase;
+      case SessionPhase.active:
+        // Completed countdown + previous rounds (with rests) + current phase progress.
+        return countdown + snapshot.roundIndex * (round + rest) + snapshot.secondsIntoPhase;
+      case SessionPhase.rest:
+        // Just finished a round; include that round plus prior rests, and current rest time.
+        return countdown + (snapshot.roundIndex + 1) * round + snapshot.roundIndex * rest + snapshot.secondsIntoPhase;
+      case SessionPhase.end:
+        return countdown + widget.preset.rounds * (round + rest);
+    }
   }
-}
 
-class _SessionHeader extends StatelessWidget {
-  const _SessionHeader({required this.snapshot});
-
-  final SessionSnapshot snapshot;
-
-  @override
-  Widget build(BuildContext context) {
-    final timerText = snapshot.phase == SessionPhase.rest
-        ? 'Rest ${snapshot.secondsRemainingInPhase}s'
-        : '${snapshot.secondsRemainingInPhase}s left';
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('Round ${snapshot.roundIndex + 1}/${snapshot.roundsTotal}', style: const TextStyle(fontSize: 24)),
-        Text(timerText, style: const TextStyle(fontSize: 20)),
-      ],
-    );
-  }
-}
-
-class _RestIndicator extends StatelessWidget {
-  const _RestIndicator({required this.seconds, required this.total});
-
-  final int seconds;
-  final int total;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 180,
-        height: 180,
-        child: CircularProgressIndicator(
-          value: total == 0 ? 0 : seconds / total,
-          strokeWidth: 8,
-          backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
-        ),
-      ),
-        const SizedBox(height: 16),
-        Text('$seconds s', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
-}
-
-class _PauseOverlay extends StatelessWidget {
-  const _PauseOverlay({
-    required this.snapshot,
-    required this.onDismiss,
-    required this.controller,
-    required this.onFinish,
-  });
-
-  final SessionSnapshot snapshot;
-  final VoidCallback onDismiss;
-  final SessionController controller;
-  final VoidCallback onFinish;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: const Color.fromRGBO(0, 0, 0, 0.75),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: Material(
-              color: Colors.grey.shade900,
-              borderRadius: BorderRadius.circular(16),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('Paused', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 16),
-                    _OverlayButton(
-                      icon: Icons.play_arrow,
-                      label: 'Continue',
-                      onPressed: onDismiss,
-                    ),
-                    _OverlayButton(
-                      icon: Icons.refresh,
-                      label: 'Reset Session',
-                      onPressed: () {
-                        controller.resetSession();
-                      },
-                    ),
-                    _OverlayButton(
-                      icon: Icons.replay,
-                      label: 'Reset Round',
-                      onPressed: () {
-                        controller.resetRound();
-                      },
-                    ),
-                    _OverlayButton(
-                      icon: Icons.skip_next,
-                      label: 'Skip Forward',
-                      onPressed: snapshot.phase == SessionPhase.active
-                          ? () {
-                              controller.skipForward();
-                            }
-                          : null,
-                    ),
-                    _OverlayButton(
-                      icon: Icons.flag,
-                      label: 'Finish Session',
-                      onPressed: onFinish,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OverlayButton extends StatelessWidget {
-  const _OverlayButton({
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-        onPressed: onPressed,
-        icon: Icon(icon),
-        label: Text(label),
-      ),
-    );
+  String _formatTime(int seconds) {
+    final m = (seconds ~/ 60).toString().padLeft(2, '0');
+    final s = (seconds % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 }

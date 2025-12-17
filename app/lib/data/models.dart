@@ -20,6 +20,7 @@ class SessionPreset {
     required this.countdownSec,
     required this.outdoorBoost,
     this.rngSeed,
+    this.activeColorIds,
   });
 
   final int rounds;
@@ -32,6 +33,7 @@ class SessionPreset {
   final int countdownSec;
   final bool outdoorBoost;
   final int? rngSeed;
+  final List<String>? activeColorIds;
 
   factory SessionPreset.defaults() {
     return const SessionPreset(
@@ -45,6 +47,7 @@ class SessionPreset {
       countdownSec: 5,
       outdoorBoost: false,
       rngSeed: null,
+      activeColorIds: null,
     );
   }
 
@@ -59,6 +62,7 @@ class SessionPreset {
     int? countdownSec,
     bool? outdoorBoost,
     int? rngSeed,
+    List<String>? activeColorIds,
   }) {
     return SessionPreset(
       rounds: rounds ?? this.rounds,
@@ -71,6 +75,7 @@ class SessionPreset {
       countdownSec: countdownSec ?? this.countdownSec,
       outdoorBoost: outdoorBoost ?? this.outdoorBoost,
       rngSeed: rngSeed ?? this.rngSeed,
+      activeColorIds: activeColorIds ?? this.activeColorIds,
     );
   }
 
@@ -85,6 +90,7 @@ class SessionPreset {
         'countdownSec': countdownSec,
         'outdoorBoost': outdoorBoost,
         'rngSeed': rngSeed,
+        'activeColorIds': activeColorIds,
       };
 
   factory SessionPreset.fromJson(Map<String, dynamic> json) {
@@ -99,6 +105,9 @@ class SessionPreset {
       countdownSec: json['countdownSec'] as int,
       outdoorBoost: json['outdoorBoost'] as bool? ?? false,
       rngSeed: json['rngSeed'] as int?,
+      activeColorIds: (json['activeColorIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
     );
   }
 }
@@ -197,6 +206,23 @@ class Palette {
   static const defaultPaletteId = 'sunrise';
 
   static const Map<String, Palette> palettes = {
+    'basic': Palette(
+      id: 'basic',
+      label: 'Basic',
+      colors: [
+        Color(0xFF2E8E43), // green
+        Color(0xFF1E88E5), // blue
+        Color(0xFFD32F2F), // red
+        Color(0xFFFBC02D), // yellow
+        Color(0xFF8E24AA), // purple
+        Color(0xFFFF7043), // orange
+        Color(0xFF00897B), // teal
+        Color(0xFFEC407A), // pink
+      ],
+      countdownColor: Color(0xFF111111),
+      restColor: Color(0xFF2F2F2F),
+      textColor: Colors.white,
+    ),
     'sunrise': Palette(
       id: 'sunrise',
       label: 'Sunrise',
@@ -205,6 +231,10 @@ class Palette {
         Color(0xFF2AB7CA),
         Color(0xFFFED766),
         Color(0xFF009FB7),
+        Color(0xFFFFA552),
+        Color(0xFFFA7921),
+        Color(0xFF7F2982),
+        Color(0xFF4062BB),
       ],
       countdownColor: Color(0xFF222831),
       restColor: Color(0xFF393E46),
@@ -218,6 +248,10 @@ class Palette {
         Color(0xFF005377),
         Color(0xFFE4572E),
         Color(0xFF17BEBB),
+        Color(0xFF7FB069),
+        Color(0xFF4D9078),
+        Color(0xFF2B2D42),
+        Color(0xFFD4A373),
       ],
       countdownColor: Color(0xFF07393C),
       restColor: Color(0xFF1B512D),
@@ -231,6 +265,10 @@ class Palette {
         Color(0xFFEE4266),
         Color(0xFF3CBBB1),
         Color(0xFF2A1E5C),
+        Color(0xFF0CCE6B),
+        Color(0xFFFE5F55),
+        Color(0xFF7D7ABC),
+        Color(0xFF1F7A8C),
       ],
       countdownColor: Color(0xFF1E1E24),
       restColor: Color(0xFF2E2E38),

@@ -1,0 +1,105 @@
+meta:
+  screen: summary
+  orientation: landscape
+  artboard:
+    w: 768
+    h: 1024
+  viewport:
+    x: 0
+    y: 224
+    w: 768
+    h: 576
+  notes: Summary (landscape) draft.
+uses:
+- use: SessionChromeLandscape
+  idPrefix: chrome.
+  props:
+    topFill: '@colors.barLight'
+    bottomFill: '@colors.barLight'
+    roundText: Session Complete
+    timeText: ''
+    bottomText: ''
+- use: PrimaryButton
+  idPrefix: cta1.
+  props:
+    x: 84
+    y: 520
+    w: 280
+    h: 64
+    label: RESTART
+    fill: '@colors.buttonGreen'
+    radius: 32
+    tap: session.restart
+- use: PrimaryButton
+  idPrefix: cta2.
+  props:
+    x: 404
+    y: 520
+    w: 280
+    h: 64
+    label: BACK
+    fill: '@colors.buttonGreenDark'
+    radius: 32
+    tap: nav.backToMenu
+elements:
+- id: bg
+  type: rect
+  frame:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  style:
+    fill: '@colors.bgLight'
+- id: stat1
+  type: text
+  frame:
+    x: 48
+    y: 316
+    w: 672
+    h: 40
+  text: 'Rounds completed: 5/5'
+  style:
+    fontSize: 22
+    fontWeight: 700
+    color: '@colors.textDark'
+    align: left
+- id: stat2
+  type: text
+  frame:
+    x: 48
+    y: 362
+    w: 672
+    h: 40
+  text: 'Total active time: 05:00'
+  style:
+    fontSize: 22
+    fontWeight: 700
+    color: '@colors.textDark'
+    align: left
+- id: stat3
+  type: text
+  frame:
+    x: 48
+    y: 408
+    w: 672
+    h: 40
+  text: 'Total rest time: 01:00'
+  style:
+    fontSize: 22
+    fontWeight: 700
+    color: '@colors.textDark'
+    align: left
+- id: stat4
+  type: text
+  frame:
+    x: 48
+    y: 454
+    w: 672
+    h: 40
+  text: 'Colors used: 4'
+  style:
+    fontSize: 22
+    fontWeight: 700
+    color: '@colors.textDark'
+    align: left

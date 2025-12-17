@@ -1,0 +1,70 @@
+meta:
+  screen: main
+  orientation: landscape
+  artboard:
+    w: 768
+    h: 1024
+  viewport:
+    x: 0
+    y: 224
+    w: 768
+    h: 576
+  notes: Main menu (landscape). Content lives in viewport; aligns with session bars.
+uses:
+- use: TopNavMenuLandscape
+  idPrefix: nav.
+  props:
+    exitTap: app.exit
+    settingsTap: nav.settings
+- use: CenterLogo
+  idPrefix: brand.
+  props:
+    x: 314
+    y: 308
+    size: 140
+    asset: assets/logo_ball.png
+- use: CenterTwoLineTitle
+  idPrefix: brand.
+  props:
+    x: 96
+    y: 456
+    w: 576
+    h: 96
+    text: Football\nTraining
+    fontSize: 56
+    lineHeight: 58
+- use: PrimaryButton
+  idPrefix: cta.
+  props:
+    x: 174
+    y: 610
+    w: 420
+    h: 88
+    label: PLAY
+    fill: '@colors.buttonGreen'
+    radius: 44
+    tap: session.start
+elements:
+- id: bg
+  type: rect
+  frame:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  style:
+    fill: '@colors.bgLight'
+- id: config
+  type: text
+  frame:
+    x: 96
+    y: 548
+    w: 576
+    h: 52
+  text: 'Rounds: 5 | Duration: 60s | Colors: 4'
+  style:
+    fontSize: 20
+    fontWeight: 600
+    color: '@colors.textDark'
+    align: center
+    lineHeight: 24

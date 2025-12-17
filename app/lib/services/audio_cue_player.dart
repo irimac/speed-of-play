@@ -6,10 +6,12 @@ class AudioCuePlayer {
 
   final AudioPlayer _tickPlayer = AudioPlayer();
   final AudioPlayer _roundStartPlayer = AudioPlayer();
+  // Toggle to disable audio globally without touching call sites.
+  static const bool _audioEnabled = false;
   bool _loaded = false;
 
   Future<void> ensureLoaded() async {
-    if (_loaded) return;
+    if (!_audioEnabled || _loaded) return;
     try {
       await Future.wait([
         _tickPlayer.setAsset('assets/audio/tick.wav'),
@@ -22,18 +24,19 @@ class AudioCuePlayer {
   }
 
   Future<void> playTick() async {
-    if (!_loaded) return;
+    if (!_audioEnabled || !_loaded) return;
     await _tickPlayer.seek(Duration.zero);
     await _tickPlayer.play();
   }
 
   Future<void> playRoundStart() async {
-    if (!_loaded) return;
+    if (!_audioEnabled || !_loaded) return;
     await _roundStartPlayer.seek(Duration.zero);
     await _roundStartPlayer.play();
   }
 
   Future<void> dispose() async {
+    if (!_audioEnabled) return;
     await Future.wait([
       _tickPlayer.dispose(),
       _roundStartPlayer.dispose(),

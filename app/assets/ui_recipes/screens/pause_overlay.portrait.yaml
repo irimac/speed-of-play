@@ -1,0 +1,98 @@
+meta:
+  screen: pause_overlay
+  orientation: portrait
+  artboard:
+    w: 768
+    h: 1024
+  viewport:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  notes: Pause overlay (portrait) with stacked actions.
+uses:
+  - use: PrimaryButton
+    idPrefix: actions.resume.
+    props:
+      x: 124
+      y: 320
+      w: 520
+      h: 80
+      label: CONTINUE
+      fill: '@colors.buttonGreen'
+      radius: 44
+      tap: session.resume
+  - use: PrimaryButton
+    idPrefix: actions.resetSession.
+    props:
+      x: 124
+      y: 420
+      w: 520
+      h: 80
+      label: RESET SESSION
+      fill: '@colors.buttonGreenDark'
+      radius: 44
+      tap: session.resetSession
+  - use: PrimaryButton
+    idPrefix: actions.resetRound.
+    props:
+      x: 124
+      y: 520
+      w: 520
+      h: 80
+      label: RESET ROUND
+      fill: '@colors.buttonGreenDark'
+      radius: 44
+      tap: session.resetRound
+  - use: PrimaryButton
+    idPrefix: actions.skip.
+    props:
+      x: 124
+      y: 620
+      w: 520
+      h: 80
+      label: SKIP FORWARD
+      fill: '@colors.buttonGreenDark'
+      radius: 44
+      tap: session.skipForward
+  - use: PrimaryButton
+    idPrefix: actions.finish.
+    props:
+      x: 124
+      y: 720
+      w: 520
+      h: 80
+      label: FINISH SESSION
+      fill: '@colors.buttonGreen'
+      radius: 44
+      tap: session.finish
+elements:
+  - id: overlay
+    type: rect
+    frame: { x: 0, y: 0, w: 768, h: 1024 }
+    style: { fill: '#000000CC' }
+  - id: card
+    type: rect
+    frame: { x: 64, y: 180, w: 640, h: 700 }
+    style:
+      fill: '#FFFFFF'
+      radius: 32
+  - id: title
+    type: text
+    frame: { x: 124, y: 220, w: 520, h: 70 }
+    text: Paused
+    style:
+      fontSize: 48
+      fontWeight: 900
+      color: '@colors.textDark'
+      align: center
+      lineHeight: 54
+  - id: hint
+    type: text
+    frame: { x: 124, y: 280, w: 520, h: 40 }
+    text: Double-tap to resume
+    style:
+      fontSize: 24
+      fontWeight: 600
+      color: '@colors.textMid'
+      align: center

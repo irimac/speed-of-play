@@ -195,7 +195,7 @@ class SessionController extends ChangeNotifier {
       _scheduler.pause();
       _paused = true;
       _isRunning = false;
-      WakelockPlus.disable();
+      _invokeWakelock(_wakelockDisable);
       _finalResult = _buildResult();
     } else {
       if (preset.restDurationSec == 0) {
@@ -230,15 +230,16 @@ class SessionController extends ChangeNotifier {
       number = randomInRange(_rng, preset.numberMin, preset.numberMax);
     } while (!force && _lastStimulus != null && _lastStimulus!.number == number);
     final palette = Palette.resolve(preset.paletteId);
+    final paletteColors = _resolveActiveColors(palette, preset);
     Color color;
     do {
-      color = palette.colors[_rng.nextInt(palette.colors.length)];
-      // ignore: deprecated_member_use
-    } while (!force && _lastStimulus != null && _lastStimulus!.colorId == color.value.toRadixString(16));
+      color = paletteColors[_rng.nextInt(paletteColors.length)];
+    } while (!force &&
+        _lastStimulus != null &&
+        _lastStimulus!.colorId == color.toARGB32().toRadixString(16));
     final stimulus = Stimulus(
       timestampMs: DateTime.now().millisecondsSinceEpoch,
-      // ignore: deprecated_member_use
-      colorId: color.value.toRadixString(16),
+      colorId: color.toARGB32().toRadixString(16),
       number: number,
     );
     _lastStimulus = stimulus;
@@ -294,5 +295,14 @@ class SessionController extends ChangeNotifier {
         }
       }),
     );
+  }
+
+  List<Color> _resolveActiveColors(Palette palette, SessionPreset preset) {
+    final ids = preset.activeColorIds;
+    if (ids == null || ids.isEmpty) return palette.colors;
+    final normalized = ids.map((e) => e.toLowerCase()).toSet();
+    final filtered =
+        palette.colors.where((c) => normalized.contains(c.toARGB32().toRadixString(16))).toList();
+    return filtered.isEmpty ? palette.colors : filtered;
   }
 }

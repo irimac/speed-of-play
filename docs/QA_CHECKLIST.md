@@ -11,6 +11,8 @@ Use this for manual sweeps; note device/OS and build flavor.
 - [ ] Pause overlay: double-tap to open; Continue, Reset Session, Reset Round, Skip Forward (active only), Finish all work.
 - [ ] End screen: summary correct; Save to History persists entry; End to Main returns home.
 - [ ] History: list newest-first; multi-select; delete removes entries; export CSV creates file and shows snackbar path.
+- [ ] UI recipes: recipe renderer loads tokens/components/screens; pause overlay recipe renders correctly in portrait/landscape.
+- [ ] Golden snapshots: main portrait/landscape and active session portrait match references.
 
 ## Persistence
 - [ ] Preset persists across app restarts.

@@ -1,0 +1,70 @@
+meta:
+  screen: main
+  orientation: portrait
+  artboard:
+    w: 768
+    h: 1024
+  viewport:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  notes: Main menu (portrait). Gear only top-right; Exit top-left.
+uses:
+- use: TopNavMenuPortrait
+  idPrefix: nav.
+  props:
+    exitTap: app.exit
+    settingsTap: nav.settings
+- use: CenterLogo
+  idPrefix: brand.
+  props:
+    x: 284
+    y: 160
+    size: 200
+    asset: assets/logo_ball.png
+- use: CenterTwoLineTitle
+  idPrefix: brand.
+  props:
+    x: 96
+    y: 370
+    w: 576
+    h: 180
+    text: Football\nTraining
+    fontSize: 78
+    lineHeight: 80
+- use: PrimaryButton
+  idPrefix: cta.
+  props:
+    x: 124
+    y: 680
+    w: 520
+    h: 120
+    label: PLAY
+    fill: '@colors.buttonGreen'
+    radius: 60
+    tap: session.start
+elements:
+- id: bg
+  type: rect
+  frame:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  style:
+    fill: '@colors.bgLight'
+- id: config
+  type: text
+  frame:
+    x: 96
+    y: 560
+    w: 576
+    h: 80
+  text: 'Rounds: 5 | Duration: 60s | Colors: 4'
+  style:
+    fontSize: 26
+    fontWeight: 600
+    color: '@colors.textDark'
+    align: center
+    lineHeight: 30

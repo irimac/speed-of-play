@@ -1,0 +1,39 @@
+meta:
+  screen: rest
+  orientation: landscape
+  artboard:
+    w: 768
+    h: 1024
+  viewport:
+    x: 0
+    y: 224
+    w: 768
+    h: 576
+  notes: Rest (landscape).
+uses:
+- use: SessionChromeLandscape
+  idPrefix: chrome.
+  props:
+    topFill: '@colors.barLight'
+    bottomFill: '@colors.barLight'
+    roundText: Round 2 / 5
+    timeText: 00:15/01:00
+    bottomText: 00:45
+- use: RestRing
+  idPrefix: body.
+  props:
+    x: 254
+    y: 378
+    size: 260
+    strokeWidth: 18
+    secondsText: '15'
+elements:
+- id: bg
+  type: rect
+  frame:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  style:
+    fill: '@colors.bgLight'

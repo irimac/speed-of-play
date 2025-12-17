@@ -1,0 +1,41 @@
+meta:
+  screen: active_session
+  orientation: portrait
+  artboard:
+    w: 768
+    h: 1024
+  viewport:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  notes: Active session (portrait).
+uses:
+- use: SessionChromePortrait
+  idPrefix: chrome.
+  props:
+    topFill: '@colors.activeBar'
+    bottomFill: '@colors.activeBottom'
+    roundText: 'Round 2 / 5'
+    timeText: 'Time: 00:15 / 01:00'
+    bottomText: 'Session Time: 00:45'
+- use: BigCenterNumber
+  idPrefix: body.
+  props:
+    x: 0
+    y: 96
+    w: 768
+    h: 816
+    text: '7'
+    fontSize: 360
+    color: '#FFD400'
+elements:
+- id: bg
+  type: rect
+  frame:
+    x: 0
+    y: 0
+    w: 768
+    h: 1024
+  style:
+    fill: '@colors.activeBg'
