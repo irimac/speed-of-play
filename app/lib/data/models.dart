@@ -21,6 +21,7 @@ class SessionPreset {
     required this.outdoorBoost,
     required this.largeSessionText,
     required this.highContrastPalette,
+    required this.audioEnabled,
     this.rngSeed,
   });
 
@@ -35,6 +36,7 @@ class SessionPreset {
   final bool outdoorBoost;
   final bool largeSessionText;
   final bool highContrastPalette;
+  final bool audioEnabled;
   final int? rngSeed;
 
   factory SessionPreset.defaults() {
@@ -50,6 +52,7 @@ class SessionPreset {
       outdoorBoost: false,
       largeSessionText: false,
       highContrastPalette: false,
+      audioEnabled: true,
       rngSeed: null,
     );
   }
@@ -66,6 +69,7 @@ class SessionPreset {
     bool? outdoorBoost,
     bool? largeSessionText,
     bool? highContrastPalette,
+    bool? audioEnabled,
     int? rngSeed,
   }) {
     return SessionPreset(
@@ -80,6 +84,7 @@ class SessionPreset {
       outdoorBoost: outdoorBoost ?? this.outdoorBoost,
       largeSessionText: largeSessionText ?? this.largeSessionText,
       highContrastPalette: highContrastPalette ?? this.highContrastPalette,
+      audioEnabled: audioEnabled ?? this.audioEnabled,
       rngSeed: rngSeed ?? this.rngSeed,
     );
   }
@@ -96,6 +101,7 @@ class SessionPreset {
         'outdoorBoost': outdoorBoost,
         'largeSessionText': largeSessionText,
         'highContrastPalette': highContrastPalette,
+        'audioEnabled': audioEnabled,
         'rngSeed': rngSeed,
       };
 
@@ -112,6 +118,7 @@ class SessionPreset {
       outdoorBoost: json['outdoorBoost'] as bool? ?? false,
       largeSessionText: json['largeSessionText'] as bool? ?? false,
       highContrastPalette: json['highContrastPalette'] as bool? ?? false,
+      audioEnabled: json['audioEnabled'] as bool? ?? true,
       rngSeed: json['rngSeed'] as int?,
     );
   }

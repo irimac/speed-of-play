@@ -34,6 +34,7 @@ void main() {
       expect(roundTrip.rngSeed, preset.rngSeed);
       expect(roundTrip.largeSessionText, preset.largeSessionText);
       expect(roundTrip.highContrastPalette, preset.highContrastPalette);
+      expect(roundTrip.audioEnabled, preset.audioEnabled);
     });
   });
 
@@ -95,12 +96,14 @@ void main() {
       final preset = SessionPreset.defaults().copyWith(
         largeSessionText: true,
         highContrastPalette: true,
+        audioEnabled: false,
       );
       await store.save(preset);
 
       final loaded = store.currentPreset;
       expect(loaded.largeSessionText, isTrue);
       expect(loaded.highContrastPalette, isTrue);
+      expect(loaded.audioEnabled, isFalse);
     });
   });
 }

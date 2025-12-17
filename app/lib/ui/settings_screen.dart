@@ -142,6 +142,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onChanged: (value) => _updatePreset(_preset.copyWith(highContrastPalette: value)),
           ),
           SwitchListTile(
+            title: const Text('Audio enabled'),
+            value: _preset.audioEnabled,
+            onChanged: (value) => _updatePreset(_preset.copyWith(audioEnabled: value)),
+          ),
+          SwitchListTile(
             title: const Text('Countdown'),
             value: _showCountdown,
             onChanged: (value) {
