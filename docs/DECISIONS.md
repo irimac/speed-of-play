@@ -27,6 +27,9 @@ Purpose: capture the “why” behind key design and implementation choices so f
 - **Audio sequencing tests**: Recording audio fakes validate preload order, countdown tick gating, round-start cues on phase transition, and silence during paused skip/resume.
 - **Accessibility toggles**: Settings include large session text and high-contrast palette; styles and palette resolution respond to these flags while persisting in presets.
 - **Large text behavior**: Large session text meaningfully increases session number/countdown size using style overrides (not just a boolean flag).
+- **Lifecycle handling**: App lifecycle observer auto-pauses sessions when backgrounded/inactive, silencing cues until the user resumes; controller scheduler is paused accordingly.
+- **Audio control**: `audioEnabled` preset flag stored in settings; hooks ready for muting cues via controller/service if desired.
+- **Cue idempotence**: Controller guards countdown ticks and round-start cues so they fire at most once per aligned second/round, respecting `audioEnabled` to avoid duplicate sounds.
 
 ## Persistence & storage
 - **Atomic history writes**: temp file then rename to avoid corrupting history on crash.

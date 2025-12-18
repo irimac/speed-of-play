@@ -38,3 +38,5 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Added session style tokens (`ui/styles/app_tokens.dart`) and `session_styles.dart`; session views now consume shared styles instead of hardcoded values. Added recording audio tests to verify preload and cue sequence and silence while paused.
 - Added accessibility toggles to settings (large session text, high contrast palette) with persistence and palette/style wiring; model persistence tests updated.
 - Increased the large-text toggle impact (larger display font) while keeping tests green.
+- Added `audioEnabled` preset flag + Settings toggle with persistence; auto-pause on app background/inactive via lifecycle observer; pause now stops scheduler (tested).
+- Audio cues made idempotent per session second/round (guards against duplicate ticks/round-starts, gated by audioEnabled); added tests for countdown tick counts and pause suppression.

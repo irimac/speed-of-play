@@ -41,6 +41,8 @@ class SessionController extends ChangeNotifier {
   int? _phaseDuration;
   Stimulus? _lastStimulus;
   SessionResult? _finalResult;
+  int _lastTickAudioSecond = -1;
+  int _lastRoundStartRound = -1;
 
   SessionSnapshot get snapshot => _snapshot;
   SessionResult? get result => _finalResult;
@@ -48,7 +50,9 @@ class SessionController extends ChangeNotifier {
   void start() {
     if (_isRunning) return;
     _resetState(startPaused: false);
-    unawaited(_audio.ensureLoaded());
+    if (preset.audioEnabled) {
+      unawaited(_audio.ensureLoaded());
+    }
     _scheduler.start();
     _invokeWakelock(_wakelockEnable);
     _updateSnapshot();
@@ -66,6 +70,8 @@ class SessionController extends ChangeNotifier {
     _roundDurations.clear();
     _lastStimulus = null;
     _finalResult = null;
+    _lastTickAudioSecond = -1;
+    _lastRoundStartRound = -1;
     _snapshot = SessionSnapshot(
       phase: _phase,
       secondsIntoPhase: 0,
@@ -185,7 +191,8 @@ class SessionController extends ChangeNotifier {
 
   void _handleAlignedSecond(int secondSinceStart) {
     if (_paused || _phase == SessionPhase.end) return;
-    if (_phase == SessionPhase.countdown) {
+    if (_phase == SessionPhase.countdown && preset.audioEnabled && _lastTickAudioSecond != _elapsedSeconds) {
+      _lastTickAudioSecond = _elapsedSeconds;
       unawaited(_audio.playTick());
     }
     _elapsedSeconds += 1;
@@ -238,7 +245,8 @@ class SessionController extends ChangeNotifier {
     if (emitStimulus) {
       _emitStimulus(force: true);
     }
-    if (playAudio) {
+    if (playAudio && preset.audioEnabled && _lastRoundStartRound != _roundIndex) {
+      _lastRoundStartRound = _roundIndex;
       unawaited(_audio.playRoundStart());
     }
   }

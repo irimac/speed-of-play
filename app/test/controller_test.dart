@@ -21,6 +21,7 @@ class _ManualScheduler extends SessionScheduler {
 
   int _seconds = 0;
   bool _running = false;
+  bool get isRunning => _running;
 
   @override
   void start() {
@@ -73,6 +74,7 @@ class _CountingAudio extends AudioCuePlayer {
 class _RecordingAudio extends AudioCuePlayer {
   final List<String> log = [];
   bool loaded = false;
+  int tickCount = 0;
 
   @override
   Future<void> ensureLoaded() async {
@@ -88,6 +90,7 @@ class _RecordingAudio extends AudioCuePlayer {
   @override
   Future<void> playTick() async {
     log.add('tick');
+    tickCount++;
   }
 }
 
@@ -129,6 +132,30 @@ void main() {
       scheduler.tick(); // should start ticking active
       expect(controller.snapshot.secondsIntoPhase, 1);
       expect(controller.snapshot.phase, SessionPhase.active);
+    });
+
+    test('pause stops scheduler and marks snapshot paused', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 1,
+        roundDurationSec: 2,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: _NoopAudioPlayer(),
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      expect(scheduler.isRunning, isTrue);
+      controller.pause();
+      expect(scheduler.isRunning, isFalse);
+      expect(controller.snapshot.isPaused, isTrue);
     });
 
     test('pause -> skip -> resume from active enters rest and ticks', () {
@@ -484,6 +511,7 @@ void main() {
       scheduler.tick(); // countdown -> active triggers round start
 
       expect(audio.log, ['load', 'tick', 'tick', 'roundStart']);
+      expect(audio.tickCount, 2);
     });
 
     test('audio stays silent while paused skip/resume', () {
@@ -518,6 +546,37 @@ void main() {
       scheduler.tick(); // rest tick, no audio expected
 
       expect(audio.log, ['load']);
+    });
+
+    test('ticks fire once per countdown second; pause suppresses extra ticks', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final audio = _RecordingAudio();
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 3,
+        roundDurationSec: 1,
+        restDurationSec: 0,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: audio,
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      scheduler.tick(); // second 1
+      controller.pause();
+      scheduler.tick(); // suppressed
+      controller.resume();
+      scheduler.tick(); // second 2
+      scheduler.tick(); // second 3 -> enter active
+
+      expect(audio.tickCount, 3);
+      expect(audio.log.where((e) => e == 'tick').length, 3);
     });
 
     test('tiny number range still progresses without infinite loop', () {

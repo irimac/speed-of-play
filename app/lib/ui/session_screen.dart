@@ -19,7 +19,7 @@ class SessionScreen extends StatefulWidget {
   State<SessionScreen> createState() => _SessionScreenState();
 }
 
-class _SessionScreenState extends State<SessionScreen> {
+class _SessionScreenState extends State<SessionScreen> with WidgetsBindingObserver {
   bool _navigatedToEnd = false;
   late final SessionController _controller;
 
@@ -28,6 +28,7 @@ class _SessionScreenState extends State<SessionScreen> {
     super.initState();
     _controller = context.read<SessionController>();
     _controller.addListener(_handleControllerUpdate);
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _controller.start();
     });
@@ -36,7 +37,16 @@ class _SessionScreenState extends State<SessionScreen> {
   @override
   void dispose() {
     _controller.removeListener(_handleControllerUpdate);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive || state == AppLifecycleState.detached) {
+      _controller.pause();
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   void _handleControllerUpdate() {
