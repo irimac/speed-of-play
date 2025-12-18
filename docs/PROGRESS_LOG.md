@@ -41,3 +41,8 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Added `audioEnabled` preset flag + Settings toggle with persistence; auto-pause on app background/inactive via lifecycle observer; pause now stops scheduler (tested).
 - Audio cues made idempotent per session second/round (guards against duplicate ticks/round-starts, gated by audioEnabled); added tests for countdown tick counts and pause suppression.
 - AudioCuePlayer now uses injectable backends and a single preload path; added spy-based test to ensure assets load once and play calls stay lightweight.
+
+## 2025-12-18
+- Added startup gate (`startup_gate.dart`) and `SpeedOfPlayBootstrapApp` wrapper to keep Launch screen visible for at least 3 seconds while bootstrapping dependencies.
+- Launch screen now shows during initialization and auto-navigates to Main after the gate; removed embedded timer from `LaunchScreen` UI.
+- Added widget tests for launch gating: initial visibility, minimum-duration enforcement, and transition after init; full test suite remains green.

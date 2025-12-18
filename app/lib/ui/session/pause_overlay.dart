@@ -23,6 +23,41 @@ class PauseOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final buttonSpacing = styles.overlayButtonSpacing;
+    final buttonMinSize = Size.fromHeight(styles.overlayButtonMinHeight);
+    final primaryStyle = ElevatedButton.styleFrom(
+      minimumSize: buttonMinSize,
+      foregroundColor: colorScheme.onPrimary,
+      backgroundColor: colorScheme.primary,
+      textStyle: const TextStyle(fontWeight: FontWeight.w600),
+    );
+    final secondaryStyle = OutlinedButton.styleFrom(
+      minimumSize: buttonMinSize,
+      foregroundColor: Colors.white,
+      side: const BorderSide(color: Colors.white54),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTokens.spacingS,
+        vertical: 12,
+      ),
+    );
+    final mutedSecondaryStyle = OutlinedButton.styleFrom(
+      minimumSize: buttonMinSize,
+      foregroundColor: Colors.white70,
+      side: const BorderSide(color: Colors.white24),
+      backgroundColor: Colors.white.withAlpha((0.04 * 255).round()),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTokens.spacingS,
+        vertical: 12,
+      ),
+    );
+    final destructiveStyle = ElevatedButton.styleFrom(
+      minimumSize: buttonMinSize,
+      foregroundColor: colorScheme.onError,
+      backgroundColor: colorScheme.error,
+      textStyle: const TextStyle(fontWeight: FontWeight.w700),
+    );
+
     return Container(
       color: styles.overlayScrimColor,
       child: Center(
@@ -37,39 +72,56 @@ class PauseOverlay extends StatelessWidget {
                 padding: styles.overlayPadding,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('Paused', style: styles.overlayTitleStyle),
+                    Text('Paused',
+                        style: styles.overlayTitleStyle,
+                        textAlign: TextAlign.center),
                     const SizedBox(height: AppTokens.spacingM),
                     _OverlayButton(
                       icon: Icons.play_arrow,
                       label: 'Continue',
                       onPressed: onDismiss,
+                      style: primaryStyle,
+                      variant: _OverlayButtonVariant.elevated,
                     ),
+                    SizedBox(height: buttonSpacing),
                     _OverlayButton(
-                      icon: Icons.refresh,
-                      label: 'Reset Session',
+                      icon: Icons.skip_next,
+                      label: 'Skip',
                       onPressed: () {
-                        controller.resetSession();
+                        controller.skipForward();
                       },
+                      style: secondaryStyle,
+                      variant: _OverlayButtonVariant.outlined,
                     ),
+                    SizedBox(height: buttonSpacing),
                     _OverlayButton(
                       icon: Icons.replay,
                       label: 'Reset Round',
                       onPressed: () {
                         controller.resetRound();
                       },
+                      style: mutedSecondaryStyle,
+                      variant: _OverlayButtonVariant.outlined,
                     ),
+                    SizedBox(height: buttonSpacing),
                     _OverlayButton(
-                      icon: Icons.skip_next,
-                      label: 'Skip Forward',
+                      icon: Icons.refresh,
+                      label: 'Reset Session',
                       onPressed: () {
-                        controller.skipForward();
+                        controller.resetSession();
                       },
+                      style: mutedSecondaryStyle,
+                      variant: _OverlayButtonVariant.outlined,
                     ),
+                    const SizedBox(height: AppTokens.spacingM),
                     _OverlayButton(
                       icon: Icons.flag,
                       label: 'Finish Session',
                       onPressed: onFinish,
+                      style: destructiveStyle,
+                      variant: _OverlayButtonVariant.elevated,
                     ),
                   ],
                 ),
@@ -87,22 +139,33 @@ class _OverlayButton extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onPressed,
+    required this.style,
+    required this.variant,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback? onPressed;
+  final ButtonStyle style;
+  final _OverlayButtonVariant variant;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+    if (variant == _OverlayButtonVariant.outlined) {
+      return OutlinedButton.icon(
+        style: style,
         onPressed: onPressed,
         icon: Icon(icon),
         label: Text(label),
-      ),
+      );
+    }
+    return ElevatedButton.icon(
+      style: style,
+      onPressed: onPressed,
+      icon: Icon(icon),
+      label: Text(label),
     );
   }
 }
+
+enum _OverlayButtonVariant { elevated, outlined }

@@ -6,6 +6,7 @@ Date: 2025-12-16
 ## Status Snapshot
 - Foundations and core UX are implemented in the app: scheduler, session controller, presets/history storage, and all screens (Launch/Main/Settings/Session/End/History).
 - Reliability/polish improved: atomic history writes exist; audio assets now match expected format; UI mojibake fixed; Settings/Main preset refresh fixed; pause overlay now derives from controller state; skip-forward semantics cover countdown/active/rest; tick audio limited to countdown; results use real elapsed/per-round durations.
+- Launch now enforces a minimum 3s display while bootstrapping to avoid flashing through on fast devices.
 - Release prep not started.
 - Tests now passing locally (`flutter test`); controller/models suites cover transitions/skip/results; CI workflow exists but needs a green run after recent changes.
 - Design rationale is captured in `docs/DECISIONS.md` for future reference.
@@ -33,7 +34,7 @@ Date: 2025-12-16
 - [ ] Persist in-flight session progress on app background; restore on resume (stretch).
 
 ### UI & Navigation
-- [x] Launch splash auto-transition (~1.5s). (Audio prewarm not implemented.)
+- [x] Launch splash auto-transition (now gated to minimum 3s; audio prewarm not implemented).
 - [x] Main: preset summary card, palette swatches, actions (Play/Settings/History), responsive layout.
 - [x] Settings: rounds, durations, interval, number range, palette select, outdoor boost, large session text, high contrast palette, countdown toggle + seconds, RNG seed toggle/input.
 - [x] Session: countdown/active/rest UIs, per-phase backgrounds, large number, rest progress, double-tap pause overlay with continue/reset/skip/finish driven by controller state; phase views and pause overlay are modular widgets.

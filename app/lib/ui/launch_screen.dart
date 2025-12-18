@@ -1,34 +1,33 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import 'main_screen.dart';
 
 class LaunchScreen extends StatefulWidget {
-  const LaunchScreen({super.key});
+  const LaunchScreen({
+    super.key,
+    this.autoProceed = false,
+  });
 
   static const routeName = '/';
+  final bool autoProceed;
 
   @override
   State<LaunchScreen> createState() => _LaunchScreenState();
 }
 
 class _LaunchScreenState extends State<LaunchScreen> {
-  Timer? _timer;
+  bool _navigated = false;
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer(const Duration(milliseconds: 1500), () {
-      if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+    if (widget.autoProceed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _navigated) return;
+        _navigated = true;
+        Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
+      });
+    }
   }
 
   @override

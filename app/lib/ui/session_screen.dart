@@ -19,7 +19,8 @@ class SessionScreen extends StatefulWidget {
   State<SessionScreen> createState() => _SessionScreenState();
 }
 
-class _SessionScreenState extends State<SessionScreen> with WidgetsBindingObserver {
+class _SessionScreenState extends State<SessionScreen>
+    with WidgetsBindingObserver {
   bool _navigatedToEnd = false;
   late final SessionController _controller;
 
@@ -43,7 +44,9 @@ class _SessionScreenState extends State<SessionScreen> with WidgetsBindingObserv
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive || state == AppLifecycleState.detached) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
       _controller.pause();
     }
     super.didChangeAppLifecycleState(state);
@@ -93,7 +96,8 @@ class _SessionScreenState extends State<SessionScreen> with WidgetsBindingObserv
             } else {
               background = snapshot.currentColor ?? colors.colors.first;
             }
-            final restTotal = snapshot.secondsIntoPhase + snapshot.secondsRemainingInPhase;
+            final restTotal =
+                snapshot.secondsIntoPhase + snapshot.secondsRemainingInPhase;
             return Stack(
               fit: StackFit.expand,
               children: [
@@ -111,8 +115,8 @@ class _SessionScreenState extends State<SessionScreen> with WidgetsBindingObserv
                             child: Center(
                               child: _buildPhaseView(
                                 snapshot: snapshot,
-                                colors: colors,
                                 numberStyle: styles.numberTextStyle,
+                                backgroundColor: background,
                                 restTotal: restTotal,
                                 outdoorBoost: ctrl.preset.outdoorBoost,
                                 styles: styles,
@@ -120,7 +124,9 @@ class _SessionScreenState extends State<SessionScreen> with WidgetsBindingObserv
                             ),
                           ),
                           const SizedBox(height: 24),
-                          Text('Double-tap to pause', textAlign: TextAlign.center, style: styles.hintTextStyle),
+                          Text('Double-tap to pause',
+                              textAlign: TextAlign.center,
+                              style: styles.hintTextStyle),
                         ],
                       ),
                     ),
@@ -151,16 +157,32 @@ class _SessionScreenState extends State<SessionScreen> with WidgetsBindingObserv
 
   Widget _buildPhaseView({
     required SessionSnapshot snapshot,
-    required Palette colors,
     required TextStyle numberStyle,
+    required Color backgroundColor,
     required int restTotal,
     required bool outdoorBoost,
     required SessionStyles styles,
   }) {
+    final contrastColor = styles.textOnStimulus(backgroundColor);
+    final shadowScale = outdoorBoost ? 1.2 : 1.0;
+    final numberShadows = styles.numberShadows.map((shadow) {
+      final scaledAlpha =
+          (shadow.color.a * 255.0 * shadowScale).clamp(0, 255).round();
+      return Shadow(
+        color: shadow.color.withAlpha(scaledAlpha),
+        blurRadius: shadow.blurRadius * shadowScale,
+        offset: shadow.offset,
+      );
+    }).toList();
+    final primaryNumberStyle = numberStyle.copyWith(
+      color: contrastColor,
+      shadows: numberShadows,
+    );
+
     if (snapshot.phase == SessionPhase.countdown) {
       return CountdownView(
         remainingSeconds: snapshot.secondsRemainingInPhase,
-        textStyle: numberStyle.copyWith(color: colors.boostedTextColor(outdoorBoost)),
+        textStyle: primaryNumberStyle,
       );
     }
     if (snapshot.phase == SessionPhase.rest) {
@@ -170,11 +192,15 @@ class _SessionScreenState extends State<SessionScreen> with WidgetsBindingObserv
         indicatorSize: styles.restIndicatorSize,
         strokeWidth: styles.restStrokeWidth,
         backgroundColor: styles.restIndicatorBackground,
+        textStyle: styles.restSecondsTextStyle.copyWith(
+          color: contrastColor,
+          shadows: numberShadows,
+        ),
       );
     }
     return ActiveRoundView(
       displayText: snapshot.currentNumber?.toString() ?? '--',
-      textStyle: numberStyle.copyWith(color: colors.boostedTextColor(outdoorBoost)),
+      textStyle: primaryNumberStyle,
     );
   }
 }
@@ -193,7 +219,8 @@ class _SessionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Round ${snapshot.roundIndex + 1}/${snapshot.roundsTotal}', style: styles.headerRoundTextStyle),
+        Text('Round ${snapshot.roundIndex + 1}/${snapshot.roundsTotal}',
+            style: styles.headerRoundTextStyle),
         Text(timerText, style: styles.headerTimerTextStyle),
       ],
     );
