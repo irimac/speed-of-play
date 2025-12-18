@@ -40,3 +40,4 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Increased the large-text toggle impact (larger display font) while keeping tests green.
 - Added `audioEnabled` preset flag + Settings toggle with persistence; auto-pause on app background/inactive via lifecycle observer; pause now stops scheduler (tested).
 - Audio cues made idempotent per session second/round (guards against duplicate ticks/round-starts, gated by audioEnabled); added tests for countdown tick counts and pause suppression.
+- AudioCuePlayer now uses injectable backends and a single preload path; added spy-based test to ensure assets load once and play calls stay lightweight.

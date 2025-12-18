@@ -30,6 +30,7 @@ Purpose: capture the “why” behind key design and implementation choices so f
 - **Lifecycle handling**: App lifecycle observer auto-pauses sessions when backgrounded/inactive, silencing cues until the user resumes; controller scheduler is paused accordingly.
 - **Audio control**: `audioEnabled` preset flag stored in settings; hooks ready for muting cues via controller/service if desired.
 - **Cue idempotence**: Controller guards countdown ticks and round-start cues so they fire at most once per aligned second/round, respecting `audioEnabled` to avoid duplicate sounds.
+- **Audio preload**: Audio player wraps injectable backends and preloads assets once on start; tests ensure plays don’t retrigger loads, keeping per-tick work minimal.
 
 ## Persistence & storage
 - **Atomic history writes**: temp file then rename to avoid corrupting history on crash.
