@@ -64,14 +64,20 @@ class AudioCuePlayer {
   }
 
   Future<void> playTick({int? sessionSecond, String? phase}) async {
-    if (!_loaded) return;
+    if (!_loaded) {
+      await ensureLoaded();
+      if (!_loaded) return;
+    }
     await _tickBackend.seek(Duration.zero);
     await _tickBackend.play();
     _recordTrace('tick', sessionSecond, phase);
   }
 
   Future<void> playRoundStart({int? sessionSecond, String? phase}) async {
-    if (!_loaded) return;
+    if (!_loaded) {
+      await ensureLoaded();
+      if (!_loaded) return;
+    }
     await _roundStartBackend.seek(Duration.zero);
     await _roundStartBackend.play();
     _recordTrace('roundStart', sessionSecond, phase);

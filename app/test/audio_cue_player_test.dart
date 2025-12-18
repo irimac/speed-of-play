@@ -66,4 +66,18 @@ void main() {
     expect(trace.first.sessionSecond, 5);
     expect(trace.last.sessionSecond, 54);
   });
+
+  test('play triggers preload once when not loaded', () async {
+    final tick = _SpyBackend();
+    final start = _SpyBackend();
+    final player = AudioCuePlayer(tickBackend: tick, roundStartBackend: start);
+
+    await player.playTick(sessionSecond: 0);
+    await player.playRoundStart(sessionSecond: 1);
+
+    expect(tick.setAssetCalls, 1);
+    expect(start.setAssetCalls, 1);
+    expect(tick.playCalls, 1);
+    expect(start.playCalls, 1);
+  });
 }
