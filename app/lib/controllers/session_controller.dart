@@ -193,7 +193,7 @@ class SessionController extends ChangeNotifier {
     if (_paused || _phase == SessionPhase.end) return;
     if (_phase == SessionPhase.countdown && preset.audioEnabled && _lastTickAudioSecond != _elapsedSeconds) {
       _lastTickAudioSecond = _elapsedSeconds;
-      unawaited(_audio.playTick());
+      unawaited(_audio.playTick(sessionSecond: _elapsedSeconds, phase: _phase.name));
     }
     _elapsedSeconds += 1;
     _secondsIntoPhase += 1;
@@ -247,7 +247,7 @@ class SessionController extends ChangeNotifier {
     }
     if (playAudio && preset.audioEnabled && _lastRoundStartRound != _roundIndex) {
       _lastRoundStartRound = _roundIndex;
-      unawaited(_audio.playRoundStart());
+      unawaited(_audio.playRoundStart(sessionSecond: _elapsedSeconds, phase: _phase.name));
     }
   }
 

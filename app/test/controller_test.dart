@@ -9,10 +9,10 @@ class _NoopAudioPlayer extends AudioCuePlayer {
   Future<void> ensureLoaded() async {}
 
   @override
-  Future<void> playRoundStart() async {}
+  Future<void> playRoundStart({int? sessionSecond, String? phase}) async {}
 
   @override
-  Future<void> playTick() async {}
+  Future<void> playTick({int? sessionSecond, String? phase}) async {}
 }
 
 class _ManualScheduler extends SessionScheduler {
@@ -61,12 +61,12 @@ class _CountingAudio extends AudioCuePlayer {
   Future<void> ensureLoaded() async {}
 
   @override
-  Future<void> playRoundStart() async {
+  Future<void> playRoundStart({int? sessionSecond, String? phase}) async {
     roundStarts++;
   }
 
   @override
-  Future<void> playTick() async {
+  Future<void> playTick({int? sessionSecond, String? phase}) async {
     ticks++;
   }
 }
@@ -75,6 +75,7 @@ class _RecordingAudio extends AudioCuePlayer {
   final List<String> log = [];
   bool loaded = false;
   int tickCount = 0;
+  List<AudioEventTraceEntry> lastTrace = const [];
 
   @override
   Future<void> ensureLoaded() async {
@@ -83,14 +84,20 @@ class _RecordingAudio extends AudioCuePlayer {
   }
 
   @override
-  Future<void> playRoundStart() async {
+  Future<void> playRoundStart({int? sessionSecond, String? phase}) async {
     log.add('roundStart');
   }
 
   @override
-  Future<void> playTick() async {
+  Future<void> playTick({int? sessionSecond, String? phase}) async {
     log.add('tick');
     tickCount++;
+  }
+
+  @override
+  List<AudioEventTraceEntry> currentTrace() {
+    lastTrace = super.currentTrace();
+    return lastTrace;
   }
 }
 

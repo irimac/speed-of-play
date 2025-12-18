@@ -31,12 +31,19 @@ class AudioCuePlayer {
     AudioBackend? tickBackend,
     AudioBackend? roundStartBackend,
   })  : _tickBackend = tickBackend ?? JustAudioBackend(),
-        _roundStartBackend = roundStartBackend ?? JustAudioBackend();
+        _roundStartBackend = roundStartBackend ?? JustAudioBackend() {
+    assert(() {
+      _trace = <AudioEventTraceEntry>[];
+      return true;
+    }());
+  }
 
   final AudioBackend _tickBackend;
   final AudioBackend _roundStartBackend;
   bool _loaded = false;
   Future<void>? _loadFuture;
+  List<AudioEventTraceEntry>? _trace;
+  static const int _traceLimit = 50;
 
   Future<void> ensureLoaded() {
     _loadFuture ??= _load();
@@ -56,16 +63,18 @@ class AudioCuePlayer {
     }
   }
 
-  Future<void> playTick() async {
+  Future<void> playTick({int? sessionSecond, String? phase}) async {
     if (!_loaded) return;
     await _tickBackend.seek(Duration.zero);
     await _tickBackend.play();
+    _recordTrace('tick', sessionSecond, phase);
   }
 
-  Future<void> playRoundStart() async {
+  Future<void> playRoundStart({int? sessionSecond, String? phase}) async {
     if (!_loaded) return;
     await _roundStartBackend.seek(Duration.zero);
     await _roundStartBackend.play();
+    _recordTrace('roundStart', sessionSecond, phase);
   }
 
   Future<void> dispose() async {
@@ -74,4 +83,37 @@ class AudioCuePlayer {
       _roundStartBackend.dispose(),
     ]);
   }
+
+  List<AudioEventTraceEntry> currentTrace() {
+    final t = _trace;
+    if (t == null) return const [];
+    return List<AudioEventTraceEntry>.unmodifiable(t);
+  }
+
+  void _recordTrace(String eventType, int? sessionSecond, String? phase) {
+    final t = _trace;
+    if (t == null || sessionSecond == null) return;
+    if (t.length >= _traceLimit) {
+      t.removeAt(0);
+    }
+    t.add(
+      AudioEventTraceEntry(
+        sessionSecond: sessionSecond,
+        eventType: eventType,
+        phase: phase,
+      ),
+    );
+  }
+}
+
+class AudioEventTraceEntry {
+  const AudioEventTraceEntry({
+    required this.sessionSecond,
+    required this.eventType,
+    this.phase,
+  });
+
+  final int sessionSecond;
+  final String eventType;
+  final String? phase;
 }
