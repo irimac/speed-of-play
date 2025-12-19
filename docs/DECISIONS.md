@@ -26,6 +26,7 @@ Purpose: capture the "why" behind key design and implementation choices so futur
 - **Shared styles**: Introduced `AppTokens` and `SessionStyles` so session views use centralized spacing/typography/indicator sizing instead of hardcoded values.
 - **Shared action sizing**: Main screen and Pause overlay buttons read height/icon/text sizes from `AppTokens` to keep touch targets and typography consistent across screens.
 - **Summary screen layout**: Session Summary uses a compact stat card grid plus a secondary details card to keep key metrics scan-first for field use.
+- **Settings save behavior**: Settings persist on each change, so explicit Save controls were removed to reduce redundant taps. End screen still requires manual save to history.
 - **Session legibility polish**: Added luminance-based text colors, subtle header/footer scrims, and tabular figures with fixed sizing boxes to reduce digit jitter and improve outdoor readability without altering session logic.
 - **Active color selection**: Added optional `activeColorIds` to presets so coaches can constrain stimulus colors; when unset/empty, behavior remains the full palette. Selection is UI-driven and persists with the preset, keeping default behavior unchanged.
 - **Palette simplification**: Default palette is now `basic`, with a single alternative via the High Contrast toggle. Toggling high contrast clears `activeColorIds` to avoid mismatched color IDs.

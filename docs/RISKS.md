@@ -14,3 +14,4 @@ Status legend: Open / Resolved / TBD
 - **Accessibility/contrast audit** (Open): Contrast, semantics, touch-target checks pending. Session scrims, luminance-based text, and stabilized numerals are in place; full audit still required.
 - **Action button size drift** (Resolved): Main and Pause overlay buttons now share sizing tokens to keep touch targets and typography aligned.
 - **Mute toggle/audio prewarm** (Open): No mute control or prewarming for lowest-latency playback yet.
+- **Settings save confusion** (Resolved): Settings persist immediately; save controls removed to avoid redundant flows.

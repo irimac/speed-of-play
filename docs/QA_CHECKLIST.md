@@ -4,7 +4,7 @@ Use this for manual sweeps; note device/OS and build flavor.
 
 ## Functional
 - [ ] Launch: native OS splash shows, transitions directly to Main with no in-app delay.
-- [ ] Settings: edit rounds/durations/interval/number range/countdown/outdoor boost/seed; Save returns to Main and values reflect immediately.
+- [ ] Settings: edit rounds/durations/interval/number range/countdown/outdoor boost/seed; Done exits and values persist immediately (no separate Save control).
 - [ ] Settings: palette is fixed to basic; High Contrast toggle (next to Active Colors) swaps palette and clears active color selection; stepper button borders render without bleeding into the app bar.
 - [ ] Session start: countdown ticks each second with audio; enters active at 0.
 - [ ] Active: number/color change at interval; no immediate repeats; tick sound only during countdown.

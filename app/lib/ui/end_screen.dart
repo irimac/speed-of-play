@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../data/models.dart';
 import '../services/history_repository.dart';
+import 'components/app_header.dart';
 import 'history_screen.dart';
 import 'main_screen.dart';
 import 'session/time_format.dart';
@@ -15,6 +16,70 @@ class EndScreen extends StatelessWidget {
 
   final SessionResult? result;
 
+  Future<void> _saveToHistory(
+    BuildContext context,
+    SessionResult resolvedResult,
+  ) async {
+    final repo = context.read<SessionHistoryRepository>();
+    await repo.saveResult(resolvedResult);
+    if (context.mounted) {
+      Navigator.of(context).pushReplacementNamed(
+        HistoryScreen.routeName,
+      );
+    }
+  }
+
+  Future<void> _handleDone(
+    BuildContext context,
+    SessionResult? resolvedResult,
+  ) async {
+    if (resolvedResult == null) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        MainScreen.routeName,
+        (route) => false,
+      );
+      return;
+    }
+    final decision = await _showUnsavedSessionDialog(context);
+    if (!context.mounted || decision == null) return;
+    if (decision == _ExitDecision.save) {
+      await _saveToHistory(context, resolvedResult);
+      return;
+    }
+    if (decision == _ExitDecision.discard) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        MainScreen.routeName,
+        (route) => false,
+      );
+    }
+  }
+
+  Future<_ExitDecision?> _showUnsavedSessionDialog(BuildContext context) {
+    return showDialog<_ExitDecision>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Save session?'),
+        content: const Text(
+          'This session has not been saved to history. Save it before leaving?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Stay'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(_ExitDecision.discard),
+            child: const Text('Discard'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(_ExitDecision.save),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final styles = SummaryStyles.defaults(Theme.of(context));
@@ -26,6 +91,25 @@ class EndScreen extends StatelessWidget {
             highContrast: resolvedResult.presetSnapshot.highContrastPalette,
           );
     return Scaffold(
+      appBar: AppHeader(
+        title: 'Session Summary',
+        titleColor: styles.titleStyle.color ?? const Color(0xFF111111),
+        actionColor: styles.accentColor,
+        backgroundColor: styles.headerBackgroundColor,
+        leadingAction: AppHeaderAction(
+          label: 'Done',
+          icon: Icons.arrow_back,
+          onPressed: () => _handleDone(context, resolvedResult),
+        ),
+        trailingAction: AppHeaderAction(
+          label: 'Save',
+          icon: Icons.save,
+          iconAfter: true,
+          onPressed: resolvedResult == null
+              ? null
+              : () => _saveToHistory(context, resolvedResult),
+        ),
+      ),
       body: Container(
         decoration: BoxDecoration(gradient: styles.backgroundGradient),
         child: SafeArea(
@@ -37,11 +121,13 @@ class EndScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _SummaryHeader(
-                      styles: styles,
-                      completedAt: resolvedResult?.completedAt,
-                    ),
-                    SizedBox(height: styles.sectionSpacing),
+                    if (resolvedResult?.completedAt != null) ...[
+                      Text(
+                        'Completed ${_formatCompletedAt(resolvedResult!.completedAt)}',
+                        style: styles.subtitleStyle,
+                      ),
+                      SizedBox(height: styles.sectionSpacing),
+                    ],
                     if (resolvedResult != null) ...[
                       _SummaryStatsGrid(
                         styles: styles,
@@ -104,16 +190,7 @@ class EndScreen extends StatelessWidget {
                         style: styles.primaryButtonStyle,
                         onPressed: resolvedResult == null
                             ? null
-                            : () async {
-                                final repo =
-                                    context.read<SessionHistoryRepository>();
-                                await repo.saveResult(resolvedResult);
-                                if (context.mounted) {
-                                  Navigator.of(context).pushReplacementNamed(
-                                    HistoryScreen.routeName,
-                                  );
-                                }
-                              },
+                            : () => _saveToHistory(context, resolvedResult),
                         child: const Text('Save to History'),
                       ),
                     ),
@@ -138,33 +215,6 @@ class EndScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _SummaryHeader extends StatelessWidget {
-  const _SummaryHeader({
-    required this.styles,
-    required this.completedAt,
-  });
-
-  final SummaryStyles styles;
-  final DateTime? completedAt;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Session Summary', style: styles.titleStyle),
-        if (completedAt != null) ...[
-          const SizedBox(height: 6),
-          Text(
-            'Completed ${_formatCompletedAt(completedAt!)}',
-            style: styles.subtitleStyle,
-          ),
-        ],
-      ],
     );
   }
 }
@@ -350,3 +400,5 @@ String _formatActiveColors(List<String>? activeIds, int paletteCount) {
   }
   return '${activeIds.length}';
 }
+
+enum _ExitDecision { save, discard }

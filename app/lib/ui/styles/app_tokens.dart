@@ -10,6 +10,10 @@ class AppTokens {
   static const double actionIconSize = 24;
   static const double primaryActionTextSize = 20;
   static const double secondaryActionTextSize = 20;
+  static const double headerTitleTextSize = 24;
+  static const double headerActionTextSize = 18;
+  static const double headerIconSize = 28;
+  static const double headerLeadingWidth = 120;
 
   static const EdgeInsets screenPadding = EdgeInsets.all(spacingL);
 }

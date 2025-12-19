@@ -52,29 +52,23 @@ void main() {
     expect(find.text('Countdown seconds'), findsNothing);
   });
 
-  testWidgets('save action pops back to host', (tester) async {
+  testWidgets('done action pops back to host', (tester) async {
     await tester.pumpWidget(_buildHostApp());
 
     await tester.tap(find.byKey(const ValueKey('open-settings')));
     await tester.pumpAndSettle();
     expect(find.text('Settings'), findsOneWidget);
 
-    await tester.tap(find.byKey(const ValueKey('settings-save')));
+    await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('open-settings')), findsOneWidget);
   });
 
-  testWidgets('save and close button pops back to host', (tester) async {
-    await tester.pumpWidget(_buildHostApp());
+  testWidgets('save action is not shown', (tester) async {
+    await tester.pumpWidget(_buildSettingsApp());
 
-    await tester.tap(find.byKey(const ValueKey('open-settings')));
-    await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text('Save & Close'), 300);
-    expect(find.text('Save & Close'), findsOneWidget);
-
-    await tester.tap(find.text('Save & Close'));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('open-settings')), findsOneWidget);
+    expect(find.text('Save'), findsNothing);
+    expect(find.text('Save & Close'), findsNothing);
   });
 }
 

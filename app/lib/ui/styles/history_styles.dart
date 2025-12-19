@@ -2,72 +2,86 @@ import 'package:flutter/material.dart';
 
 import 'app_tokens.dart';
 
-class SummaryStyles {
-  const SummaryStyles({
+class HistoryStyles {
+  const HistoryStyles({
     required this.screenPadding,
+    required this.listPadding,
+    required this.emptyStatePadding,
     required this.contentMaxWidth,
     required this.backgroundGradient,
     required this.headerBackgroundColor,
     required this.titleStyle,
-    required this.subtitleStyle,
-    required this.sectionTitleStyle,
-    required this.emptyStateStyle,
+    required this.primaryTextStyle,
+    required this.secondaryTextStyle,
+    required this.selectionCountStyle,
+    required this.emptyStateTitleStyle,
+    required this.emptyStateSubtitleStyle,
     required this.accentColor,
     required this.cardColor,
-    required this.detailCardColor,
+    required this.cardSelectedColor,
+    required this.cardSelectedBorder,
     required this.cardRadius,
     required this.cardPadding,
     required this.cardSpacing,
+    required this.cardMinHeight,
     required this.cardShadows,
-    required this.statLabelStyle,
-    required this.statValueStyle,
-    required this.statCaptionStyle,
-    required this.statCardMinHeight,
-    required this.detailLabelStyle,
-    required this.detailValueStyle,
-    required this.dividerColor,
+    required this.checkboxSize,
+    required this.actionBarColor,
+    required this.actionBarPadding,
+    required this.actionBarShadows,
     required this.actionButtonHeight,
+    required this.actionButtonSpacing,
     required this.primaryButtonStyle,
     required this.secondaryButtonStyle,
-    required this.buttonSpacing,
     required this.sectionSpacing,
-    required this.gridBreakPoint,
   });
 
   final EdgeInsets screenPadding;
+  final EdgeInsets listPadding;
+  final EdgeInsets emptyStatePadding;
   final double contentMaxWidth;
   final Gradient backgroundGradient;
   final Color headerBackgroundColor;
   final TextStyle titleStyle;
-  final TextStyle subtitleStyle;
-  final TextStyle sectionTitleStyle;
-  final TextStyle emptyStateStyle;
+  final TextStyle primaryTextStyle;
+  final TextStyle secondaryTextStyle;
+  final TextStyle selectionCountStyle;
+  final TextStyle emptyStateTitleStyle;
+  final TextStyle emptyStateSubtitleStyle;
   final Color accentColor;
   final Color cardColor;
-  final Color detailCardColor;
+  final Color cardSelectedColor;
+  final Color cardSelectedBorder;
   final double cardRadius;
   final EdgeInsets cardPadding;
   final double cardSpacing;
+  final double cardMinHeight;
   final List<BoxShadow> cardShadows;
-  final TextStyle statLabelStyle;
-  final TextStyle statValueStyle;
-  final TextStyle statCaptionStyle;
-  final double statCardMinHeight;
-  final TextStyle detailLabelStyle;
-  final TextStyle detailValueStyle;
-  final Color dividerColor;
+  final double checkboxSize;
+  final Color actionBarColor;
+  final EdgeInsets actionBarPadding;
+  final List<BoxShadow> actionBarShadows;
   final double actionButtonHeight;
+  final double actionButtonSpacing;
   final ButtonStyle primaryButtonStyle;
   final ButtonStyle secondaryButtonStyle;
-  final double buttonSpacing;
   final double sectionSpacing;
-  final double gridBreakPoint;
 
-  factory SummaryStyles.defaults(ThemeData theme) {
+  factory HistoryStyles.defaults(ThemeData theme) {
     const accentColor = Color(0xFF1E88E5);
     const headerBackgroundColor = Color(0xFFF8F8F4);
-    return SummaryStyles(
+    return HistoryStyles(
       screenPadding: AppTokens.screenPadding,
+      listPadding: const EdgeInsets.fromLTRB(
+        AppTokens.spacingL,
+        AppTokens.spacingM,
+        AppTokens.spacingL,
+        AppTokens.spacingL,
+      ),
+      emptyStatePadding: const EdgeInsets.symmetric(
+        horizontal: AppTokens.spacingL,
+        vertical: AppTokens.spacingL,
+      ),
       contentMaxWidth: 560,
       backgroundGradient: const LinearGradient(
         begin: Alignment.topCenter,
@@ -79,31 +93,45 @@ class SummaryStyles {
       ),
       headerBackgroundColor: headerBackgroundColor,
       titleStyle: const TextStyle(
-        fontSize: 32,
+        fontSize: 30,
         fontWeight: FontWeight.w800,
         color: Color(0xFF1C1C1C),
       ),
-      subtitleStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: Color(0xFF4A4A4A),
-      ),
-      sectionTitleStyle: const TextStyle(
+      primaryTextStyle: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w700,
         color: Color(0xFF1C1C1C),
+        fontFeatures: [FontFeature.tabularFigures()],
       ),
-      emptyStateStyle: const TextStyle(
-        fontSize: 18,
+      secondaryTextStyle: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF4A4A4A),
+        fontFeatures: [FontFeature.tabularFigures()],
+      ),
+      selectionCountStyle: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF4A4A4A),
+      ),
+      emptyStateTitleStyle: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF1C1C1C),
+      ),
+      emptyStateSubtitleStyle: const TextStyle(
+        fontSize: 16,
         fontWeight: FontWeight.w600,
         color: Color(0xFF4A4A4A),
       ),
       accentColor: accentColor,
       cardColor: Colors.white,
-      detailCardColor: const Color(0xFFF4F6F8),
+      cardSelectedColor: const Color(0xFFEAF2FF),
+      cardSelectedBorder: accentColor,
       cardRadius: AppTokens.cornerL,
       cardPadding: const EdgeInsets.all(16),
       cardSpacing: 12,
+      cardMinHeight: 88,
       cardShadows: [
         BoxShadow(
           color: const Color(0xFF000000).withAlpha(18),
@@ -111,36 +139,18 @@ class SummaryStyles {
           offset: const Offset(0, 8),
         ),
       ],
-      statLabelStyle: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: Color(0xFF4A4A4A),
-      ),
-      statValueStyle: const TextStyle(
-        fontSize: 26,
-        fontWeight: FontWeight.w800,
-        color: Color(0xFF1C1C1C),
-        fontFeatures: [FontFeature.tabularFigures()],
-      ),
-      statCaptionStyle: const TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: Color(0xFF6A6A6A),
-      ),
-      statCardMinHeight: 108,
-      detailLabelStyle: const TextStyle(
-        fontSize: 15,
-        fontWeight: FontWeight.w600,
-        color: Color(0xFF2E2E2E),
-      ),
-      detailValueStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w700,
-        color: Color(0xFF1C1C1C),
-        fontFeatures: [FontFeature.tabularFigures()],
-      ),
-      dividerColor: const Color(0xFFD5D5D5),
+      checkboxSize: 48,
+      actionBarColor: Colors.white,
+      actionBarPadding: const EdgeInsets.all(AppTokens.spacingL),
+      actionBarShadows: [
+        BoxShadow(
+          color: const Color(0xFF000000).withAlpha(12),
+          blurRadius: 12,
+          offset: const Offset(0, -4),
+        ),
+      ],
       actionButtonHeight: AppTokens.primaryButtonHeight,
+      actionButtonSpacing: AppTokens.spacingS,
       primaryButtonStyle: ElevatedButton.styleFrom(
         backgroundColor: accentColor,
         foregroundColor: Colors.white,
@@ -158,9 +168,7 @@ class SummaryStyles {
           fontWeight: FontWeight.w700,
         ),
       ),
-      buttonSpacing: AppTokens.spacingS,
       sectionSpacing: AppTokens.spacingL,
-      gridBreakPoint: 360,
     );
   }
 }

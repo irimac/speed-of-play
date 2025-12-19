@@ -82,3 +82,8 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 ## 2025-12-19 (summary restyle)
 - Restyled Session Summary screen with a scan-first header, stat card grid, and detail cards; actions are full-width and consistent with main token sizing.
 - Added SummaryStyles tokens and widget tests for summary actions/navigation.
+
+## 2025-12-19 (history restyle + header unification)
+- Restyled History screen with scan-friendly card rows, selection action bar, and empty state CTA; added HistoryStyles tokens and widget tests.
+- Unified Settings/History/End headers via shared AppHeader component; standardized title/action sizing tokens and status bar background colors.
+- Settings no longer shows save controls (changes persist on edit); Done uses back arrow. End screen still prompts to save before exit.

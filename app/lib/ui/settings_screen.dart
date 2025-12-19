@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/models.dart';
+import 'components/app_header.dart';
 import 'styles/settings_styles.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -50,38 +51,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     widget.onPresetChanged(preset);
   }
 
-  void _saveAndExit() {
-    Navigator.of(context).pop(_preset);
-  }
-
   @override
   Widget build(BuildContext context) {
     final styles = SettingsStyles.defaults(Theme.of(context));
     return Scaffold(
       backgroundColor: styles.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leadingWidth: styles.appBarLeadingWidth,
-        leading: TextButton.icon(
+      appBar: AppHeader(
+        title: 'Settings',
+        titleColor: styles.textColor,
+        actionColor: styles.accentColor,
+        backgroundColor: styles.backgroundColor,
+        leadingAction: AppHeaderAction(
+          label: 'Done',
+          icon: Icons.arrow_back,
           onPressed: () => Navigator.of(context).pop(),
-          icon: Icon(Icons.arrow_back, color: styles.textColor, size: 28),
-          label: Text(
-            'Back',
-            style: styles.appBarActionStyle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
         ),
-        title: Text('Settings', style: styles.appBarTitleStyle),
-        actions: [
-          TextButton.icon(
-            key: const ValueKey('settings-save'),
-            onPressed: _saveAndExit,
-            icon: Icon(Icons.save, color: styles.accentColor, size: 28),
-            label: Text('Save', style: styles.appBarActionStyle),
-          ),
-        ],
       ),
       body: SafeArea(
         child: ListView(
@@ -344,20 +328,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
               ],
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: styles.accentColor,
-                foregroundColor: styles.onAccentColor,
-                minimumSize: const Size.fromHeight(56),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(styles.buttonRadius),
-                ),
-                textStyle: styles.primaryButtonTextStyle,
-              ),
-              onPressed: _saveAndExit,
-              child: const Text('Save & Close'),
             ),
             const SizedBox(height: 12),
           ],

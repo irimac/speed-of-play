@@ -34,5 +34,5 @@ flutter_launcher_icons:
   android: true
   ios: false
   image_path: assets/icon_ios_1024.png
-  adaptive_icon_foreground: assets/icon_foreground_1024.png
-  adaptive_icon_background: "#000000"   # or assets/icon_background.png
+  adaptive_icon_foreground: assets/icon_foreground_blue.png
+  adaptive_icon_background: "#FFFFFF"   # or assets/icon_background.png
