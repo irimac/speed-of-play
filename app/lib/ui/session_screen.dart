@@ -98,6 +98,21 @@ class _SessionScreenState extends State<SessionScreen>
             }
             final restTotal =
                 snapshot.secondsIntoPhase + snapshot.secondsRemainingInPhase;
+            final maxAbsNumber =
+                ctrl.preset.numberMin.abs() > ctrl.preset.numberMax.abs()
+                    ? ctrl.preset.numberMin.abs()
+                    : ctrl.preset.numberMax.abs();
+            final numberDigits = maxAbsNumber.toString().length;
+            final needsNumberSign = ctrl.preset.numberMin < 0;
+            final activeSizingText =
+                '${needsNumberSign ? '-' : ''}${_repeatChar('8', numberDigits)}';
+            final countdownDigits =
+                (ctrl.preset.countdownSec <= 0 ? 0 : ctrl.preset.countdownSec)
+                    .toString()
+                    .length;
+            final countdownSizingText = '-${_repeatChar('8', countdownDigits)}';
+            final headerTextColor = styles.textOnStimulus(background);
+            final scrimColor = styles.scrimColorForBackground(background);
             return Stack(
               fit: StackFit.expand,
               children: [
@@ -105,13 +120,18 @@ class _SessionScreenState extends State<SessionScreen>
                   duration: const Duration(milliseconds: 150),
                   color: background,
                   child: SafeArea(
-                    child: Padding(
-                      padding: styles.screenPadding,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _SessionHeader(snapshot: snapshot, styles: styles),
-                          Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _SessionHeader(
+                          snapshot: snapshot,
+                          styles: styles,
+                          textColor: headerTextColor,
+                          scrimColor: scrimColor,
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: styles.screenPadding,
                             child: Center(
                               child: _buildPhaseView(
                                 snapshot: snapshot,
@@ -120,15 +140,18 @@ class _SessionScreenState extends State<SessionScreen>
                                 restTotal: restTotal,
                                 outdoorBoost: ctrl.preset.outdoorBoost,
                                 styles: styles,
+                                activeSizingText: activeSizingText,
+                                countdownSizingText: countdownSizingText,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 24),
-                          Text('Double-tap to pause',
-                              textAlign: TextAlign.center,
-                              style: styles.hintTextStyle),
-                        ],
-                      ),
+                        ),
+                        _SessionFooter(
+                          styles: styles,
+                          textColor: headerTextColor,
+                          scrimColor: scrimColor,
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -162,18 +185,13 @@ class _SessionScreenState extends State<SessionScreen>
     required int restTotal,
     required bool outdoorBoost,
     required SessionStyles styles,
+    required String activeSizingText,
+    required String countdownSizingText,
   }) {
     final contrastColor = styles.textOnStimulus(backgroundColor);
-    final shadowScale = outdoorBoost ? 1.2 : 1.0;
-    final numberShadows = styles.numberShadows.map((shadow) {
-      final scaledAlpha =
-          (shadow.color.a * 255.0 * shadowScale).clamp(0, 255).round();
-      return Shadow(
-        color: shadow.color.withAlpha(scaledAlpha),
-        blurRadius: shadow.blurRadius * shadowScale,
-        offset: shadow.offset,
-      );
-    }).toList();
+    final shadowScale = outdoorBoost ? styles.numberShadowBoost : 1.0;
+    final numberShadows =
+        styles.numberShadowsForText(contrastColor, intensity: shadowScale);
     final primaryNumberStyle = numberStyle.copyWith(
       color: contrastColor,
       shadows: numberShadows,
@@ -183,6 +201,7 @@ class _SessionScreenState extends State<SessionScreen>
       return CountdownView(
         remainingSeconds: snapshot.secondsRemainingInPhase,
         textStyle: primaryNumberStyle,
+        sizingText: countdownSizingText,
       );
     }
     if (snapshot.phase == SessionPhase.rest) {
@@ -191,6 +210,7 @@ class _SessionScreenState extends State<SessionScreen>
         totalSeconds: restTotal,
         indicatorSize: styles.restIndicatorSize,
         strokeWidth: styles.restStrokeWidth,
+        innerPadding: styles.restInnerPadding,
         backgroundColor: styles.restIndicatorBackground,
         textStyle: styles.restSecondsTextStyle.copyWith(
           color: contrastColor,
@@ -201,28 +221,87 @@ class _SessionScreenState extends State<SessionScreen>
     return ActiveRoundView(
       displayText: snapshot.currentNumber?.toString() ?? '--',
       textStyle: primaryNumberStyle,
+      sizingText: activeSizingText,
     );
   }
 }
 
 class _SessionHeader extends StatelessWidget {
-  const _SessionHeader({required this.snapshot, required this.styles});
+  const _SessionHeader({
+    required this.snapshot,
+    required this.styles,
+    required this.textColor,
+    required this.scrimColor,
+  });
 
   final SessionSnapshot snapshot;
   final SessionStyles styles;
+  final Color textColor;
+  final Color scrimColor;
 
   @override
   Widget build(BuildContext context) {
+    final remainingText = _formatSeconds(snapshot.secondsRemainingInPhase);
     final timerText = snapshot.phase == SessionPhase.rest
-        ? 'Rest ${snapshot.secondsRemainingInPhase}s'
-        : '${snapshot.secondsRemainingInPhase}s left';
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('Round ${snapshot.roundIndex + 1}/${snapshot.roundsTotal}',
-            style: styles.headerRoundTextStyle),
-        Text(timerText, style: styles.headerTimerTextStyle),
-      ],
+        ? 'Rest $remainingText'
+        : '$remainingText left';
+    return Container(
+      height: styles.headerHeight,
+      padding: styles.headerPadding,
+      color: scrimColor,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Round ${snapshot.roundIndex + 1}/${snapshot.roundsTotal}',
+            style: styles.headerRoundTextStyle.copyWith(color: textColor),
+          ),
+          Text(
+            timerText,
+            style: styles.headerTimerTextStyle.copyWith(color: textColor),
+          ),
+        ],
+      ),
     );
   }
+}
+
+class _SessionFooter extends StatelessWidget {
+  const _SessionFooter({
+    required this.styles,
+    required this.textColor,
+    required this.scrimColor,
+  });
+
+  final SessionStyles styles;
+  final Color textColor;
+  final Color scrimColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: styles.footerHeight,
+      padding: styles.footerPadding,
+      color: scrimColor,
+      alignment: Alignment.center,
+      child: Text(
+        'Double-tap to pause',
+        textAlign: TextAlign.center,
+        style: styles.hintTextStyle.copyWith(color: textColor),
+      ),
+    );
+  }
+}
+
+String _formatSeconds(int seconds) {
+  final clamped = seconds < 0 ? 0 : seconds;
+  final minutes = clamped ~/ 60;
+  final remaining = clamped % 60;
+  return '${minutes.toString().padLeft(2, '0')}:'
+      '${remaining.toString().padLeft(2, '0')}';
+}
+
+String _repeatChar(String char, int count) {
+  if (count <= 0) return char;
+  return List.filled(count, char).join();
 }

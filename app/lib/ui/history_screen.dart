@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../data/models.dart';
@@ -96,7 +96,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           icon: const Icon(Icons.delete),
                           label: const Text('Delete Selected'),
                           onPressed: () async {
-                            final repo = context.read<SessionHistoryRepository>();
+                            final repo =
+                                context.read<SessionHistoryRepository>();
                             await repo.deleteByIds(_selectedIds);
                             if (!mounted) return;
                             setState(() => _selectedIds.clear());
@@ -111,15 +112,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           label: const Text('Export CSV'),
                           onPressed: () async {
                             final messenger = ScaffoldMessenger.of(context);
-                            final repo = context.read<SessionHistoryRepository>();
+                            final repo =
+                                context.read<SessionHistoryRepository>();
                             final all = await repo.loadHistory();
-                            final sessions =
-                                all.where((s) => _selectedIds.contains(s.id)).toList();
+                            final sessions = all
+                                .where((s) => _selectedIds.contains(s.id))
+                                .toList();
                             if (sessions.isEmpty) return;
                             final file = await repo.exportCsv(sessions);
                             if (!mounted) return;
                             messenger.showSnackBar(
-                              SnackBar(content: Text('CSV saved to ${file.path}')),
+                              SnackBar(
+                                  content: Text('CSV saved to ${file.path}')),
                             );
                           },
                         ),

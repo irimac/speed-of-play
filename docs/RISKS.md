@@ -11,5 +11,5 @@ Status legend: Open / Resolved / TBD
 - **Round-start audio while paused** (Resolved): SkipForward uses silent transition when paused; audio only on running transitions.
 - **Metrics alignment** (Resolved): `totalElapsedSec` includes countdown + active + rest (excluding pauses); `roundsCompleted` counts completed active phases only.
 - **History/CI coverage** (Open): CI workflow exists; needs consistent green runs and history repository tests.
-- **Accessibility/contrast audit** (Open): Contrast, semantics, touch-target checks pending.
+- **Accessibility/contrast audit** (Open): Contrast, semantics, touch-target checks pending. Session scrims, luminance-based text, and stabilized numerals are in place; full audit still required.
 - **Mute toggle/audio prewarm** (Open): No mute control or prewarming for lowest-latency playback yet.

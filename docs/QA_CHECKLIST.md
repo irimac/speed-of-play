@@ -3,12 +3,12 @@
 Use this for manual sweeps; note device/OS and build flavor.
 
 ## Functional
-- [ ] Launch: splash shows, auto-transitions in ~1.5s to Main.
+- [ ] Launch: native OS splash shows, transitions directly to Main with no in-app delay.
 - [ ] Settings: edit rounds/durations/interval/number range/palette/countdown/outdoor boost/seed; Save returns to Main and values reflect immediately.
 - [ ] Session start: countdown ticks each second with audio; enters active at 0.
-- [ ] Active: number/color change at interval; no immediate repeats; tick sound each second.
-- [ ] Rest: rest background + circular progress; resumes next round automatically.
-- [ ] Pause overlay: double-tap to open; Continue, Reset Session, Reset Round, Skip Forward (active only), Finish all work.
+- [ ] Active: number/color change at interval; no immediate repeats; tick sound only during countdown.
+- [ ] Rest: rest background + circular progress ring; resumes next round automatically.
+- [ ] Pause overlay: double-tap to open; Continue, Skip, Reset Round, Reset Session, Finish all work.
 - [ ] End screen: summary correct; Save to History persists entry; End to Main returns home.
 - [ ] History: list newest-first; multi-select; delete removes entries; export CSV creates file and shows snackbar path.
 
@@ -27,6 +27,7 @@ Use this for manual sweeps; note device/OS and build flavor.
 
 ## Accessibility & Readability
 - [ ] Text legible outdoors; outdoor boost improves contrast.
+- [ ] Session digits do not jitter; header/footer text remains readable on bright palettes.
 - [ ] Buttons meet touch target size; semantics/labels read correctly with screen reader.
 
 ## Known Gaps (track if not tested/implemented)

@@ -53,7 +53,8 @@ void main() {
     expect(start.disposed, 1);
   });
 
-  test('AudioCuePlayer debug trace caps at 50 entries and preserves order', () async {
+  test('AudioCuePlayer debug trace caps at 50 entries and preserves order',
+      () async {
     final tick = _SpyBackend();
     final start = _SpyBackend();
     final player = AudioCuePlayer(tickBackend: tick, roundStartBackend: start);

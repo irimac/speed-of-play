@@ -35,7 +35,8 @@ class SessionHistoryRepository {
   }
 
   Future<File> exportCsv(List<SessionResult> sessions) async {
-    final file = await _storage.file('exports/history_${DateTime.now().millisecondsSinceEpoch}.csv');
+    final file = await _storage
+        .file('exports/history_${DateTime.now().millisecondsSinceEpoch}.csv');
     await file.writeAsString(sessions.toCsv());
     return file;
   }

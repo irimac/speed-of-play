@@ -6,39 +6,65 @@ class SessionStyles {
   const SessionStyles({
     required this.screenPadding,
     required this.numberTextStyle,
-    required this.numberShadows,
+    required this.numberShadowBlur,
+    required this.numberShadowOffset,
+    required this.numberShadowOpacity,
+    required this.numberShadowBoost,
     required this.headerRoundTextStyle,
     required this.headerTimerTextStyle,
+    required this.headerHeight,
+    required this.footerHeight,
+    required this.headerPadding,
+    required this.footerPadding,
+    required this.scrimLuminanceThreshold,
+    required this.scrimLightOpacity,
+    required this.scrimDarkOpacity,
     required this.restIndicatorSize,
     required this.restStrokeWidth,
+    required this.restInnerPadding,
     required this.restIndicatorBackground,
     required this.restSecondsTextStyle,
     required this.overlayMaxWidth,
     required this.overlayCardColor,
     required this.overlayScrimColor,
     required this.overlayTitleStyle,
+    required this.overlaySubtitleStyle,
     required this.overlayPadding,
     required this.hintTextStyle,
     required this.overlayButtonSpacing,
+    required this.overlaySectionSpacing,
     required this.overlayButtonMinHeight,
   });
 
   final EdgeInsets screenPadding;
   final TextStyle numberTextStyle;
-  final List<Shadow> numberShadows;
+  final double numberShadowBlur;
+  final Offset numberShadowOffset;
+  final double numberShadowOpacity;
+  final double numberShadowBoost;
   final TextStyle headerRoundTextStyle;
   final TextStyle headerTimerTextStyle;
+  final double headerHeight;
+  final double footerHeight;
+  final EdgeInsets headerPadding;
+  final EdgeInsets footerPadding;
+  final double scrimLuminanceThreshold;
+  final double scrimLightOpacity;
+  final double scrimDarkOpacity;
   final double restIndicatorSize;
   final double restStrokeWidth;
+  final double restInnerPadding;
   final Color restIndicatorBackground;
   final TextStyle restSecondsTextStyle;
   final double overlayMaxWidth;
   final Color overlayCardColor;
   final Color overlayScrimColor;
   final TextStyle overlayTitleStyle;
+  final TextStyle overlaySubtitleStyle;
   final EdgeInsets overlayPadding;
   final TextStyle hintTextStyle;
   final double overlayButtonSpacing;
+  final double overlaySectionSpacing;
   final double overlayButtonMinHeight;
 
   factory SessionStyles.defaults(ThemeData theme,
@@ -51,28 +77,42 @@ class SessionStyles {
       fontWeight: FontWeight.bold,
       height: 1,
       fontFeatures: const [FontFeature.tabularFigures()],
-      shadows: const [
-        Shadow(
-          color: Color.fromRGBO(0, 0, 0, 0.35),
-          blurRadius: 12,
-          offset: Offset(0, 2),
-        ),
-      ],
     );
     return SessionStyles(
       screenPadding: AppTokens.screenPadding,
       numberTextStyle: baseNumberStyle,
-      numberShadows: const [
-        Shadow(
-          color: Color.fromRGBO(0, 0, 0, 0.35),
-          blurRadius: 12,
-          offset: Offset(0, 2),
-        ),
-      ],
-      headerRoundTextStyle: const TextStyle(fontSize: 24),
-      headerTimerTextStyle: const TextStyle(fontSize: 20),
-      restIndicatorSize: 240,
-      restStrokeWidth: 24,
+      numberShadowBlur: 10,
+      numberShadowOffset: const Offset(0, 2),
+      numberShadowOpacity: 0.24,
+      numberShadowBoost: 1.25,
+      headerRoundTextStyle: const TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        height: 1,
+        fontFeatures: [FontFeature.tabularFigures()],
+      ),
+      headerTimerTextStyle: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+        height: 1,
+        fontFeatures: [FontFeature.tabularFigures()],
+      ),
+      headerHeight: 56,
+      footerHeight: 52,
+      headerPadding: const EdgeInsets.symmetric(
+        horizontal: AppTokens.spacingL,
+        vertical: AppTokens.spacingS,
+      ),
+      footerPadding: const EdgeInsets.symmetric(
+        horizontal: AppTokens.spacingL,
+        vertical: AppTokens.spacingS,
+      ),
+      scrimLuminanceThreshold: 0.4,
+      scrimLightOpacity: 0.18,
+      scrimDarkOpacity: 0.0,
+      restIndicatorSize: 268,
+      restStrokeWidth: 28,
+      restInnerPadding: 12,
       restIndicatorBackground: const Color.fromRGBO(255, 255, 255, 0.3),
       restSecondsTextStyle:
           (textTheme.displayMedium ?? const TextStyle()).copyWith(
@@ -84,13 +124,43 @@ class SessionStyles {
       overlayMaxWidth: 420,
       overlayCardColor: Colors.grey.shade900,
       overlayScrimColor: const Color.fromRGBO(0, 0, 0, 0.75),
-      overlayTitleStyle:
-          const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+      overlayTitleStyle: const TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+      overlaySubtitleStyle: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: Colors.white70,
+      ),
       overlayPadding: const EdgeInsets.all(AppTokens.spacingL),
       hintTextStyle: textTheme.bodyMedium ?? const TextStyle(fontSize: 16),
-      overlayButtonSpacing: AppTokens.spacingS / 2,
-      overlayButtonMinHeight: 52,
+      overlayButtonSpacing: AppTokens.spacingS,
+      overlaySectionSpacing: AppTokens.spacingM,
+      overlayButtonMinHeight: 56,
     );
+  }
+
+  List<Shadow> numberShadowsForText(Color textColor, {double intensity = 1}) {
+    final baseColor = textColor == Colors.black ? Colors.white : Colors.black;
+    final opacity = (numberShadowOpacity * intensity).clamp(0.0, 1.0);
+    final alpha = (opacity * 255).round().clamp(0, 255);
+    return [
+      Shadow(
+        color: baseColor.withAlpha(alpha),
+        blurRadius: numberShadowBlur * intensity,
+        offset: numberShadowOffset,
+      ),
+    ];
+  }
+
+  Color scrimColorForBackground(Color background) {
+    final isLight = background.computeLuminance() >= scrimLuminanceThreshold;
+    final base = isLight ? Colors.black : Colors.white;
+    final opacity = isLight ? scrimLightOpacity : scrimDarkOpacity;
+    final alpha = (opacity * 255).round().clamp(0, 255);
+    return base.withAlpha(alpha);
   }
 
   Color textOnStimulus(Color background) {

@@ -555,7 +555,8 @@ void main() {
       expect(audio.log, ['load']);
     });
 
-    test('ticks fire once per countdown second; pause suppresses extra ticks', () {
+    test('ticks fire once per countdown second; pause suppresses extra ticks',
+        () {
       _ManualScheduler scheduler = _ManualScheduler((_) {});
       final audio = _RecordingAudio();
       final preset = SessionPreset.defaults().copyWith(

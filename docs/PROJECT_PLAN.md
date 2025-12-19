@@ -8,7 +8,8 @@ Date: 2025-12-16
 - Reliability/polish improved: atomic history writes exist; audio assets now match expected format; UI mojibake fixed; Settings/Main preset refresh fixed; pause overlay now derives from controller state; skip-forward semantics cover countdown/active/rest; tick audio limited to countdown; results use real elapsed/per-round durations.
 - Launch now uses native OS splash (Android configured; iOS pending platform folder) with no in-app delay before Main renders.
 - Release prep not started.
-- Tests now passing locally (`flutter test`); controller/models suites cover transitions/skip/results; CI workflow exists but needs a green run after recent changes.
+- Session screen polish landed: stable tabular numerals, luminance-based text colors, top/bottom scrims, clearer pause overlay, and updated rest ring sizing; goldens cover Active and Pause views.
+- Tests now passing locally (`flutter test`, `flutter analyze`); controller/models suites cover transitions/skip/results; CI workflow exists but needs a green run after recent changes.
 - Design rationale is captured in `docs/DECISIONS.md` for future reference.
 - Risk log is tracked in `docs/RISKS.md` for ongoing mitigation.
 
@@ -37,18 +38,19 @@ Date: 2025-12-16
 - [x] Launch handled by native OS splash (no in-app gate); audio prewarm not implemented.
 - [x] Main: preset summary card, palette swatches, actions (Play/Settings/History), responsive layout.
 - [x] Settings: rounds, durations, interval, number range, palette select, outdoor boost, large session text, high contrast palette, countdown toggle + seconds, RNG seed toggle/input.
-- [x] Session: countdown/active/rest UIs, per-phase backgrounds, large number, rest progress, double-tap pause overlay with continue/reset/skip/finish driven by controller state; phase views and pause overlay are modular widgets.
+- [x] Session: countdown/active/rest UIs, per-phase backgrounds, large number, rest progress, double-tap pause overlay with continue/reset/skip/finish driven by controller state; phase views and pause overlay are modular widgets. Added stable numeric layout, luminance-based text, and header/footer scrims for readability.
 - [x] End: summary, per-round list, Save to History, End to Main.
 - [x] History: newest-first list, multi-select, delete, export CSV, empty state.
 
 ### Visual/Accessibility/Performance
 - [x] Theme/palettes applied; outdoor boost behavior implemented.
-- [ ] Contrast, semantics, and touch-target audit; ensure readability outdoors.
+- [ ] Contrast, semantics, and touch-target audit; ensure readability outdoors. (Session screen scrims and tabular numerals done; full audit pending.)
 - [ ] Optimize animations/transitions/perf; prewarm audio to reduce first-play latency.
 
 ### QA & Tooling
 - [ ] Smoke tests: controller timing, preset encode/decode, history repo write/read. (models encode/decode, CSV, randomInRange, controller transitions/skip/result tests added)
 - [x] Manual QA checklist (rotation, pause/resume, reset, end-save-export, history delete/export).
+- [x] Local checks: `flutter analyze`, `flutter test` run green after recent UI polish.
 - [ ] CI: format/lint/test (`flutter analyze`, `flutter test`). (workflow added; needs green run)
 
 ## Risks & Mitigations

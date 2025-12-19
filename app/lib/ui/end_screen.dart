@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../data/models.dart';
@@ -29,7 +29,8 @@ class EndScreen extends StatelessWidget {
             const SizedBox(height: 16),
             if (result != null) ...[
               _SummaryRow(label: 'Rounds', value: '${result!.roundsCompleted}'),
-              _SummaryRow(label: 'Total Time', value: '${result!.totalElapsedSec}s'),
+              _SummaryRow(
+                  label: 'Total Time', value: '${result!.totalElapsedSec}s'),
               _SummaryRow(
                 label: 'Palette',
                 value: result!.presetSnapshot.paletteId,
@@ -63,7 +64,8 @@ class EndScreen extends StatelessWidget {
                       final repo = context.read<SessionHistoryRepository>();
                       await repo.saveResult(result!);
                       if (context.mounted) {
-                        Navigator.of(context).pushReplacementNamed(HistoryScreen.routeName);
+                        Navigator.of(context)
+                            .pushReplacementNamed(HistoryScreen.routeName);
                       }
                     },
               child: const Text('Save to History'),
@@ -104,4 +106,3 @@ class _SummaryRow extends StatelessWidget {
     );
   }
 }
-

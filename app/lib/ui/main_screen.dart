@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../data/models.dart';
 import 'history_screen.dart';
@@ -116,12 +116,18 @@ class _SummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Session Preset', style: Theme.of(context).textTheme.titleLarge),
+            Text('Session Preset',
+                style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            _InfoRow(label: 'Rounds', value: '${preset.rounds} x ${preset.roundDurationSec}s'),
+            _InfoRow(
+                label: 'Rounds',
+                value: '${preset.rounds} x ${preset.roundDurationSec}s'),
             _InfoRow(label: 'Rest', value: '${preset.restDurationSec}s'),
-            _InfoRow(label: 'Change every', value: '${preset.changeIntervalSec}s'),
-            _InfoRow(label: 'Numbers', value: '${preset.numberMin}-${preset.numberMax}'),
+            _InfoRow(
+                label: 'Change every', value: '${preset.changeIntervalSec}s'),
+            _InfoRow(
+                label: 'Numbers',
+                value: '${preset.numberMin}-${preset.numberMax}'),
             _InfoRow(label: 'Countdown', value: '${preset.countdownSec}s'),
             const SizedBox(height: 16),
             Wrap(
@@ -196,11 +202,12 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Expanded(child: Text(label, style: const TextStyle(color: Colors.white70))),
+          Expanded(
+              child:
+                  Text(label, style: const TextStyle(color: Colors.white70))),
           Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );
   }
 }
-

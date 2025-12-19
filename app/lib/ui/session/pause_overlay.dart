@@ -77,7 +77,13 @@ class PauseOverlay extends StatelessWidget {
                     Text('Paused',
                         style: styles.overlayTitleStyle,
                         textAlign: TextAlign.center),
-                    const SizedBox(height: AppTokens.spacingM),
+                    const SizedBox(height: AppTokens.spacingS),
+                    Text(
+                      'Ready when you are',
+                      style: styles.overlaySubtitleStyle,
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: styles.overlaySectionSpacing),
                     _OverlayButton(
                       icon: Icons.play_arrow,
                       label: 'Continue',
@@ -115,7 +121,7 @@ class PauseOverlay extends StatelessWidget {
                       style: mutedSecondaryStyle,
                       variant: _OverlayButtonVariant.outlined,
                     ),
-                    const SizedBox(height: AppTokens.spacingM),
+                    SizedBox(height: styles.overlaySectionSpacing),
                     _OverlayButton(
                       icon: Icons.flag,
                       label: 'Finish Session',

@@ -57,3 +57,9 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Restyled the Settings screen with sectioned layout, shared SettingsStyles tokens, card rows, and a primary Save action; added widget tests for headers, steppers, countdown toggles, and save actions.
 - Added active color selection UI, persisted `activeColorIds` in presets, and filtered stimulus palettes by the selected subset while keeping full-palette defaults when unset.
 - Standardized palettes to 8 colors and added a basic palette (white, yellow, blue, red, green, orange, black, gray).
+
+## 2025-12-19 (later)
+- Polished Session screen visuals: stable tabular numerals, fixed-size number boxes, luminance-based text colors, and header/footer scrims for readability; rest ring sizing/tokens adjusted.
+- Pause overlay hierarchy improved with subtitle and spacing; rest/countdown formatting uses mm:ss and avoids jitter.
+- Added session goldens (Active bright/dark, Pause overlay) and a unit test for `textOnStimulus`; updated tests to use `TextScaler`.
+- `flutter analyze` and `flutter test` run clean.
