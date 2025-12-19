@@ -63,3 +63,4 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Pause overlay hierarchy improved with subtitle and spacing; rest/countdown formatting uses mm:ss and avoids jitter.
 - Added session goldens (Active bright/dark, Pause overlay) and a unit test for `textOnStimulus`; updated tests to use `TextScaler`.
 - `flutter analyze` and `flutter test` run clean.
+- Session header/footer bars now show round/time and session elapsed in mm:ss with consistent typography; rotation no longer auto-pauses. Added shared time formatting helper + unit test.

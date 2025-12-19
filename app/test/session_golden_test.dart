@@ -59,6 +59,8 @@ Future<void> _pumpGolden(
 }
 
 void main() {
+  // Update goldens with:
+  // flutter test --update-goldens test/session_golden_test.dart
   testWidgets('Active view golden - bright stimulus', (tester) async {
     final styles = SessionStyles.defaults(ThemeData.light());
     const background = Color(0xFFF6F069);

@@ -322,6 +322,7 @@ class SessionSnapshot {
     required this.phase,
     required this.secondsIntoPhase,
     required this.secondsRemainingInPhase,
+    required this.elapsedSeconds,
     required this.roundIndex,
     required this.roundsTotal,
     required this.currentNumber,
@@ -333,6 +334,7 @@ class SessionSnapshot {
   final SessionPhase phase;
   final int secondsIntoPhase;
   final int secondsRemainingInPhase;
+  final int elapsedSeconds;
   final int roundIndex;
   final int roundsTotal;
   final int? currentNumber;
@@ -344,6 +346,7 @@ class SessionSnapshot {
     SessionPhase? phase,
     int? secondsIntoPhase,
     int? secondsRemainingInPhase,
+    int? elapsedSeconds,
     int? roundIndex,
     int? roundsTotal,
     int? currentNumber,
@@ -356,6 +359,7 @@ class SessionSnapshot {
       secondsIntoPhase: secondsIntoPhase ?? this.secondsIntoPhase,
       secondsRemainingInPhase:
           secondsRemainingInPhase ?? this.secondsRemainingInPhase,
+      elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
       roundIndex: roundIndex ?? this.roundIndex,
       roundsTotal: roundsTotal ?? this.roundsTotal,
       currentNumber: currentNumber ?? this.currentNumber,

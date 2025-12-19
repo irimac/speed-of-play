@@ -21,7 +21,7 @@ Use this for manual sweeps; note device/OS and build flavor.
 - [ ] No dropped frames or jank during sessions; CPU/battery reasonable for 10-minute use.
 
 ## Reliability
-- [ ] Rotate device mid-countdown and mid-active; state and timing remain correct.
+- [ ] Rotate device mid-countdown and mid-active; session continues without auto-pause and timing remains correct.
 - [ ] Pause/resume multiple times; ticks remain aligned to seconds (no doubles/skips).
 - [ ] Background/foreground app during session; state resumes correctly (if not implemented, note as known gap).
 

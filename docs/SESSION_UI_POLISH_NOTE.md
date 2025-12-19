@@ -17,6 +17,7 @@ Planned changes (mapped to tasks):
 
 Status: implemented
 - Added luminance helper tests + scrim/shadow tokens; session header/footer now render on scrims for consistent contrast.
+- Header/footer bars show round/time and session elapsed in mm:ss with consistent typography and always-on light contrast.
 - Active/Countdown numbers are measured against fixed sizing text with tabular figures and strut, removing digit jitter.
 - Rest ring is thicker/larger with inner padding for breathing room; rest seconds stay centered.
 - Pause overlay hierarchy updated with subtitle and clearer spacing groups; tap targets remain >= 48dp.

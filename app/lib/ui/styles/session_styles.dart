@@ -86,13 +86,13 @@ class SessionStyles {
       numberShadowOpacity: 0.24,
       numberShadowBoost: 1.25,
       headerRoundTextStyle: const TextStyle(
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: FontWeight.w600,
         height: 1,
         fontFeatures: [FontFeature.tabularFigures()],
       ),
       headerTimerTextStyle: const TextStyle(
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: FontWeight.w600,
         height: 1,
         fontFeatures: [FontFeature.tabularFigures()],
@@ -109,7 +109,7 @@ class SessionStyles {
       ),
       scrimLuminanceThreshold: 0.4,
       scrimLightOpacity: 0.18,
-      scrimDarkOpacity: 0.0,
+      scrimDarkOpacity: 0.08,
       restIndicatorSize: 268,
       restStrokeWidth: 28,
       restInnerPadding: 12,
@@ -135,7 +135,11 @@ class SessionStyles {
         color: Colors.white70,
       ),
       overlayPadding: const EdgeInsets.all(AppTokens.spacingL),
-      hintTextStyle: textTheme.bodyMedium ?? const TextStyle(fontSize: 16),
+      hintTextStyle:
+          (textTheme.bodyMedium ?? const TextStyle(fontSize: 20)).copyWith(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+      ),
       overlayButtonSpacing: AppTokens.spacingS,
       overlaySectionSpacing: AppTokens.spacingM,
       overlayButtonMinHeight: 56,

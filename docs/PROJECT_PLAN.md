@@ -9,6 +9,7 @@ Date: 2025-12-16
 - Launch now uses native OS splash (Android configured; iOS pending platform folder) with no in-app delay before Main renders.
 - Release prep not started.
 - Session screen polish landed: stable tabular numerals, luminance-based text colors, top/bottom scrims, clearer pause overlay, and updated rest ring sizing; goldens cover Active and Pause views.
+- Session header/footer bars now show round/time and session elapsed in mm:ss with consistent typography; rotation no longer auto-pauses.
 - Tests now passing locally (`flutter test`, `flutter analyze`); controller/models suites cover transitions/skip/results; CI workflow exists but needs a green run after recent changes.
 - Design rationale is captured in `docs/DECISIONS.md` for future reference.
 - Risk log is tracked in `docs/RISKS.md` for ongoing mitigation.

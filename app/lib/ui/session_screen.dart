@@ -8,6 +8,7 @@ import 'session/active_round_view.dart';
 import 'session/countdown_view.dart';
 import 'session/pause_overlay.dart';
 import 'session/rest_view.dart';
+import 'session/time_format.dart';
 import 'styles/session_styles.dart';
 
 class SessionScreen extends StatefulWidget {
@@ -45,7 +46,6 @@ class _SessionScreenState extends State<SessionScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) {
       _controller.pause();
     }
@@ -128,6 +128,7 @@ class _SessionScreenState extends State<SessionScreen>
                           styles: styles,
                           textColor: headerTextColor,
                           scrimColor: scrimColor,
+                          roundDurationSec: ctrl.preset.roundDurationSec,
                         ),
                         Expanded(
                           child: Padding(
@@ -150,6 +151,7 @@ class _SessionScreenState extends State<SessionScreen>
                           styles: styles,
                           textColor: headerTextColor,
                           scrimColor: scrimColor,
+                          elapsedSeconds: snapshot.elapsedSeconds,
                         ),
                       ],
                     ),
@@ -232,19 +234,22 @@ class _SessionHeader extends StatelessWidget {
     required this.styles,
     required this.textColor,
     required this.scrimColor,
+    required this.roundDurationSec,
   });
 
   final SessionSnapshot snapshot;
   final SessionStyles styles;
   final Color textColor;
   final Color scrimColor;
+  final int roundDurationSec;
 
   @override
   Widget build(BuildContext context) {
-    final remainingText = _formatSeconds(snapshot.secondsRemainingInPhase);
-    final timerText = snapshot.phase == SessionPhase.rest
-        ? 'Rest $remainingText'
-        : '$remainingText left';
+    final roundRemainingSec = snapshot.phase == SessionPhase.active
+        ? snapshot.secondsRemainingInPhase
+        : roundDurationSec;
+    final timerText =
+        '${formatSessionSeconds(roundRemainingSec)} / ${formatSessionSeconds(roundDurationSec)}';
     return Container(
       height: styles.headerHeight,
       padding: styles.headerPadding,
@@ -253,7 +258,7 @@ class _SessionHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Round ${snapshot.roundIndex + 1}/${snapshot.roundsTotal}',
+            'Round ${snapshot.roundIndex + 1} / ${snapshot.roundsTotal}',
             style: styles.headerRoundTextStyle.copyWith(color: textColor),
           ),
           Text(
@@ -271,11 +276,13 @@ class _SessionFooter extends StatelessWidget {
     required this.styles,
     required this.textColor,
     required this.scrimColor,
+    required this.elapsedSeconds,
   });
 
   final SessionStyles styles;
   final Color textColor;
   final Color scrimColor;
+  final int elapsedSeconds;
 
   @override
   Widget build(BuildContext context) {
@@ -285,20 +292,12 @@ class _SessionFooter extends StatelessWidget {
       color: scrimColor,
       alignment: Alignment.center,
       child: Text(
-        'Double-tap to pause',
+        'Session ${formatSessionSeconds(elapsedSeconds)}',
         textAlign: TextAlign.center,
         style: styles.hintTextStyle.copyWith(color: textColor),
       ),
     );
   }
-}
-
-String _formatSeconds(int seconds) {
-  final clamped = seconds < 0 ? 0 : seconds;
-  final minutes = clamped ~/ 60;
-  final remaining = clamped % 60;
-  return '${minutes.toString().padLeft(2, '0')}:'
-      '${remaining.toString().padLeft(2, '0')}';
 }
 
 String _repeatChar(String char, int count) {
