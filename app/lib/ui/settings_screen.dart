@@ -24,6 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late SessionPreset _preset;
   bool _showCountdown = true;
   bool _useSeed = false;
+  static const String _basicPaletteId = 'basic';
 
   @override
   void initState() {
@@ -31,6 +32,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _preset = widget.preset;
     _showCountdown = _preset.countdownSec > 0;
     _useSeed = _preset.rngSeed != null;
+    if (_preset.paletteId != _basicPaletteId) {
+      _preset = _preset.copyWith(
+        paletteId: _basicPaletteId,
+        activeColorIds: null,
+      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onPresetChanged(_preset);
+      });
+    }
   }
 
   void _updatePreset(SessionPreset preset) {
@@ -52,16 +62,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.close, color: styles.textColor),
+        leadingWidth: styles.appBarLeadingWidth,
+        leading: TextButton.icon(
           onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.arrow_back, color: styles.textColor, size: 28),
+          label: Text(
+            'Back',
+            style: styles.appBarActionStyle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         title: Text('Settings', style: styles.appBarTitleStyle),
         actions: [
-          TextButton(
+          TextButton.icon(
             onPressed: _saveAndExit,
-            child: Text('Save', style: styles.appBarActionStyle),
-          )
+            icon: Icon(Icons.save, color: styles.accentColor, size: 28),
+            label: Text('Save', style: styles.appBarActionStyle),
+          ),
         ],
       ),
       body: SafeArea(
@@ -207,25 +225,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ],
                 ),
-                SettingsPaletteDropdownRow(
-                  styles: styles,
-                  selectedPaletteId: _preset.paletteId,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    _updatePreset(
-                      _preset.copyWith(
-                        paletteId: value,
-                        activeColorIds: null,
-                      ),
-                    );
-                  },
-                ),
                 SettingsActiveColorsSelector(
                   styles: styles,
-                  palette: Palette.resolve(_preset.paletteId),
+                  palette: Palette.resolveWithContrast(
+                    _basicPaletteId,
+                    highContrast: _preset.highContrastPalette,
+                  ),
                   activeColorIds: _preset.activeColorIds,
-                  onChanged: (value) =>
-                      _updatePreset(_preset.copyWith(activeColorIds: value)),
+                  highContrastEnabled: _preset.highContrastPalette,
+                  onHighContrastChanged: (value) => _updatePreset(
+                    _preset.copyWith(
+                      highContrastPalette: value,
+                      activeColorIds: null,
+                    ),
+                  ),
+                  onChanged: (value) => _updatePreset(
+                    _preset.copyWith(
+                      paletteId: _basicPaletteId,
+                      activeColorIds: value,
+                    ),
+                  ),
                 ),
                 SettingsSwitchRow(
                   label: 'Outdoor brightness boost',
@@ -240,14 +259,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   styles: styles,
                   onChanged: (value) => _updatePreset(
                     _preset.copyWith(largeSessionText: value),
-                  ),
-                ),
-                SettingsSwitchRow(
-                  label: 'High contrast palette',
-                  value: _preset.highContrastPalette,
-                  styles: styles,
-                  onChanged: (value) => _updatePreset(
-                    _preset.copyWith(highContrastPalette: value),
                   ),
                 ),
               ],
@@ -602,80 +613,28 @@ class _StepperButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderColor = enabled ? styles.textColor : styles.mutedTextColor;
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(styles.stepperButtonRadius),
+      side: BorderSide(color: borderColor, width: 2),
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: InkWell(
-        key: buttonKey,
-        onTap: enabled ? onPressed : null,
-        borderRadius: BorderRadius.circular(styles.stepperButtonRadius),
-        child: Ink(
-          width: styles.stepperButtonSize,
-          height: styles.stepperButtonSize,
-          decoration: BoxDecoration(
-            color: styles.cardColor,
-            borderRadius: BorderRadius.circular(styles.stepperButtonRadius),
-            border: Border.all(color: borderColor, width: 2),
+      child: Material(
+        color: styles.cardColor,
+        shape: shape,
+        child: InkWell(
+          key: buttonKey,
+          onTap: enabled ? onPressed : null,
+          customBorder: shape,
+          child: SizedBox(
+            width: styles.stepperButtonSize,
+            height: styles.stepperButtonSize,
+            child: Icon(
+              icon,
+              color: borderColor,
+              size: styles.stepperIconSize,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: borderColor,
-            size: styles.stepperIconSize,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class SettingsPaletteDropdownRow extends StatelessWidget {
-  const SettingsPaletteDropdownRow({
-    super.key,
-    required this.styles,
-    required this.selectedPaletteId,
-    required this.onChanged,
-  });
-
-  final SettingsStyles styles;
-  final String selectedPaletteId;
-  final ValueChanged<String?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final items = Palette.palettes.values.toList();
-    return SettingsCardRow(
-      styles: styles,
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: selectedPaletteId,
-          isExpanded: true,
-          borderRadius: BorderRadius.circular(styles.dropdownRadius),
-          iconEnabledColor: styles.textColor,
-          style: styles.rowLabelStyle,
-          items: items
-              .map(
-                (palette) => DropdownMenuItem(
-                  value: palette.id,
-                  child: Row(
-                    children: [
-                      Container(
-                        width: styles.paletteSwatchWidth,
-                        height: styles.paletteSwatchHeight,
-                        margin: const EdgeInsets.only(right: 12),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(styles.paletteSwatchRadius),
-                          gradient: LinearGradient(
-                            colors: palette.colors.take(3).toList(),
-                          ),
-                        ),
-                      ),
-                      Text(palette.label),
-                    ],
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
         ),
       ),
     );
@@ -689,12 +648,16 @@ class SettingsActiveColorsSelector extends StatelessWidget {
     required this.palette,
     required this.activeColorIds,
     required this.onChanged,
+    required this.highContrastEnabled,
+    required this.onHighContrastChanged,
   });
 
   final SettingsStyles styles;
   final Palette palette;
   final List<String>? activeColorIds;
   final ValueChanged<List<String>?> onChanged;
+  final bool highContrastEnabled;
+  final ValueChanged<bool> onHighContrastChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -709,7 +672,20 @@ class SettingsActiveColorsSelector extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text('Active colors', style: styles.rowLabelStyle),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text('Active colors', style: styles.rowLabelStyle),
+                ),
+                Text('High contrast', style: styles.helperStyle),
+                Switch.adaptive(
+                  value: highContrastEnabled,
+                  activeThumbColor: styles.accentColor,
+                  activeTrackColor: styles.accentColor.withAlpha(180),
+                  onChanged: onHighContrastChanged,
+                ),
+              ],
+            ),
           ),
           Wrap(
             spacing: 10,

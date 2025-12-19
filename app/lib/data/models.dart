@@ -227,7 +227,7 @@ class Palette {
   final Color restColor;
   final Color textColor;
 
-  static const defaultPaletteId = 'sunrise';
+  static const defaultPaletteId = 'basic';
 
   static const Map<String, Palette> palettes = {
     'sunrise': Palette(

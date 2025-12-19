@@ -30,6 +30,7 @@ class SettingsStyles {
     required this.cardShadows,
     required this.appBarTitleStyle,
     required this.appBarActionStyle,
+    required this.appBarLeadingWidth,
     required this.sectionTitleStyle,
     required this.rowLabelStyle,
     required this.rowValueStyle,
@@ -63,6 +64,7 @@ class SettingsStyles {
   final List<BoxShadow> cardShadows;
   final TextStyle appBarTitleStyle;
   final TextStyle appBarActionStyle;
+  final double appBarLeadingWidth;
   final TextStyle sectionTitleStyle;
   final TextStyle rowLabelStyle;
   final TextStyle rowValueStyle;
@@ -73,7 +75,7 @@ class SettingsStyles {
     return const SettingsStyles(
       backgroundColor: Color(0xFFF5F5F5),
       cardColor: Colors.white,
-      accentColor: Color(0xFF2E8E43),
+      accentColor: Color(0xFF1E88E5),
       onAccentColor: Colors.white,
       textColor: Color(0xFF111111),
       mutedTextColor: Color(0xFF666666),
@@ -110,10 +112,11 @@ class SettingsStyles {
         fontSize: 24,
       ),
       appBarActionStyle: TextStyle(
-        color: Color(0xFF2E8E43),
+        color: Color(0xFF1E88E5),
         fontWeight: FontWeight.w800,
-        fontSize: 16,
+        fontSize: 18,
       ),
+      appBarLeadingWidth: 112,
       sectionTitleStyle: TextStyle(
         color: Color(0xFF111111),
         fontSize: 18,

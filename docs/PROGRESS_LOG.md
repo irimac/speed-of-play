@@ -64,3 +64,9 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Added session goldens (Active bright/dark, Pause overlay) and a unit test for `textOnStimulus`; updated tests to use `TextScaler`.
 - `flutter analyze` and `flutter test` run clean.
 - Session header/footer bars now show round/time and session elapsed in mm:ss with consistent typography; rotation no longer auto-pauses. Added shared time formatting helper + unit test.
+- Default palette set to `basic`; High Contrast toggle now clears active color selections to avoid mismatched color IDs.
+
+## 2025-12-19 (settings polish)
+- Removed palette picker; active colors now follow basic vs high-contrast toggle in the same row.
+- Fixed stepper button borders (no bleed into app bar) and updated settings accent color.
+- Settings app bar uses Back/Save icon+text actions for clarity.
