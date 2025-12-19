@@ -11,6 +11,7 @@ Use this for manual sweeps; note device/OS and build flavor.
 - [ ] Rest: rest background + circular progress ring; resumes next round automatically.
 - [ ] Pause overlay: double-tap to open; Continue, Skip, Reset Round, Reset Session, Finish all work.
 - [ ] End screen: summary correct; Save to History persists entry; End to Main returns home.
+- [ ] Summary screen: stat cards render and actions (Save to History, Back to Main) work.
 - [ ] History: list newest-first; multi-select; delete removes entries; export CSV creates file and shows snackbar path.
 
 ## Persistence

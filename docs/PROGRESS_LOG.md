@@ -78,3 +78,7 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 ## 2025-12-19 (action consistency)
 - Unified Main and Pause overlay action button sizing/typography via `AppTokens` (height, icon size, text sizes) and matched pill shapes.
 - Renamed the session footer text style token for clearer intent (`footerTextStyle`).
+
+## 2025-12-19 (summary restyle)
+- Restyled Session Summary screen with a scan-first header, stat card grid, and detail cards; actions are full-width and consistent with main token sizing.
+- Added SummaryStyles tokens and widget tests for summary actions/navigation.
