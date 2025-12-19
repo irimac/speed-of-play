@@ -4,6 +4,7 @@ import '../data/models.dart';
 import 'history_screen.dart';
 import 'session_screen.dart';
 import 'settings_screen.dart';
+import 'styles/main_styles.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({
@@ -40,42 +41,105 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = Palette.resolve(_preset.paletteId);
+    final palette = Palette.resolveWithContrast(
+      _preset.paletteId,
+      highContrast: _preset.highContrastPalette,
+    );
+    final styles = MainStyles.defaults(Theme.of(context));
+    final activeColors = _activeColors(palette, _preset.activeColorIds);
+    final summaryText = 'Rounds: ${_preset.rounds} | '
+        'Duration: ${_formatMinutesSeconds(_preset.roundDurationSec)} | '
+        'Rest: ${_preset.restDurationSec}s';
     return Scaffold(
-      appBar: AppBar(title: const Text('SpeedOfPlay')),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final isWide = constraints.maxWidth > 640;
-            final summaryCard = _SummaryCard(preset: _preset, palette: palette);
-            final actions = _Actions(
-              onPlay: () => Navigator.of(context).pushNamed(
-                SessionScreen.routeName,
-                arguments: _preset,
+      body: Container(
+        decoration: BoxDecoration(gradient: styles.backgroundGradient),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: styles.screenPadding,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: styles.contentMaxWidth),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _MainHeader(styles: styles),
+                    SizedBox(height: styles.sectionSpacing),
+                    Text(
+                      summaryText,
+                      style: styles.summaryStyle,
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: styles.summarySpacing),
+                    _ActiveColorsRow(styles: styles, colors: activeColors),
+                    SizedBox(height: styles.summarySpacing),
+                    Text(
+                      'Numbers: ${_preset.numberMin} - ${_preset.numberMax}',
+                      style: styles.secondaryInfoStyle,
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: styles.sectionSpacing),
+                    SizedBox(
+                      width: styles.playButtonWidth,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size.fromHeight(styles.playButtonHeight),
+                          backgroundColor: styles.playButtonColor,
+                          foregroundColor: styles.playButtonForegroundColor,
+                          shape: const StadiumBorder(),
+                          elevation: 4,
+                          shadowColor: const Color.fromARGB(80, 0, 0, 0),
+                          textStyle: styles.playButtonTextStyle,
+                        ),
+                        onPressed: () => Navigator.of(context).pushNamed(
+                          SessionScreen.routeName,
+                          arguments: _preset,
+                        ),
+                        icon:
+                            Icon(Icons.play_arrow, size: styles.buttonIconSize),
+                        label: const Text('Start'),
+                      ),
+                    ),
+                    SizedBox(height: styles.buttonSpacing),
+                    SizedBox(
+                      width: styles.playButtonWidth,
+                      child: OutlinedButton.icon(
+                        onPressed: _openSettings,
+                        icon: Icon(Icons.settings, size: styles.buttonIconSize),
+                        label: const Text('Settings'),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize:
+                              Size.fromHeight(styles.secondaryButtonHeight),
+                          shape: const StadiumBorder(),
+                          textStyle: styles.secondaryButtonTextStyle,
+                          foregroundColor: styles.primaryTextColor,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: styles.buttonSpacing),
+                    SizedBox(
+                      width: styles.playButtonWidth,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pushNamed(HistoryScreen.routeName);
+                        },
+                        icon:
+                            Icon(Icons.bar_chart, size: styles.buttonIconSize),
+                        label: const Text('History'),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize:
+                              Size.fromHeight(styles.secondaryButtonHeight),
+                          shape: const StadiumBorder(),
+                          textStyle: styles.secondaryButtonTextStyle,
+                          foregroundColor: styles.primaryTextColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              onSettings: _openSettings,
-              onHistory: () {
-                Navigator.of(context).pushNamed(HistoryScreen.routeName);
-              },
-            );
-            if (isWide) {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: summaryCard),
-                  Expanded(child: actions),
-                ],
-              );
-            }
-            return ListView(
-              padding: const EdgeInsets.all(24),
-              children: [
-                summaryCard,
-                const SizedBox(height: 24),
-                actions,
-              ],
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
@@ -101,113 +165,87 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({required this.preset, required this.palette});
+class _MainHeader extends StatelessWidget {
+  const _MainHeader({required this.styles});
 
-  final SessionPreset preset;
-  final Palette palette;
+  final MainStyles styles;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: const Color.fromRGBO(255, 255, 255, 0.05),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Session Preset',
-                style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 16),
-            _InfoRow(
-                label: 'Rounds',
-                value: '${preset.rounds} x ${preset.roundDurationSec}s'),
-            _InfoRow(label: 'Rest', value: '${preset.restDurationSec}s'),
-            _InfoRow(
-                label: 'Change every', value: '${preset.changeIntervalSec}s'),
-            _InfoRow(
-                label: 'Numbers',
-                value: '${preset.numberMin}-${preset.numberMax}'),
-            _InfoRow(label: 'Countdown', value: '${preset.countdownSec}s'),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              children: palette.colors
-                  .map(
-                    (color) => Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: color,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ],
-        ),
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: styles.logoMaxWidth),
+      child: Image.asset(
+        'assets/RPT-SpeedOfPlay.png',
+        height: styles.logoHeight,
+        fit: BoxFit.contain,
       ),
     );
   }
 }
 
-class _Actions extends StatelessWidget {
-  const _Actions({
-    required this.onPlay,
-    required this.onSettings,
-    required this.onHistory,
+class _ActiveColorsRow extends StatelessWidget {
+  const _ActiveColorsRow({
+    required this.styles,
+    required this.colors,
   });
 
-  final VoidCallback onPlay;
-  final VoidCallback onSettings;
-  final VoidCallback onHistory;
+  final MainStyles styles;
+  final List<Color> colors;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ElevatedButton.icon(
-          onPressed: onPlay,
-          icon: const Icon(Icons.play_arrow),
-          label: const Text('Play'),
+        Text(
+          'Active colors',
+          style: styles.activeColorsLabelStyle,
         ),
-        const SizedBox(height: 12),
-        OutlinedButton.icon(
-          onPressed: onSettings,
-          icon: const Icon(Icons.settings),
-          label: const Text('Settings'),
-        ),
-        const SizedBox(height: 12),
-        OutlinedButton.icon(
-          onPressed: onHistory,
-          icon: const Icon(Icons.history),
-          label: const Text('History'),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          children: colors
+              .map(
+                (color) => Container(
+                  width: styles.activeSwatchSize,
+                  height: styles.activeSwatchSize,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: styles.activeSwatchBorderColor,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
         ),
       ],
     );
   }
 }
 
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-              child:
-                  Text(label, style: const TextStyle(color: Colors.white70))),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
+List<Color> _activeColors(Palette palette, List<String>? activeIds) {
+  if (activeIds == null || activeIds.isEmpty) {
+    return palette.colors;
   }
+  final paletteById = <String, Color>{
+    for (final color in palette.colors)
+      color.toARGB32().toRadixString(16).toLowerCase(): color
+  };
+  final active = activeIds
+      .map((id) => id.toLowerCase())
+      .where(paletteById.containsKey)
+      .map((id) => paletteById[id]!)
+      .toList();
+  return active.isEmpty ? palette.colors : active;
+}
+
+String _formatMinutesSeconds(int seconds) {
+  final clamped = seconds < 0 ? 0 : seconds;
+  final minutes = clamped ~/ 60;
+  final remaining = clamped % 60;
+  return '${minutes}min:${remaining.toString().padLeft(2, '0')}s';
 }

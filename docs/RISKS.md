@@ -12,4 +12,5 @@ Status legend: Open / Resolved / TBD
 - **Metrics alignment** (Resolved): `totalElapsedSec` includes countdown + active + rest (excluding pauses); `roundsCompleted` counts completed active phases only.
 - **History/CI coverage** (Open): CI workflow exists; needs consistent green runs and history repository tests.
 - **Accessibility/contrast audit** (Open): Contrast, semantics, touch-target checks pending. Session scrims, luminance-based text, and stabilized numerals are in place; full audit still required.
+- **Action button size drift** (Resolved): Main and Pause overlay buttons now share sizing tokens to keep touch targets and typography aligned.
 - **Mute toggle/audio prewarm** (Open): No mute control or prewarming for lowest-latency playback yet.

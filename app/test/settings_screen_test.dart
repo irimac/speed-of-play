@@ -59,7 +59,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Settings'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(TextButton, 'Save'));
+    await tester.tap(find.byKey(const ValueKey('settings-save')));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('open-settings')), findsOneWidget);
   });

@@ -294,7 +294,7 @@ class _SessionFooter extends StatelessWidget {
       child: Text(
         'Session ${formatSessionSeconds(elapsedSeconds)}',
         textAlign: TextAlign.center,
-        style: styles.hintTextStyle.copyWith(color: textColor),
+        style: styles.footerTextStyle.copyWith(color: textColor),
       ),
     );
   }

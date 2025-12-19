@@ -70,3 +70,11 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Removed palette picker; active colors now follow basic vs high-contrast toggle in the same row.
 - Fixed stepper button borders (no bleed into app bar) and updated settings accent color.
 - Settings app bar uses Back/Save icon+text actions for clarity.
+
+## 2025-12-19 (main restyle)
+- Restyled Main screen to match mock with centered logo, settings summary, active color swatches, and a prominent Start CTA.
+- Secondary actions moved below the primary CTA with icon+text buttons; added MainStyles tokens and main screen widget tests.
+
+## 2025-12-19 (action consistency)
+- Unified Main and Pause overlay action button sizing/typography via `AppTokens` (height, icon size, text sizes) and matched pill shapes.
+- Renamed the session footer text style token for clearer intent (`footerTextStyle`).

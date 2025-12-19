@@ -76,6 +76,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: Text('Settings', style: styles.appBarTitleStyle),
         actions: [
           TextButton.icon(
+            key: const ValueKey('settings-save'),
             onPressed: _saveAndExit,
             icon: Icon(Icons.save, color: styles.accentColor, size: 28),
             label: Text('Save', style: styles.appBarActionStyle),

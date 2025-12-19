@@ -26,19 +26,25 @@ class PauseOverlay extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final buttonSpacing = styles.overlayButtonSpacing;
     final buttonMinSize = Size.fromHeight(styles.overlayButtonMinHeight);
+    const buttonShape = StadiumBorder();
     final primaryStyle = ElevatedButton.styleFrom(
       minimumSize: buttonMinSize,
       foregroundColor: colorScheme.onPrimary,
       backgroundColor: colorScheme.primary,
-      textStyle: const TextStyle(fontWeight: FontWeight.w600),
+      shape: buttonShape,
+      textStyle: const TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: AppTokens.primaryActionTextSize,
+      ),
     );
     final secondaryStyle = OutlinedButton.styleFrom(
       minimumSize: buttonMinSize,
       foregroundColor: Colors.white,
       side: const BorderSide(color: Colors.white54),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTokens.spacingS,
-        vertical: 12,
+      shape: buttonShape,
+      textStyle: const TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: AppTokens.secondaryActionTextSize,
       ),
     );
     final mutedSecondaryStyle = OutlinedButton.styleFrom(
@@ -46,16 +52,21 @@ class PauseOverlay extends StatelessWidget {
       foregroundColor: Colors.white70,
       side: const BorderSide(color: Colors.white24),
       backgroundColor: Colors.white.withAlpha((0.04 * 255).round()),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTokens.spacingS,
-        vertical: 12,
+      shape: buttonShape,
+      textStyle: const TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: AppTokens.secondaryActionTextSize,
       ),
     );
     final destructiveStyle = ElevatedButton.styleFrom(
       minimumSize: buttonMinSize,
       foregroundColor: colorScheme.onError,
       backgroundColor: colorScheme.error,
-      textStyle: const TextStyle(fontWeight: FontWeight.w700),
+      shape: buttonShape,
+      textStyle: const TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: AppTokens.primaryActionTextSize,
+      ),
     );
 
     return Container(
@@ -161,14 +172,14 @@ class _OverlayButton extends StatelessWidget {
       return OutlinedButton.icon(
         style: style,
         onPressed: onPressed,
-        icon: Icon(icon),
+        icon: Icon(icon, size: AppTokens.actionIconSize),
         label: Text(label),
       );
     }
     return ElevatedButton.icon(
       style: style,
       onPressed: onPressed,
-      icon: Icon(icon),
+      icon: Icon(icon, size: AppTokens.actionIconSize),
       label: Text(label),
     );
   }

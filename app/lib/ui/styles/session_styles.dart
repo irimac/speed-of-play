@@ -30,7 +30,7 @@ class SessionStyles {
     required this.overlayTitleStyle,
     required this.overlaySubtitleStyle,
     required this.overlayPadding,
-    required this.hintTextStyle,
+    required this.footerTextStyle,
     required this.overlayButtonSpacing,
     required this.overlaySectionSpacing,
     required this.overlayButtonMinHeight,
@@ -62,7 +62,7 @@ class SessionStyles {
   final TextStyle overlayTitleStyle;
   final TextStyle overlaySubtitleStyle;
   final EdgeInsets overlayPadding;
-  final TextStyle hintTextStyle;
+  final TextStyle footerTextStyle;
   final double overlayButtonSpacing;
   final double overlaySectionSpacing;
   final double overlayButtonMinHeight;
@@ -86,13 +86,13 @@ class SessionStyles {
       numberShadowOpacity: 0.24,
       numberShadowBoost: 1.25,
       headerRoundTextStyle: const TextStyle(
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: FontWeight.w600,
         height: 1,
         fontFeatures: [FontFeature.tabularFigures()],
       ),
       headerTimerTextStyle: const TextStyle(
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: FontWeight.w600,
         height: 1,
         fontFeatures: [FontFeature.tabularFigures()],
@@ -135,14 +135,14 @@ class SessionStyles {
         color: Colors.white70,
       ),
       overlayPadding: const EdgeInsets.all(AppTokens.spacingL),
-      hintTextStyle:
+      footerTextStyle:
           (textTheme.bodyMedium ?? const TextStyle(fontSize: 20)).copyWith(
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: FontWeight.w600,
       ),
       overlayButtonSpacing: AppTokens.spacingS,
       overlaySectionSpacing: AppTokens.spacingM,
-      overlayButtonMinHeight: 56,
+      overlayButtonMinHeight: AppTokens.primaryButtonHeight,
     );
   }
 

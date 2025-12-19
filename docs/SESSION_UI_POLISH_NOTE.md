@@ -22,3 +22,4 @@ Status: implemented
 - Rest ring is thicker/larger with inner padding for breathing room; rest seconds stay centered.
 - Pause overlay hierarchy updated with subtitle and clearer spacing groups; tap targets remain >= 48dp.
 - Goldens added for Active (bright/dark) and Pause overlay; tests updated to use `TextScaler`.
+- Pause overlay action buttons aligned to shared sizing tokens for consistent height and icon/text sizes with Main screen.

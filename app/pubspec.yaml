@@ -9,6 +9,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/audio/
+    - assets/RPT-SpeedOfPlay.png
 
 dependencies:
   flutter:

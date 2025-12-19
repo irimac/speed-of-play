@@ -11,6 +11,7 @@ Date: 2025-12-16
 - Session screen polish landed: stable tabular numerals, luminance-based text colors, top/bottom scrims, clearer pause overlay, and updated rest ring sizing; goldens cover Active and Pause views.
 - Session header/footer bars now show round/time and session elapsed in mm:ss with consistent typography; rotation no longer auto-pauses.
 - Default palette set to `basic` with optional High Contrast toggle; palette picker removed and active colors reset on toggle.
+- Action buttons now share `AppTokens` sizing across Main and Pause overlay for consistent touch targets and typography.
 - Tests now passing locally (`flutter test`, `flutter analyze`); controller/models suites cover transitions/skip/results; CI workflow exists but needs a green run after recent changes.
 - Design rationale is captured in `docs/DECISIONS.md` for future reference.
 - Risk log is tracked in `docs/RISKS.md` for ongoing mitigation.
@@ -38,7 +39,7 @@ Date: 2025-12-16
 
 ### UI & Navigation
 - [x] Launch handled by native OS splash (no in-app gate); audio prewarm not implemented.
-- [x] Main: preset summary card, palette swatches, actions (Play/Settings/History), responsive layout.
+- [x] Main: centered logo, settings summary + active colors, prominent Start CTA, and Settings/History-Stats actions below (restyled to mock).
 - [x] Settings: rounds, durations, interval, number range, outdoor boost, large session text, high contrast palette toggle with active colors in the same row, countdown toggle + seconds, RNG seed toggle/input (palette picker removed; default basic palette).
 - [x] Session: countdown/active/rest UIs, per-phase backgrounds, large number, rest progress, double-tap pause overlay with continue/reset/skip/finish driven by controller state; phase views and pause overlay are modular widgets. Added stable numeric layout, luminance-based text, and header/footer scrims for readability.
 - [x] End: summary, per-round list, Save to History, End to Main.
