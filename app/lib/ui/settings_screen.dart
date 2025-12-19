@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../data/models.dart';
+import 'styles/settings_styles.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
@@ -44,177 +46,738 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final styles = SettingsStyles.defaults(Theme.of(context));
     return Scaffold(
+      backgroundColor: styles.backgroundColor,
       appBar: AppBar(
-        title: const Text('Settings'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.close, color: styles.textColor),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text('Settings', style: styles.appBarTitleStyle),
         actions: [
           TextButton(
             onPressed: _saveAndExit,
-            child: const Text('Save'),
+            child: Text('Save', style: styles.appBarActionStyle),
           )
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
-          _numberField(
-            label: 'Rounds',
-            initialValue: _preset.rounds,
-            min: 1,
-            max: 20,
-            onChanged: (value) => _updatePreset(_preset.copyWith(rounds: value)),
-          ),
-          _numberField(
-            label: 'Round Duration (sec)',
-            initialValue: _preset.roundDurationSec,
-            min: 15,
-            max: 180,
-            onChanged: (value) => _updatePreset(_preset.copyWith(roundDurationSec: value)),
-          ),
-          _numberField(
-            label: 'Rest Duration (sec)',
-            initialValue: _preset.restDurationSec,
-            min: 0,
-            max: 120,
-            onChanged: (value) => _updatePreset(_preset.copyWith(restDurationSec: value)),
-          ),
-          _numberField(
-            label: 'Change Interval (sec)',
-            initialValue: _preset.changeIntervalSec,
-            min: 1,
-            max: 5,
-            onChanged: (value) => _updatePreset(_preset.copyWith(changeIntervalSec: value)),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: _numberField(
-                  label: 'Number Min',
-                  initialValue: _preset.numberMin,
-                  min: 0,
-                  max: _preset.numberMax - 1,
-                  onChanged: (value) => _updatePreset(_preset.copyWith(numberMin: value)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _numberField(
-                  label: 'Number Max',
-                  initialValue: _preset.numberMax,
-                  min: _preset.numberMin + 1,
-                  max: 99,
-                  onChanged: (value) => _updatePreset(_preset.copyWith(numberMax: value)),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            initialValue: _preset.paletteId,
-            decoration: const InputDecoration(labelText: 'Palette'),
-            items: Palette.palettes.values
-                .map(
-                  (palette) => DropdownMenuItem(
-                    value: palette.id,
-                    child: Text(palette.label),
+      body: SafeArea(
+        child: ListView(
+          padding: styles.screenPadding,
+          children: [
+            SettingsSection(
+              title: 'Session',
+              styles: styles,
+              children: [
+                SettingsNumberStepperRow(
+                  label: 'Rounds',
+                  value: _preset.rounds,
+                  min: 1,
+                  max: 20,
+                  styles: styles,
+                  valueKeyPrefix: 'rounds',
+                  onChanged: (value) =>
+                      _updatePreset(_preset.copyWith(rounds: value)),
+                  onValueTap: () => _promptAndApplyValue(
+                    label: 'Rounds',
+                    value: _preset.rounds,
+                    min: 1,
+                    max: 20,
+                    onChanged: (next) =>
+                        _updatePreset(_preset.copyWith(rounds: next)),
                   ),
-                )
-                .toList(),
-            onChanged: (value) {
-              if (value == null) return;
-              _updatePreset(_preset.copyWith(paletteId: value));
-            },
-          ),
-          const SizedBox(height: 16),
-          SwitchListTile(
-            title: const Text('Outdoor brightness boost'),
-            value: _preset.outdoorBoost,
-            onChanged: (value) => _updatePreset(_preset.copyWith(outdoorBoost: value)),
-          ),
-          SwitchListTile(
-            title: const Text('Large session text'),
-            value: _preset.largeSessionText,
-            onChanged: (value) => _updatePreset(_preset.copyWith(largeSessionText: value)),
-          ),
-          SwitchListTile(
-            title: const Text('High contrast palette'),
-            value: _preset.highContrastPalette,
-            onChanged: (value) => _updatePreset(_preset.copyWith(highContrastPalette: value)),
-          ),
-          SwitchListTile(
-            title: const Text('Audio enabled'),
-            value: _preset.audioEnabled,
-            onChanged: (value) => _updatePreset(_preset.copyWith(audioEnabled: value)),
-          ),
-          SwitchListTile(
-            title: const Text('Countdown'),
-            value: _showCountdown,
-            onChanged: (value) {
-              setState(() => _showCountdown = value);
-              _updatePreset(_preset.copyWith(countdownSec: value ? (_preset.countdownSec == 0 ? 5 : _preset.countdownSec) : 0));
-            },
-          ),
-          if (_showCountdown)
-            _numberField(
-              label: 'Countdown Seconds',
-              initialValue: _preset.countdownSec,
-              min: 1,
-              max: 10,
-              onChanged: (value) => _updatePreset(_preset.copyWith(countdownSec: value)),
+                ),
+                SettingsNumberStepperRow(
+                  label: 'Round duration (sec)',
+                  value: _preset.roundDurationSec,
+                  min: 15,
+                  max: 180,
+                  styles: styles,
+                  onChanged: (value) => _updatePreset(
+                    _preset.copyWith(roundDurationSec: value),
+                  ),
+                  onValueTap: () => _promptAndApplyValue(
+                    label: 'Round duration (sec)',
+                    value: _preset.roundDurationSec,
+                    min: 15,
+                    max: 180,
+                    onChanged: (next) => _updatePreset(
+                      _preset.copyWith(roundDurationSec: next),
+                    ),
+                  ),
+                ),
+                SettingsNumberStepperRow(
+                  label: 'Rest duration (sec)',
+                  value: _preset.restDurationSec,
+                  min: 0,
+                  max: 120,
+                  styles: styles,
+                  onChanged: (value) => _updatePreset(
+                    _preset.copyWith(restDurationSec: value),
+                  ),
+                  onValueTap: () => _promptAndApplyValue(
+                    label: 'Rest duration (sec)',
+                    value: _preset.restDurationSec,
+                    min: 0,
+                    max: 120,
+                    onChanged: (next) => _updatePreset(
+                      _preset.copyWith(restDurationSec: next),
+                    ),
+                  ),
+                ),
+                SettingsNumberStepperRow(
+                  label: 'Change interval (sec)',
+                  value: _preset.changeIntervalSec,
+                  min: 1,
+                  max: 5,
+                  styles: styles,
+                  onChanged: (value) => _updatePreset(
+                    _preset.copyWith(changeIntervalSec: value),
+                  ),
+                  onValueTap: () => _promptAndApplyValue(
+                    label: 'Change interval (sec)',
+                    value: _preset.changeIntervalSec,
+                    min: 1,
+                    max: 5,
+                    onChanged: (next) => _updatePreset(
+                      _preset.copyWith(changeIntervalSec: next),
+                    ),
+                  ),
+                ),
+                SettingsSwitchRow(
+                  label: 'Audio enabled',
+                  value: _preset.audioEnabled,
+                  styles: styles,
+                  onChanged: (value) =>
+                      _updatePreset(_preset.copyWith(audioEnabled: value)),
+                ),
+              ],
             ),
-          SwitchListTile(
-            title: const Text('Lock RNG seed (QA)'),
-            value: _useSeed,
-            onChanged: (value) {
-              setState(() => _useSeed = value);
-              _updatePreset(_preset.copyWith(rngSeed: value ? (_preset.rngSeed ?? 42) : null));
-            },
-          ),
-          if (_useSeed)
-            _numberField(
-              label: 'Seed',
-              initialValue: _preset.rngSeed ?? 42,
-              min: 0,
-              max: 1 << 31,
-              onChanged: (value) => _updatePreset(_preset.copyWith(rngSeed: value)),
+            SettingsSection(
+              title: 'Display',
+              styles: styles,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: SettingsNumberStepperRow(
+                        label: 'Number min',
+                        value: _preset.numberMin,
+                        min: 0,
+                        max: _preset.numberMax - 1,
+                        styles: styles,
+                        onChanged: (value) => _updatePreset(
+                          _preset.copyWith(numberMin: value),
+                        ),
+                        onValueTap: () => _promptAndApplyValue(
+                          label: 'Number min',
+                          value: _preset.numberMin,
+                          min: 0,
+                          max: _preset.numberMax - 1,
+                          onChanged: (next) => _updatePreset(
+                            _preset.copyWith(numberMin: next),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: SettingsNumberStepperRow(
+                        label: 'Number max',
+                        value: _preset.numberMax,
+                        min: _preset.numberMin + 1,
+                        max: 99,
+                        styles: styles,
+                        onChanged: (value) => _updatePreset(
+                          _preset.copyWith(numberMax: value),
+                        ),
+                        onValueTap: () => _promptAndApplyValue(
+                          label: 'Number max',
+                          value: _preset.numberMax,
+                          min: _preset.numberMin + 1,
+                          max: 99,
+                          onChanged: (next) => _updatePreset(
+                            _preset.copyWith(numberMax: next),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SettingsPaletteDropdownRow(
+                  styles: styles,
+                  selectedPaletteId: _preset.paletteId,
+                  onChanged: (value) {
+                    if (value == null) return;
+                    _updatePreset(
+                      _preset.copyWith(
+                        paletteId: value,
+                        activeColorIds: null,
+                      ),
+                    );
+                  },
+                ),
+                SettingsActiveColorsSelector(
+                  styles: styles,
+                  palette: Palette.resolve(_preset.paletteId),
+                  activeColorIds: _preset.activeColorIds,
+                  onChanged: (value) =>
+                      _updatePreset(_preset.copyWith(activeColorIds: value)),
+                ),
+                SettingsSwitchRow(
+                  label: 'Outdoor brightness boost',
+                  value: _preset.outdoorBoost,
+                  styles: styles,
+                  onChanged: (value) =>
+                      _updatePreset(_preset.copyWith(outdoorBoost: value)),
+                ),
+                SettingsSwitchRow(
+                  label: 'Large session text',
+                  value: _preset.largeSessionText,
+                  styles: styles,
+                  onChanged: (value) => _updatePreset(
+                    _preset.copyWith(largeSessionText: value),
+                  ),
+                ),
+                SettingsSwitchRow(
+                  label: 'High contrast palette',
+                  value: _preset.highContrastPalette,
+                  styles: styles,
+                  onChanged: (value) => _updatePreset(
+                    _preset.copyWith(highContrastPalette: value),
+                  ),
+                ),
+              ],
             ),
-        ],
+            SettingsSection(
+              title: 'Timing',
+              styles: styles,
+              children: [
+                SettingsSwitchRow(
+                  label: 'Show countdown',
+                  value: _showCountdown,
+                  styles: styles,
+                  switchKey: const ValueKey('settings-countdown-toggle'),
+                  onChanged: (value) {
+                    setState(() => _showCountdown = value);
+                    _updatePreset(
+                      _preset.copyWith(
+                        countdownSec: value
+                            ? (_preset.countdownSec == 0
+                                ? 5
+                                : _preset.countdownSec)
+                            : 0,
+                      ),
+                    );
+                  },
+                ),
+                if (_showCountdown)
+                  SettingsNumberStepperRow(
+                    label: 'Countdown seconds',
+                    value: _preset.countdownSec,
+                    min: 1,
+                    max: 10,
+                    styles: styles,
+                    onChanged: (value) => _updatePreset(
+                      _preset.copyWith(countdownSec: value),
+                    ),
+                    onValueTap: () => _promptAndApplyValue(
+                      label: 'Countdown seconds',
+                      value: _preset.countdownSec,
+                      min: 1,
+                      max: 10,
+                      onChanged: (next) => _updatePreset(
+                        _preset.copyWith(countdownSec: next),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            SettingsSection(
+              title: 'Advanced',
+              styles: styles,
+              children: [
+                SettingsSwitchRow(
+                  label: 'Lock RNG seed (QA)',
+                  value: _useSeed,
+                  styles: styles,
+                  onChanged: (value) {
+                    setState(() => _useSeed = value);
+                    _updatePreset(
+                      _preset.copyWith(
+                        rngSeed: value ? (_preset.rngSeed ?? 42) : null,
+                      ),
+                    );
+                  },
+                ),
+                if (_useSeed)
+                  SettingsNumberStepperRow(
+                    label: 'Seed',
+                    value: _preset.rngSeed ?? 42,
+                    min: 0,
+                    max: 1 << 31,
+                    styles: styles,
+                    onChanged: (value) =>
+                        _updatePreset(_preset.copyWith(rngSeed: value)),
+                    onValueTap: () => _promptAndApplyValue(
+                      label: 'Seed',
+                      value: _preset.rngSeed ?? 42,
+                      min: 0,
+                      max: 1 << 31,
+                      onChanged: (next) =>
+                          _updatePreset(_preset.copyWith(rngSeed: next)),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: styles.accentColor,
+                foregroundColor: styles.onAccentColor,
+                minimumSize: const Size.fromHeight(56),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(styles.buttonRadius),
+                ),
+                textStyle: styles.primaryButtonTextStyle,
+              ),
+              onPressed: _saveAndExit,
+              child: const Text('Save & Close'),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _numberField({
+  Future<void> _promptAndApplyValue({
+    required String label,
+    required int value,
+    required int min,
+    required int max,
+    required ValueChanged<int> onChanged,
+  }) async {
+    final next = await _promptNumberInput(
+      label: label,
+      initialValue: value,
+      min: min,
+      max: max,
+    );
+    if (next != null && next != value) {
+      onChanged(next);
+    }
+  }
+
+  Future<int?> _promptNumberInput({
     required String label,
     required int initialValue,
     required int min,
     required int max,
-    required ValueChanged<int> onChanged,
-  }) {
+  }) async {
+    final controller = TextEditingController(text: initialValue.toString());
+    final result = await showDialog<int>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(label),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: const InputDecoration(
+              hintText: 'Enter value',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final parsed = int.tryParse(controller.text.trim());
+                if (parsed == null) {
+                  Navigator.of(ctx).pop();
+                  return;
+                }
+                final clamped = parsed.clamp(min, max);
+                Navigator.of(ctx).pop(clamped);
+              },
+              child: const Text('Set'),
+            ),
+          ],
+        );
+      },
+    );
+    return result;
+  }
+}
+
+class SettingsSection extends StatelessWidget {
+  const SettingsSection({
+    super.key,
+    required this.title,
+    required this.styles,
+    required this.children,
+  });
+
+  final String title;
+  final SettingsStyles styles;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
+      padding: EdgeInsets.only(bottom: styles.sectionSpacing),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: Text(label)),
-          IconButton(
-            tooltip: 'Decrease',
-            onPressed: initialValue > min
-                ? () => onChanged(initialValue - 1)
-                : null,
-            icon: const Icon(Icons.remove_circle_outline),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Text(title, style: styles.sectionTitleStyle),
           ),
-          SizedBox(
-            width: 64,
-            child: Center(child: Text('$initialValue')),
-          ),
-          IconButton(
-            tooltip: 'Increase',
-            onPressed: initialValue < max
-                ? () => onChanged(initialValue + 1)
-                : null,
-            icon: const Icon(Icons.add_circle_outline),
+          ..._intersperse(
+            children,
+            SizedBox(height: styles.cardSpacing),
           ),
         ],
       ),
     );
   }
 }
+
+class SettingsCardRow extends StatelessWidget {
+  const SettingsCardRow({
+    super.key,
+    required this.styles,
+    required this.child,
+  });
+
+  final SettingsStyles styles;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: styles.cardPadding,
+      decoration: BoxDecoration(
+        color: styles.cardColor,
+        borderRadius: BorderRadius.circular(styles.cardRadius),
+        boxShadow: styles.cardShadows,
+      ),
+      child: DefaultTextStyle.merge(
+        style: styles.rowLabelStyle,
+        child: child,
+      ),
+    );
+  }
+}
+
+class SettingsSwitchRow extends StatelessWidget {
+  const SettingsSwitchRow({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.styles,
+    required this.onChanged,
+    this.switchKey,
+  });
+
+  final String label;
+  final bool value;
+  final SettingsStyles styles;
+  final ValueChanged<bool> onChanged;
+  final Key? switchKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsCardRow(
+      styles: styles,
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(label, style: styles.rowLabelStyle),
+          ),
+          Switch.adaptive(
+            key: switchKey,
+            value: value,
+            activeThumbColor: styles.accentColor,
+            activeTrackColor: styles.accentColor.withAlpha(180),
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SettingsNumberStepperRow extends StatelessWidget {
+  const SettingsNumberStepperRow({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.styles,
+    required this.onChanged,
+    required this.onValueTap,
+    this.valueKeyPrefix,
+  });
+
+  final String label;
+  final int value;
+  final int min;
+  final int max;
+  final SettingsStyles styles;
+  final ValueChanged<int> onChanged;
+  final VoidCallback onValueTap;
+  final String? valueKeyPrefix;
+
+  @override
+  Widget build(BuildContext context) {
+    final canDec = value > min;
+    final canInc = value < max;
+    return SettingsCardRow(
+      styles: styles,
+      child: Row(
+        children: [
+          Expanded(child: Text(label, style: styles.rowLabelStyle)),
+          _StepperButton(
+            icon: Icons.remove,
+            enabled: canDec,
+            styles: styles,
+            buttonKey: valueKeyPrefix == null
+                ? null
+                : ValueKey('settings-$valueKeyPrefix-dec'),
+            onPressed: canDec ? () => onChanged(value - 1) : null,
+          ),
+          InkWell(
+            onTap: onValueTap,
+            borderRadius: BorderRadius.circular(styles.valueTapRadius),
+            child: SizedBox(
+              key: valueKeyPrefix == null
+                  ? null
+                  : ValueKey('settings-$valueKeyPrefix-value'),
+              width: styles.valueWidth,
+              child: Center(
+                child: Text('$value', style: styles.rowValueStyle),
+              ),
+            ),
+          ),
+          _StepperButton(
+            icon: Icons.add,
+            enabled: canInc,
+            styles: styles,
+            buttonKey: valueKeyPrefix == null
+                ? null
+                : ValueKey('settings-$valueKeyPrefix-inc'),
+            onPressed: canInc ? () => onChanged(value + 1) : null,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StepperButton extends StatelessWidget {
+  const _StepperButton({
+    required this.icon,
+    required this.enabled,
+    required this.styles,
+    required this.onPressed,
+    this.buttonKey,
+  });
+
+  final IconData icon;
+  final bool enabled;
+  final SettingsStyles styles;
+  final VoidCallback? onPressed;
+  final Key? buttonKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final borderColor = enabled ? styles.textColor : styles.mutedTextColor;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: InkWell(
+        key: buttonKey,
+        onTap: enabled ? onPressed : null,
+        borderRadius: BorderRadius.circular(styles.stepperButtonRadius),
+        child: Ink(
+          width: styles.stepperButtonSize,
+          height: styles.stepperButtonSize,
+          decoration: BoxDecoration(
+            color: styles.cardColor,
+            borderRadius: BorderRadius.circular(styles.stepperButtonRadius),
+            border: Border.all(color: borderColor, width: 2),
+          ),
+          child: Icon(
+            icon,
+            color: borderColor,
+            size: styles.stepperIconSize,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SettingsPaletteDropdownRow extends StatelessWidget {
+  const SettingsPaletteDropdownRow({
+    super.key,
+    required this.styles,
+    required this.selectedPaletteId,
+    required this.onChanged,
+  });
+
+  final SettingsStyles styles;
+  final String selectedPaletteId;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = Palette.palettes.values.toList();
+    return SettingsCardRow(
+      styles: styles,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: selectedPaletteId,
+          isExpanded: true,
+          borderRadius: BorderRadius.circular(styles.dropdownRadius),
+          iconEnabledColor: styles.textColor,
+          style: styles.rowLabelStyle,
+          items: items
+              .map(
+                (palette) => DropdownMenuItem(
+                  value: palette.id,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: styles.paletteSwatchWidth,
+                        height: styles.paletteSwatchHeight,
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.circular(styles.paletteSwatchRadius),
+                          gradient: LinearGradient(
+                            colors: palette.colors.take(3).toList(),
+                          ),
+                        ),
+                      ),
+                      Text(palette.label),
+                    ],
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+}
+
+class SettingsActiveColorsSelector extends StatelessWidget {
+  const SettingsActiveColorsSelector({
+    super.key,
+    required this.styles,
+    required this.palette,
+    required this.activeColorIds,
+    required this.onChanged,
+  });
+
+  final SettingsStyles styles;
+  final Palette palette;
+  final List<String>? activeColorIds;
+  final ValueChanged<List<String>?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final allIds = palette.colors.map((color) => _colorId(color)).toList();
+    final activeSet =
+        activeColorIds?.map((value) => value.toLowerCase()).toSet() ??
+            <String>{};
+    return SettingsCardRow(
+      styles: styles,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text('Active colors', style: styles.rowLabelStyle),
+          ),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: palette.colors.map((color) {
+              final id = _colorId(color);
+              final selected = activeSet.isEmpty || activeSet.contains(id);
+              return GestureDetector(
+                onTap: () {
+                  final next =
+                      activeSet.isEmpty ? allIds.toSet() : activeSet.toSet();
+                  if (selected) {
+                    next.remove(id);
+                  } else {
+                    next.add(id);
+                  }
+                  final normalized =
+                      next.isEmpty || next.length == allIds.length
+                          ? null
+                          : next.toList();
+                  onChanged(normalized);
+                },
+                child: Container(
+                  width: styles.activeSwatchSize,
+                  height: styles.activeSwatchSize,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: selected ? Colors.white : Colors.black54,
+                      width: styles.activeSwatchBorderWidth,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color.fromARGB(31, 0, 0, 0),
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: selected
+                      ? const Icon(Icons.check, color: Colors.white, size: 22)
+                      : null,
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Toggle to include/exclude colors for stimuli.',
+            style: styles.helperStyle,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+List<Widget> _intersperse(Iterable<Widget> children, Widget separator) {
+  final items = <Widget>[];
+  for (final child in children) {
+    if (items.isNotEmpty) {
+      items.add(separator);
+    }
+    items.add(child);
+  }
+  return items;
+}
+
+String _colorId(Color color) =>
+    color.toARGB32().toRadixString(16).toLowerCase();

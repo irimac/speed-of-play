@@ -12,12 +12,14 @@ class SessionController extends ChangeNotifier {
   SessionController({
     required this.preset,
     AudioCuePlayer? audioPlayer,
-    SessionScheduler Function(void Function(int secondSinceStart))? schedulerBuilder,
+    SessionScheduler Function(void Function(int secondSinceStart))?
+        schedulerBuilder,
     Future<void> Function()? wakelockEnable,
     Future<void> Function()? wakelockDisable,
   })  : _audio = audioPlayer ?? AudioCuePlayer(),
         _rng = Random(preset.rngSeed) {
-    _scheduler = (schedulerBuilder ?? (cb) => SessionScheduler(onAlignedSecond: cb))(_handleAlignedSecond);
+    _scheduler = (schedulerBuilder ??
+        (cb) => SessionScheduler(onAlignedSecond: cb))(_handleAlignedSecond);
     _wakelockEnable = wakelockEnable ?? WakelockPlus.enable;
     _wakelockDisable = wakelockDisable ?? WakelockPlus.disable;
     _resetState(startPaused: true);
@@ -61,11 +63,14 @@ class SessionController extends ChangeNotifier {
   void _resetState({required bool startPaused}) {
     _isRunning = !startPaused;
     _paused = startPaused;
-    _phase = preset.countdownSec > 0 ? SessionPhase.countdown : SessionPhase.active;
+    _phase =
+        preset.countdownSec > 0 ? SessionPhase.countdown : SessionPhase.active;
     _secondsIntoPhase = 0;
     _elapsedSeconds = 0;
     _roundIndex = 0;
-    _phaseDuration = _phase == SessionPhase.countdown ? preset.countdownSec : preset.roundDurationSec;
+    _phaseDuration = _phase == SessionPhase.countdown
+        ? preset.countdownSec
+        : preset.roundDurationSec;
     _stimuli.clear();
     _roundDurations.clear();
     _lastStimulus = null;
@@ -123,7 +128,9 @@ class SessionController extends ChangeNotifier {
       return;
     }
     if (_secondsIntoPhase > 0) {
-      _elapsedSeconds = (_elapsedSeconds - _secondsIntoPhase).clamp(0, _elapsedSeconds).toInt();
+      _elapsedSeconds = (_elapsedSeconds - _secondsIntoPhase)
+          .clamp(0, _elapsedSeconds)
+          .toInt();
     }
     if (_phase == SessionPhase.rest && _roundIndex < preset.rounds - 1) {
       _roundIndex += 1;
@@ -191,9 +198,12 @@ class SessionController extends ChangeNotifier {
 
   void _handleAlignedSecond(int secondSinceStart) {
     if (_paused || _phase == SessionPhase.end) return;
-    if (_phase == SessionPhase.countdown && preset.audioEnabled && _lastTickAudioSecond != _elapsedSeconds) {
+    if (_phase == SessionPhase.countdown &&
+        preset.audioEnabled &&
+        _lastTickAudioSecond != _elapsedSeconds) {
       _lastTickAudioSecond = _elapsedSeconds;
-      unawaited(_audio.playTick(sessionSecond: _elapsedSeconds, phase: _phase.name));
+      unawaited(
+          _audio.playTick(sessionSecond: _elapsedSeconds, phase: _phase.name));
     }
     _elapsedSeconds += 1;
     _secondsIntoPhase += 1;
@@ -245,9 +255,12 @@ class SessionController extends ChangeNotifier {
     if (emitStimulus) {
       _emitStimulus(force: true);
     }
-    if (playAudio && preset.audioEnabled && _lastRoundStartRound != _roundIndex) {
+    if (playAudio &&
+        preset.audioEnabled &&
+        _lastRoundStartRound != _roundIndex) {
       _lastRoundStartRound = _roundIndex;
-      unawaited(_audio.playRoundStart(sessionSecond: _elapsedSeconds, phase: _phase.name));
+      unawaited(_audio.playRoundStart(
+          sessionSecond: _elapsedSeconds, phase: _phase.name));
     }
   }
 
@@ -256,21 +269,38 @@ class SessionController extends ChangeNotifier {
     final canAvoidRepeatNumber = preset.numberMax > preset.numberMin;
     do {
       number = randomInRange(_rng, preset.numberMin, preset.numberMax);
-    } while (!force && _lastStimulus != null && canAvoidRepeatNumber && _lastStimulus!.number == number);
+    } while (!force &&
+        _lastStimulus != null &&
+        canAvoidRepeatNumber &&
+        _lastStimulus!.number == number);
     final palette = Palette.resolveWithContrast(
       preset.paletteId,
       highContrast: preset.highContrastPalette,
     );
+    final activeIds =
+        preset.activeColorIds?.map((value) => value.toLowerCase()).toSet();
+    final paletteColors = palette.colors;
+    final filteredColors = activeIds == null || activeIds.isEmpty
+        ? paletteColors
+        : paletteColors.where((color) {
+            final id = color.toARGB32().toRadixString(16).toLowerCase();
+            return activeIds.contains(id);
+          }).toList();
+    final availableColors =
+        filteredColors.isEmpty ? paletteColors : filteredColors;
     Color color;
-    final canAvoidRepeatColor = palette.colors.length > 1;
+    final canAvoidRepeatColor = availableColors.length > 1;
     String colorId;
     do {
-      color = palette.colors[_rng.nextInt(palette.colors.length)];
-      colorId = color.value.toRadixString(16); // ignore: deprecated_member_use
-    } while (!force && _lastStimulus != null && canAvoidRepeatColor && _lastStimulus!.colorId == colorId);
+      color = availableColors[_rng.nextInt(availableColors.length)];
+      colorId = color.toARGB32().toRadixString(16);
+    } while (!force &&
+        _lastStimulus != null &&
+        canAvoidRepeatColor &&
+        _lastStimulus!.colorId == colorId);
     final stimulus = Stimulus(
       timestampSec: _elapsedSeconds,
-      colorId: colorId, // ignore: deprecated_member_use
+      colorId: colorId,
       number: number,
     );
     _lastStimulus = stimulus;

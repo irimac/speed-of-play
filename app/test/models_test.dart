@@ -18,7 +18,9 @@ void main() {
 
   group('SessionPreset', () {
     test('encodes and decodes symmetrically', () {
-      final preset = SessionPreset.defaults();
+      final preset = SessionPreset.defaults().copyWith(
+        activeColorIds: ['ff0000', '00ff00'],
+      );
       final json = preset.toJson();
       final roundTrip = SessionPreset.fromJson(json);
 
@@ -35,6 +37,7 @@ void main() {
       expect(roundTrip.largeSessionText, preset.largeSessionText);
       expect(roundTrip.highContrastPalette, preset.highContrastPalette);
       expect(roundTrip.audioEnabled, preset.audioEnabled);
+      expect(roundTrip.activeColorIds, preset.activeColorIds);
     });
   });
 
@@ -60,7 +63,8 @@ void main() {
       expect(roundTrip.roundsCompleted, result.roundsCompleted);
       expect(roundTrip.totalElapsedSec, result.totalElapsedSec);
       expect(roundTrip.perRoundDurationsSec, result.perRoundDurationsSec);
-      expect(roundTrip.presetSnapshot.paletteId, result.presetSnapshot.paletteId);
+      expect(
+          roundTrip.presetSnapshot.paletteId, result.presetSnapshot.paletteId);
       expect(roundTrip.presetSnapshot.rounds, result.presetSnapshot.rounds);
       expect(roundTrip.stimuli.length, result.stimuli.length);
       expect(roundTrip.stimuli.first.number, result.stimuli.first.number);
@@ -81,10 +85,12 @@ void main() {
 
       final csv = [result].toCsv();
 
-      expect(csv.split('\n').first, 'id,completedAt,roundsCompleted,totalElapsedSec,palette,roundDurations');
+      expect(csv.split('\n').first,
+          'id,completedAt,roundsCompleted,totalElapsedSec,palette,roundDurations');
       expect(
         csv,
-        contains('abc,2024-01-01T12:00:00.000Z,2,90,${preset.paletteId},"45|45"'),
+        contains(
+            'abc,2024-01-01T12:00:00.000Z,2,90,${preset.paletteId},"45|45"'),
       );
     });
 
@@ -97,6 +103,7 @@ void main() {
         largeSessionText: true,
         highContrastPalette: true,
         audioEnabled: false,
+        activeColorIds: ['ff00ff'],
       );
       await store.save(preset);
 
@@ -104,6 +111,7 @@ void main() {
       expect(loaded.largeSessionText, isTrue);
       expect(loaded.highContrastPalette, isTrue);
       expect(loaded.audioEnabled, isFalse);
+      expect(loaded.activeColorIds, ['ff00ff']);
     });
   });
 }

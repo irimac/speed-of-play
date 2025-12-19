@@ -22,6 +22,7 @@ class SessionPreset {
     required this.largeSessionText,
     required this.highContrastPalette,
     required this.audioEnabled,
+    this.activeColorIds,
     this.rngSeed,
   });
 
@@ -37,7 +38,10 @@ class SessionPreset {
   final bool largeSessionText;
   final bool highContrastPalette;
   final bool audioEnabled;
+  final List<String>? activeColorIds;
   final int? rngSeed;
+
+  static const _unset = Object();
 
   factory SessionPreset.defaults() {
     return const SessionPreset(
@@ -53,6 +57,7 @@ class SessionPreset {
       largeSessionText: false,
       highContrastPalette: false,
       audioEnabled: true,
+      activeColorIds: null,
       rngSeed: null,
     );
   }
@@ -70,7 +75,8 @@ class SessionPreset {
     bool? largeSessionText,
     bool? highContrastPalette,
     bool? audioEnabled,
-    int? rngSeed,
+    Object? activeColorIds = _unset,
+    Object? rngSeed = _unset,
   }) {
     return SessionPreset(
       rounds: rounds ?? this.rounds,
@@ -85,7 +91,10 @@ class SessionPreset {
       largeSessionText: largeSessionText ?? this.largeSessionText,
       highContrastPalette: highContrastPalette ?? this.highContrastPalette,
       audioEnabled: audioEnabled ?? this.audioEnabled,
-      rngSeed: rngSeed ?? this.rngSeed,
+      activeColorIds: activeColorIds == _unset
+          ? this.activeColorIds
+          : activeColorIds as List<String>?,
+      rngSeed: rngSeed == _unset ? this.rngSeed : rngSeed as int?,
     );
   }
 
@@ -102,10 +111,12 @@ class SessionPreset {
         'largeSessionText': largeSessionText,
         'highContrastPalette': highContrastPalette,
         'audioEnabled': audioEnabled,
+        'activeColorIds': activeColorIds,
         'rngSeed': rngSeed,
       };
 
   factory SessionPreset.fromJson(Map<String, dynamic> json) {
+    final rawActive = json['activeColorIds'] as List<dynamic>?;
     return SessionPreset(
       rounds: json['rounds'] as int,
       roundDurationSec: json['roundDurationSec'] as int,
@@ -119,6 +130,7 @@ class SessionPreset {
       largeSessionText: json['largeSessionText'] as bool? ?? false,
       highContrastPalette: json['highContrastPalette'] as bool? ?? false,
       audioEnabled: json['audioEnabled'] as bool? ?? true,
+      activeColorIds: rawActive?.map((value) => value.toString()).toList(),
       rngSeed: json['rngSeed'] as int?,
     );
   }
@@ -226,6 +238,10 @@ class Palette {
         Color(0xFF2AB7CA),
         Color(0xFFFED766),
         Color(0xFF009FB7),
+        Color(0xFFF6AE2D),
+        Color(0xFF6D597A),
+        Color(0xFF355070),
+        Color(0xFFFF9B71),
       ],
       countdownColor: Color(0xFF222831),
       restColor: Color(0xFF393E46),
@@ -239,9 +255,30 @@ class Palette {
         Color(0xFF005377),
         Color(0xFFE4572E),
         Color(0xFF17BEBB),
+        Color(0xFF2E7D32),
+        Color(0xFF6A994E),
+        Color(0xFFBC4749),
+        Color(0xFFF2E8CF),
       ],
       countdownColor: Color(0xFF07393C),
       restColor: Color(0xFF1B512D),
+      textColor: Colors.white,
+    ),
+    'basic': Palette(
+      id: 'basic',
+      label: 'Basic',
+      colors: [
+        Color(0xFFFFFFFF),
+        Color(0xFFFFD400),
+        Color(0xFF0077FF),
+        Color(0xFFE10600),
+        Color(0xFF1B9E3C),
+        Color(0xFFFF7A00),
+        Color(0xFF000000),
+        Color(0xFF9E9E9E),
+      ],
+      countdownColor: Color(0xFF111111),
+      restColor: Color(0xFF222222),
       textColor: Colors.white,
     ),
     'contrast': Palette(
@@ -252,6 +289,10 @@ class Palette {
         Color(0xFFEE4266),
         Color(0xFF3CBBB1),
         Color(0xFF2A1E5C),
+        Color(0xFF0F4C5C),
+        Color(0xFF1B998B),
+        Color(0xFFED6A5A),
+        Color(0xFF114B5F),
       ],
       countdownColor: Color(0xFF1E1E24),
       restColor: Color(0xFF2E2E38),

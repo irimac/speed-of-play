@@ -46,3 +46,14 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Added startup gate (`startup_gate.dart`) and `SpeedOfPlayBootstrapApp` wrapper to keep Launch screen visible for at least 3 seconds while bootstrapping dependencies.
 - Launch screen now shows during initialization and auto-navigates to Main after the gate; removed embedded timer from `LaunchScreen` UI.
 - Added widget tests for launch gating: initial visibility, minimum-duration enforcement, and transition after init; full test suite remains green.
+
+## 2025-12-18 (later)
+- Removed in-app `LaunchScreen` and startup gating; app now boots directly into `MainScreen` once Flutter is ready.
+- Deleted launch gating tests and helper; simplified `main.dart` to construct dependencies up front.
+- Android splash now native-branded: colored background and centered launcher icon via `LaunchTheme` (Android 12+ attributes plus pre-12 drawable). Added `splash_background` color and `splash_logo` drawable. No artificial delay.
+- iOS platform folder is not present in this repo; add matching branding to `Runner/LaunchScreen.storyboard` when iOS is available.
+
+## 2025-12-19
+- Restyled the Settings screen with sectioned layout, shared SettingsStyles tokens, card rows, and a primary Save action; added widget tests for headers, steppers, countdown toggles, and save actions.
+- Added active color selection UI, persisted `activeColorIds` in presets, and filtered stimulus palettes by the selected subset while keeping full-palette defaults when unset.
+- Standardized palettes to 8 colors and added a basic palette (white, yellow, blue, red, green, orange, black, gray).
