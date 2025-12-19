@@ -10,6 +10,7 @@ class SessionStyles {
     required this.numberShadowOffset,
     required this.numberShadowOpacity,
     required this.numberShadowBoost,
+    required this.largeNumberHeightFractionLandscape,
     required this.headerRoundTextStyle,
     required this.headerTimerTextStyle,
     required this.headerHeight,
@@ -42,6 +43,7 @@ class SessionStyles {
   final Offset numberShadowOffset;
   final double numberShadowOpacity;
   final double numberShadowBoost;
+  final double largeNumberHeightFractionLandscape;
   final TextStyle headerRoundTextStyle;
   final TextStyle headerTimerTextStyle;
   final double headerHeight;
@@ -85,6 +87,7 @@ class SessionStyles {
       numberShadowOffset: const Offset(0, 2),
       numberShadowOpacity: 0.24,
       numberShadowBoost: 1.25,
+      largeNumberHeightFractionLandscape: 0.8,
       headerRoundTextStyle: const TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w600,
@@ -170,5 +173,15 @@ class SessionStyles {
   Color textOnStimulus(Color background) {
     final luminance = background.computeLuminance();
     return luminance > 0.4 ? Colors.black : Colors.white;
+  }
+
+  double largeNumberHeightFractionFor(Size size) {
+    final isLandscape = size.width > size.height;
+    final ratio =
+        isLandscape ? size.width / size.height : size.height / size.width;
+    if (isLandscape) {
+      return largeNumberHeightFractionLandscape;
+    }
+    return largeNumberHeightFractionLandscape / ratio;
   }
 }

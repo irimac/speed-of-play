@@ -87,3 +87,6 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Restyled History screen with scan-friendly card rows, selection action bar, and empty state CTA; added HistoryStyles tokens and widget tests.
 - Unified Settings/History/End headers via shared AppHeader component; standardized title/action sizing tokens and status bar background colors.
 - Settings no longer shows save controls (changes persist on edit); Done uses back arrow. End screen still prompts to save before exit.
+
+## 2025-12-19 (session number sizing)
+- Large session numbers now size as a fraction of available height with separate landscape/portrait scaling to prevent oversized digits.

@@ -42,6 +42,7 @@ Date: 2025-12-16
 - [x] Main: centered logo, settings summary + active colors, prominent Start CTA, and Settings/History-Stats actions below (restyled to mock).
 - [x] Settings: rounds, durations, interval, number range, outdoor boost, large session text, high contrast palette toggle with active colors in the same row, countdown toggle + seconds, RNG seed toggle/input (palette picker removed; default basic palette). Changes persist immediately; save controls removed.
 - [x] Session: countdown/active/rest UIs, per-phase backgrounds, large number, rest progress, double-tap pause overlay with continue/reset/skip/finish driven by controller state; phase views and pause overlay are modular widgets. Added stable numeric layout, luminance-based text, and header/footer scrims for readability.
+- [x] Large session text sizing now scales by available height with portrait/landscape fractions to avoid oversized digits.
 - [x] End: summary screen restyled with stat cards, detail section, and full-width actions; Save to History and Back to Main preserved.
 - [x] History: newest-first list, multi-select, delete, export CSV, empty state.
 

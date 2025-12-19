@@ -30,6 +30,7 @@ Use this for manual sweeps; note device/OS and build flavor.
 ## Accessibility & Readability
 - [ ] Text legible outdoors; outdoor boost improves contrast.
 - [ ] Session digits do not jitter; header/footer text remains readable on bright palettes.
+- [ ] Large session text scale remains within target size in both portrait and landscape.
 - [ ] Main + Pause overlay buttons are visually consistent and meet minimum touch target size.
 - [ ] Buttons meet touch target size; semantics/labels read correctly with screen reader.
 

@@ -133,17 +133,26 @@ class _SessionScreenState extends State<SessionScreen>
                         Expanded(
                           child: Padding(
                             padding: styles.screenPadding,
-                            child: Center(
-                              child: _buildPhaseView(
-                                snapshot: snapshot,
-                                numberStyle: styles.numberTextStyle,
-                                backgroundColor: background,
-                                restTotal: restTotal,
-                                outdoorBoost: ctrl.preset.outdoorBoost,
-                                styles: styles,
-                                activeSizingText: activeSizingText,
-                                countdownSizingText: countdownSizingText,
-                              ),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Center(
+                                  child: _buildPhaseView(
+                                    snapshot: snapshot,
+                                    numberStyle: styles.numberTextStyle,
+                                    backgroundColor: background,
+                                    restTotal: restTotal,
+                                    outdoorBoost: ctrl.preset.outdoorBoost,
+                                    styles: styles,
+                                    activeSizingText: activeSizingText,
+                                    countdownSizingText: countdownSizingText,
+                                    availableSize: Size(
+                                      constraints.maxWidth,
+                                      constraints.maxHeight,
+                                    ),
+                                    useLargeText: ctrl.preset.largeSessionText,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
@@ -189,12 +198,22 @@ class _SessionScreenState extends State<SessionScreen>
     required SessionStyles styles,
     required String activeSizingText,
     required String countdownSizingText,
+    required Size availableSize,
+    required bool useLargeText,
   }) {
     final contrastColor = styles.textOnStimulus(backgroundColor);
+    final effectiveNumberStyle = useLargeText
+        ? numberStyle.copyWith(
+            fontSize: availableSize.height *
+                styles.largeNumberHeightFractionFor(
+                  availableSize,
+                ),
+          )
+        : numberStyle;
     final shadowScale = outdoorBoost ? styles.numberShadowBoost : 1.0;
     final numberShadows =
         styles.numberShadowsForText(contrastColor, intensity: shadowScale);
-    final primaryNumberStyle = numberStyle.copyWith(
+    final primaryNumberStyle = effectiveNumberStyle.copyWith(
       color: contrastColor,
       shadows: numberShadows,
     );
