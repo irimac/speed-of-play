@@ -90,3 +90,6 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 
 ## 2025-12-19 (session number sizing)
 - Large session numbers now size as a fraction of available height with separate landscape/portrait scaling to prevent oversized digits.
+
+## 2025-12-19 (rotation policy)
+- Rotation no longer auto-pauses sessions (product decision) to avoid unintended interruptions; rationale and revisit criteria captured in `docs/DECISIONS.md`.

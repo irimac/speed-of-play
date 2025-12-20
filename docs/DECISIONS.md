@@ -38,6 +38,10 @@ Purpose: capture the "why" behind key design and implementation choices so futur
 - **Accessibility toggles**: Settings include large session text and high-contrast palette; styles and palette resolution respond to these flags while persisting in presets.
 - **Large text behavior**: Large session text meaningfully increases session number/countdown size using style overrides (not just a boolean flag).
 - **Lifecycle handling**: App lifecycle observer auto-pauses sessions when backgrounded or detached; inactive is ignored to avoid rotation-triggered pauses. Scheduler pauses accordingly until the user resumes.
+- **Rotation behavior (product decision)**: Rotation does not auto-pause to avoid unintended interruptions and keep workouts flowing. Revisit if any of the following dominate:
+  - user expectation/safety (accidental rotation should not cost time or cues),
+  - platform realities (rotation rebuilds/layout shifts cause interruptions),
+  - consistency with other interrupts (screen lock, app background, calls).
 - **Audio control**: `audioEnabled` preset flag stored in settings; hooks ready for muting cues via controller/service if desired.
 - **Cue idempotence**: Controller guards countdown ticks and round-start cues so they fire at most once per aligned second/round, respecting `audioEnabled` to avoid duplicate sounds.
 - **Audio preload**: Audio player wraps injectable backends and preloads assets once on start; tests ensure plays don't retrigger loads, keeping per-tick work minimal.
