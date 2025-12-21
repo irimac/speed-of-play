@@ -35,6 +35,8 @@ Purpose: capture the "why" behind key design and implementation choices so futur
 - **Rest phase label**: Rest shows a subtle "RECOVER" label above the ring to align with countdown labeling and reduce phase ambiguity.
 - **Ring geometry policy**: Countdown/Rest ring diameter, stroke, and padding are derived from available center height with a single scale (independent of large session text) to keep the ring consistent across modes.
 - **Rest time format**: Rest ring center always uses mm:ss for consistency and quick scanning, even when remaining time is under 60 seconds.
+- **Countdown tick emphasis**: Countdown tick audio is limited to the final 3 seconds (3/2/1) to emphasize urgency without constant beeping.
+- **Countdown urgency cue**: Added a subtle pulse to the countdown center number on the final 3 seconds to increase urgency while staying non-distracting.
 - **Active color selection**: Added optional `activeColorIds` to presets so coaches can constrain stimulus colors; when unset/empty, behavior remains the full palette. Selection is UI-driven and persists with the preset, keeping default behavior unchanged.
 - **Palette simplification**: Default palette is now `basic`, with a single alternative via the High Contrast toggle. Toggling high contrast clears `activeColorIds` to avoid mismatched color IDs.
 - **Settings simplification**: Palette picker removed to reduce choice overload; High Contrast toggle is co-located with Active Colors to make display control obvious.

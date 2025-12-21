@@ -15,6 +15,8 @@ class CountdownView extends StatelessWidget {
     required this.labelStyle,
     required this.minTextDigits,
     required this.labelGap,
+    required this.pulseScale,
+    required this.pulseDuration,
   });
 
   final int remainingSeconds;
@@ -27,9 +29,12 @@ class CountdownView extends StatelessWidget {
   final TextStyle labelStyle;
   final int minTextDigits;
   final double labelGap;
+  final double pulseScale;
+  final Duration pulseDuration;
 
   @override
   Widget build(BuildContext context) {
+    final pulseActive = remainingSeconds > 0 && remainingSeconds <= 3;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -61,6 +66,10 @@ class CountdownView extends StatelessWidget {
           backgroundRingColor: backgroundColor,
           minTextDigits: minTextDigits,
           alwaysShowMinutes: false,
+          pulse: pulseActive,
+          pulseTrigger: remainingSeconds,
+          pulseScale: pulseScale,
+          pulseDuration: pulseDuration,
         ),
       ],
     );

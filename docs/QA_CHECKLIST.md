@@ -36,6 +36,8 @@ Use this for manual sweeps; note device/OS and build flavor.
 - [ ] Rest shows a "RECOVER" label above the ring and remains readable across palettes.
 - [ ] Countdown/Rest ring geometry stays consistent across normal/large text modes.
 - [ ] Rest ring center always shows mm:ss (including under 60 seconds).
+- [ ] Countdown tick audio only plays during the final 3 seconds.
+- [ ] Countdown center number pulses subtly on 3/2/1 (visual-only).
 - [ ] Main + Pause overlay buttons are visually consistent and meet minimum touch target size.
 - [ ] Buttons meet touch target size; semantics/labels read correctly with screen reader.
 

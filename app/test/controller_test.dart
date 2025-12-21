@@ -521,6 +521,35 @@ void main() {
       expect(audio.tickCount, 2);
     });
 
+    test('countdown ticks only for last three seconds', () {
+      _ManualScheduler scheduler = _ManualScheduler((_) {});
+      final audio = _RecordingAudio();
+      final preset = SessionPreset.defaults().copyWith(
+        countdownSec: 5,
+        roundDurationSec: 1,
+        restDurationSec: 0,
+        changeIntervalSec: 1,
+        rounds: 1,
+        rngSeed: 14,
+      );
+      final controller = SessionController(
+        preset: preset,
+        audioPlayer: audio,
+        schedulerBuilder: (cb) {
+          scheduler = _ManualScheduler(cb);
+          return scheduler;
+        },
+        wakelockEnable: () async {},
+        wakelockDisable: () async {},
+      );
+
+      controller.start();
+      scheduler.tick(5); // countdown completes -> active starts
+
+      expect(audio.tickCount, 3);
+      expect(audio.log.where((e) => e == 'tick').length, 3);
+    });
+
     test('audio stays silent while paused skip/resume', () {
       _ManualScheduler scheduler = _ManualScheduler((_) {});
       final audio = _RecordingAudio();

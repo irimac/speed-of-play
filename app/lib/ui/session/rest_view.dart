@@ -61,6 +61,10 @@ class RestView extends StatelessWidget {
           backgroundRingColor: backgroundColor,
           minTextDigits: minTextDigits,
           alwaysShowMinutes: true,
+          pulse: false,
+          pulseTrigger: secondsRemaining,
+          pulseScale: 1.0,
+          pulseDuration: Duration.zero,
         ),
       ],
     );

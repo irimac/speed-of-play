@@ -224,6 +224,8 @@ class _SessionScreenState extends State<SessionScreen>
         textStyle: primaryNumberStyle,
         labelStyle: styles.phaseLabelTextStyle.copyWith(color: contrastColor),
         labelGap: styles.phaseLabelGap,
+        pulseScale: styles.countdownPulseScale,
+        pulseDuration: styles.countdownPulseDuration,
         minTextDigits: ringTextDigits,
       );
     }

@@ -202,9 +202,13 @@ class SessionController extends ChangeNotifier {
     if (_phase == SessionPhase.countdown &&
         preset.audioEnabled &&
         _lastTickAudioSecond != _elapsedSeconds) {
-      _lastTickAudioSecond = _elapsedSeconds;
-      unawaited(
-          _audio.playTick(sessionSecond: _elapsedSeconds, phase: _phase.name));
+      final phaseDuration = _phaseDuration ?? preset.countdownSec;
+      final remainingBefore = phaseDuration - _secondsIntoPhase;
+      if (remainingBefore <= 3 && remainingBefore > 0) {
+        _lastTickAudioSecond = _elapsedSeconds;
+        unawaited(
+            _audio.playTick(sessionSecond: _elapsedSeconds, phase: _phase.name));
+      }
     }
     _elapsedSeconds += 1;
     _secondsIntoPhase += 1;

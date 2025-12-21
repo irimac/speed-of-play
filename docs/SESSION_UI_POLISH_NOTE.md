@@ -28,3 +28,5 @@ Status: implemented
 - Rest now displays a "RECOVER" label above the ring to mirror the countdown label pattern.
 - Countdown/Rest ring geometry now uses a single height-based scale (independent of the large text toggle) for predictable sizing.
 - Rest ring center now always renders mm:ss for consistent time reading across short and long rests.
+- Countdown tick audio now plays only for the final 3 seconds (3/2/1) to heighten urgency without constant beeping.
+- Countdown center number now pulses subtly on 3/2/1 for added urgency without changing timing.

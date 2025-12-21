@@ -14,6 +14,10 @@ class PhaseRingTimer extends StatelessWidget {
     required this.backgroundRingColor,
     required this.minTextDigits,
     required this.alwaysShowMinutes,
+    required this.pulse,
+    required this.pulseTrigger,
+    required this.pulseScale,
+    required this.pulseDuration,
     this.ringColor,
   });
 
@@ -26,6 +30,10 @@ class PhaseRingTimer extends StatelessWidget {
   final Color backgroundRingColor;
   final int minTextDigits;
   final bool alwaysShowMinutes;
+  final bool pulse;
+  final int pulseTrigger;
+  final double pulseScale;
+  final Duration pulseDuration;
   final Color? ringColor;
 
   @override
@@ -97,23 +105,131 @@ class PhaseRingTimer extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.center,
-                child: Text(
-                  displayText,
-                  style: textStyle,
-                  textAlign: TextAlign.center,
-                  softWrap: false,
-                  textWidthBasis: TextWidthBasis.longestLine,
-                  textHeightBehavior: const TextHeightBehavior(
-                    applyHeightToFirstAscent: false,
-                    applyHeightToLastDescent: false,
+                child: PulseScale(
+                  enabled: pulse,
+                  trigger: pulseTrigger,
+                  scale: pulseScale,
+                  duration: pulseDuration,
+                  child: Text(
+                    displayText,
+                    style: textStyle,
+                    textAlign: TextAlign.center,
+                    softWrap: false,
+                    textWidthBasis: TextWidthBasis.longestLine,
+                    textHeightBehavior: const TextHeightBehavior(
+                      applyHeightToFirstAscent: false,
+                      applyHeightToLastDescent: false,
+                    ),
+                    strutStyle: strutStyle,
                   ),
-                  strutStyle: strutStyle,
                 ),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class PulseScale extends StatefulWidget {
+  const PulseScale({
+    super.key,
+    required this.enabled,
+    required this.trigger,
+    required this.scale,
+    required this.duration,
+    required this.child,
+  });
+
+  final bool enabled;
+  final int trigger;
+  final double scale;
+  final Duration duration;
+  final Widget child;
+
+  @override
+  State<PulseScale> createState() => _PulseScaleState();
+}
+
+class _PulseScaleState extends State<PulseScale>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  int? _lastTrigger;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+    _buildAnimation();
+    if (widget.enabled) {
+      _lastTrigger = widget.trigger;
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant PulseScale oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.duration != oldWidget.duration) {
+      _controller.duration = widget.duration;
+    }
+    if (widget.scale != oldWidget.scale ||
+        widget.duration != oldWidget.duration) {
+      _buildAnimation();
+    }
+    if (!widget.enabled) {
+      _controller.stop();
+      return;
+    }
+    if (!oldWidget.enabled && widget.enabled) {
+      _lastTrigger = widget.trigger;
+      _controller.forward(from: 0);
+      return;
+    }
+    if (_lastTrigger != widget.trigger) {
+      _lastTrigger = widget.trigger;
+      _controller.forward(from: 0);
+    }
+  }
+
+  void _buildAnimation() {
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: widget.scale)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: widget.scale, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
+    ]).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.enabled) {
+      return widget.child;
+    }
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      child: widget.child,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          alignment: Alignment.center,
+          child: child,
+        );
+      },
     );
   }
 }

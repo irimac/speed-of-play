@@ -34,6 +34,8 @@ class SessionStyles {
     required this.restSecondsTextStyle,
     required this.phaseLabelTextStyle,
     required this.phaseLabelGap,
+    required this.countdownPulseScale,
+    required this.countdownPulseDuration,
     required this.overlayMaxWidth,
     required this.overlayCardColor,
     required this.overlayScrimColor,
@@ -76,6 +78,8 @@ class SessionStyles {
   final TextStyle restSecondsTextStyle;
   final TextStyle phaseLabelTextStyle;
   final double phaseLabelGap;
+  final double countdownPulseScale;
+  final Duration countdownPulseDuration;
   final double overlayMaxWidth;
   final Color overlayCardColor;
   final Color overlayScrimColor;
@@ -156,6 +160,8 @@ class SessionStyles {
         height: 1.05,
       ),
       phaseLabelGap: AppTokens.spacingL,
+      countdownPulseScale: 1.06,
+      countdownPulseDuration: const Duration(milliseconds: 300),
       overlayMaxWidth: 420,
       overlayCardColor: Colors.grey.shade900,
       overlayScrimColor: const Color.fromRGBO(0, 0, 0, 0.75),

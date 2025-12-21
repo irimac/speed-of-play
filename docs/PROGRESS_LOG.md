@@ -101,3 +101,5 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 - Rest now shows a "RECOVER" label above the ring to mirror Countdown’s phase label.
 - Countdown/Rest ring geometry now uses a single scale tied to available center height (independent of largeSessionText).
 - Rest ring center now always shows mm:ss (even under 60s) for consistent time readability.
+- Countdown tick audio now plays only during the final 3 seconds for a stronger urgency cue.
+- Countdown center number now gets a subtle pulse on 3/2/1 for added urgency without affecting timing.
