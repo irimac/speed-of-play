@@ -281,7 +281,7 @@ class _SessionHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Round ${snapshot.roundIndex + 1} / ${snapshot.roundsTotal}',
+            'Round ${snapshot.roundIndex + 1}/${snapshot.roundsTotal}',
             style: styles.headerRoundTextStyle.copyWith(color: textColor),
           ),
           Text(
@@ -315,7 +315,7 @@ class _SessionFooter extends StatelessWidget {
       color: scrimColor,
       alignment: Alignment.center,
       child: Text(
-        'Session ${formatSessionSeconds(elapsedSeconds)}',
+        'Elapsed ${formatSessionSeconds(elapsedSeconds)}',
         textAlign: TextAlign.center,
         style: styles.footerTextStyle.copyWith(color: textColor),
       ),
