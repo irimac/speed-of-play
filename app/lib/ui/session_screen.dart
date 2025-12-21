@@ -80,10 +80,7 @@ class _SessionScreenState extends State<SessionScreen>
             if (snapshot.phase == SessionPhase.end) {
               return const SizedBox.shrink();
             }
-            final styles = SessionStyles.defaults(
-              Theme.of(context),
-              largeSessionText: ctrl.preset.largeSessionText,
-            );
+            final styles = SessionStyles.defaults(Theme.of(context));
             final colors = Palette.resolveWithContrast(
               ctrl.preset.paletteId,
               highContrast: ctrl.preset.highContrastPalette,
@@ -202,14 +199,9 @@ class _SessionScreenState extends State<SessionScreen>
     required bool useLargeText,
   }) {
     final contrastColor = styles.textOnStimulus(backgroundColor);
-    final effectiveNumberStyle = useLargeText
-        ? numberStyle.copyWith(
-            fontSize: availableSize.height *
-                styles.largeNumberHeightFractionFor(
-                  availableSize,
-                ),
-          )
-        : numberStyle;
+    final targetFontSize =
+        styles.bigNumberFontSizeFor(availableSize, large: useLargeText);
+    final effectiveNumberStyle = numberStyle.copyWith(fontSize: targetFontSize);
     final shadowScale = outdoorBoost ? styles.numberShadowBoost : 1.0;
     final numberShadows =
         styles.numberShadowsForText(contrastColor, intensity: shadowScale);

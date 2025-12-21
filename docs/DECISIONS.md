@@ -28,6 +28,7 @@ Purpose: capture the "why" behind key design and implementation choices so futur
 - **Summary screen layout**: Session Summary uses a compact stat card grid plus a secondary details card to keep key metrics scan-first for field use.
 - **Settings save behavior**: Settings persist on each change, so explicit Save controls were removed to reduce redundant taps. End screen still requires manual save to history.
 - **Large number scaling**: Large session digits scale from available height using a landscape base fraction with a portrait adjustment via aspect ratio for consistent sizing.
+- **Unified big number policy**: Active and Countdown use the same height-based sizing logic for both normal and large modes; the toggle only adjusts the fraction.
 - **Session legibility polish**: Added luminance-based text colors, subtle header/footer scrims, and tabular figures with fixed sizing boxes to reduce digit jitter and improve outdoor readability without altering session logic.
 - **Active color selection**: Added optional `activeColorIds` to presets so coaches can constrain stimulus colors; when unset/empty, behavior remains the full palette. Selection is UI-driven and persists with the preset, keeping default behavior unchanged.
 - **Palette simplification**: Default palette is now `basic`, with a single alternative via the High Contrast toggle. Toggling high contrast clears `activeColorIds` to avoid mismatched color IDs.

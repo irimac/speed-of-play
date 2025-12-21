@@ -13,7 +13,7 @@ stateDiagram-v2
 
     %% Navigation from Main
     Main --> Settings: openSettings
-    Settings --> Main: save/back
+    Settings --> Main: done/back
 
     Main --> History: openHistory
     History --> History: deleteSelected

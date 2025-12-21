@@ -13,8 +13,8 @@ Sources: `SpeedOfPlay - Project Proposal.md`, `Session_Flow_and_Behavior_with_Hi
 ### 2. Users & Key Jobs
 | Persona | Needs | Success signals |
 | --- | --- | --- |
-| Field Coach | Configure recurring session presets, monitor timing, pause/reset instantly without losing progress. | Can launch a session in ≤3 taps, timing stays aligned even after rotation/pause. |
-| Athlete | Quickly recognize cues (color + large number), react on predictable beat, hear audio ticks. | Can see/read numbers from ≥5 m, audio ticks every second, no unexpected pauses. |
+| Field Coach | Configure recurring session presets, monitor timing, pause/reset instantly without losing progress. | Can launch a session in <= 3 taps, timing stays aligned even after rotation/pause. |
+| Athlete | Quickly recognize cues (color + large number), react on predictable beat, hear audio ticks. | Can see/read numbers from <= 5 m, audio ticks every second, no unexpected pauses. |
 
 ### 3. Core Assumptions
 1. Sessions are always single-device, coach-controlled (based on provided specs).
@@ -23,19 +23,19 @@ Sources: `SpeedOfPlay - Project Proposal.md`, `Session_Flow_and_Behavior_with_Hi
 4. Visual design follows provided mocks; colors referenced below assume accessibility-safe palettes derived from mocks.
 
 ### 4. End-to-end Flow Summary
-1. Launch splash (≤1.5 s) auto-transitions to Main; intro tone plays once.
+1. Native OS splash shows brand and transitions to Main when Flutter is ready (no in-app launch delay).
 2. Main shows current configuration summary + primary actions: Play, Settings, History.
 3. Settings edits rounds, durations, palette, number range, countdown, RNG seed toggle. Persist immediately.
-4. Play → Session closes Main. Session sub-flow: Countdown → Active/Rest repeated per scheduler, with double-tap pause overlay.
-5. End screen offers Save to History (navigates to History) or End → Main.
+4. Play -> Session closes Main. Session sub-flow: Countdown -> Active/Rest repeated per scheduler, with double-tap pause overlay.
+5. End screen offers Save to History (navigates to History) or End -> Main.
 6. History lists saved sessions, supports selection, delete, export CSV, sorting newest-first.
 
 ### 5. Screen Specifications
 
-#### 5.1 Launch
-- Full-bleed dark background with centered logo (per `mocks/Launch.png`).
-- Auto-dismiss via timer (1500 ms) once assets + audio pool ready.
-- VoiceOver/ TalkBack label: “Speed of Play launch screen.”
+#### 5.1 Native splash
+- Native OS splash uses a background color with centered logo (Android/iOS).
+- No in-app launch delay; splash dismisses when Flutter is ready.
+- Accessibility: keep splash branding text readable.
 
 #### 5.2 Main
 - Layout: responsive column (portrait) / two-column (landscape). Left/top: session summary card; right/bottom: action buttons.

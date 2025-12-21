@@ -1,4 +1,4 @@
-# Prompt for AI Coding Agent — SpeedOfPlay (Flutter)
+# Prompt for AI Coding Agent - SpeedOfPlay (Flutter)
 
 You are an AI coding agent working in the `speed-of-play` Flutter repo (https://github.com/irimac/speed).
 
@@ -10,9 +10,9 @@ Read and follow `01_CONTEXT.md` and `02_CONTRACT.md`.
 ---
 
 ## Success criteria (must-have)
-1. App includes screens: **Launch, Main, Settings, Session, End, History**.
+1. App includes screens: **Native splash, Main, Settings, Session, End, History**.
 2. Session runner implements phases:
-   - Countdown (`-N … -1`, 1 Hz ticks, distinct sound at 0)
+   - Countdown (`-N ... -1`, 1 Hz ticks, distinct sound at 0)
    - Active round (stimulus changes every `changeIntervalSec`, no immediate repeats)
    - Rest (neutral bg + circular progress, auto-start next round)
    - Pause overlay via double-tap with actions: reset session, reset round, continue, skip forward, finish
@@ -39,8 +39,8 @@ Implement a single controller state machine:
   - `start()`, `pause()`, `resume()`, `resetSession()`, `resetRound()`, `skipForward()`, `finish()`
 
 Transitions must match the proposal and the conversation:
-- idle → countdown → active ↔ rest (repeat) → completed
-- any of countdown/active/rest → paused on double-tap
+- idle -> countdown -> active -> rest (repeat) -> completed
+- any of countdown/active/rest -> paused on double-tap
 - paused → previous phase on continue
 - paused actions affect timers deterministically
 
@@ -102,7 +102,7 @@ During Session, prevent screen locking (use a known Flutter plugin if already pr
 2. **Models**: add typed models for settings + history record (prefer `freezed` + JSON if available).
 3. **Scheduler**: implement deterministic 1 Hz monotonic scheduler + unit tests.
 4. **Controller**: implement phase machine + unit tests for transitions and stimulus non-repeat rules.
-5. **UI scaffolding**: implement Launch/Main/Settings/History/End skeletons.
+5. **UI scaffolding**: implement Main/Settings/History/End skeletons (native splash handled by platform).
 6. **Session UI**: implement phase views + pause overlay gesture + wiring to controller actions.
 7. **Persistence**: wire settings load/save and history append/read/export.
 8. **Audio**: wire cues, ensure no lag spikes, document assets.

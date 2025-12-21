@@ -20,7 +20,7 @@ A **football awareness & reactivity trainer** for tablet/smartphone. It delivers
 
 ### 4. App Structure & Screens
 
-1. **Launch** – logo + intro tone (≤ 1.5 s).
+1. **Startup** - native OS splash (no in-app launch delay).
 
 2. **Main** – settings summary + **Play** + **Settings** + **History** (portrait/landscape).
 

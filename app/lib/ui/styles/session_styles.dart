@@ -10,7 +10,8 @@ class SessionStyles {
     required this.numberShadowOffset,
     required this.numberShadowOpacity,
     required this.numberShadowBoost,
-    required this.largeNumberHeightFractionLandscape,
+    required this.bigNumberHeightFractionLarge,
+    required this.bigNumberHeightFractionNormal,
     required this.headerRoundTextStyle,
     required this.headerTimerTextStyle,
     required this.headerHeight,
@@ -43,7 +44,8 @@ class SessionStyles {
   final Offset numberShadowOffset;
   final double numberShadowOpacity;
   final double numberShadowBoost;
-  final double largeNumberHeightFractionLandscape;
+  final double bigNumberHeightFractionLarge;
+  final double bigNumberHeightFractionNormal;
   final TextStyle headerRoundTextStyle;
   final TextStyle headerTimerTextStyle;
   final double headerHeight;
@@ -69,14 +71,20 @@ class SessionStyles {
   final double overlaySectionSpacing;
   final double overlayButtonMinHeight;
 
-  factory SessionStyles.defaults(ThemeData theme,
-      {bool largeSessionText = false}) {
+  factory SessionStyles.defaults(ThemeData theme) {
     final textTheme = theme.textTheme;
-    final double numberSize = largeSessionText ? 300 : 180;
+    const double numberSize = 180;
     final baseNumberStyle =
         (textTheme.displayLarge ?? const TextStyle()).copyWith(
       fontSize: numberSize,
       fontWeight: FontWeight.bold,
+      height: 1,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+    final restTextStyle =
+        (textTheme.displayMedium ?? const TextStyle()).copyWith(
+      fontSize: (textTheme.displayMedium ?? const TextStyle()).fontSize ?? 96,
+      fontWeight: FontWeight.w700,
       height: 1,
       fontFeatures: const [FontFeature.tabularFigures()],
     );
@@ -87,7 +95,8 @@ class SessionStyles {
       numberShadowOffset: const Offset(0, 2),
       numberShadowOpacity: 0.24,
       numberShadowBoost: 1.25,
-      largeNumberHeightFractionLandscape: 0.8,
+      bigNumberHeightFractionLarge: 0.8,
+      bigNumberHeightFractionNormal: 0.45,
       headerRoundTextStyle: const TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w600,
@@ -117,13 +126,7 @@ class SessionStyles {
       restStrokeWidth: 28,
       restInnerPadding: 12,
       restIndicatorBackground: const Color.fromRGBO(255, 255, 255, 0.3),
-      restSecondsTextStyle:
-          (textTheme.displayMedium ?? const TextStyle()).copyWith(
-        fontSize: 96,
-        fontWeight: FontWeight.w700,
-        height: 1,
-        fontFeatures: const [FontFeature.tabularFigures()],
-      ),
+      restSecondsTextStyle: restTextStyle,
       overlayMaxWidth: 420,
       overlayCardColor: Colors.grey.shade900,
       overlayScrimColor: const Color.fromRGBO(0, 0, 0, 0.75),
@@ -175,13 +178,13 @@ class SessionStyles {
     return luminance > 0.4 ? Colors.black : Colors.white;
   }
 
-  double largeNumberHeightFractionFor(Size size) {
+  double bigNumberFontSizeFor(Size size, {required bool large}) {
+    final fraction =
+        large ? bigNumberHeightFractionLarge : bigNumberHeightFractionNormal;
     final isLandscape = size.width > size.height;
     final ratio =
         isLandscape ? size.width / size.height : size.height / size.width;
-    if (isLandscape) {
-      return largeNumberHeightFractionLandscape;
-    }
-    return largeNumberHeightFractionLandscape / ratio;
+    final heightFraction = isLandscape ? fraction : fraction / ratio;
+    return size.height * heightFraction;
   }
 }

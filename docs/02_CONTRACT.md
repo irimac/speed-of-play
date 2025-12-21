@@ -1,6 +1,6 @@
-# Contract — Working Agreement for the AI Coding Agent
+# Contract - Working Agreement for the AI Coding Agent
 
-This is the “how we work” contract. The agent must follow these rules.
+This is the "how we work" contract. The agent must follow these rules.
 
 ## Goal
 Implement the SpeedOfPlay Flutter MVP with:
@@ -17,7 +17,7 @@ Implement the SpeedOfPlay Flutter MVP with:
 6. **Test what matters**: scheduler + state transitions + non-repeat stimulus rules.
 
 ## Deliverables
-- Implement all MVP screens (Launch/Main/Settings/Session/End/History).
+- Implement all MVP screens (Native splash/Main/Settings/Session/End/History).
 - Implement session state machine with pause overlay actions.
 - Implement persistence:
   - settings (local),

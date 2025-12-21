@@ -5,6 +5,7 @@ import 'package:speed_of_play/data/models.dart';
 import 'package:speed_of_play/services/audio_cue_player.dart';
 import 'package:speed_of_play/services/session_scheduler.dart';
 import 'package:speed_of_play/ui/session/active_round_view.dart';
+import 'package:speed_of_play/ui/session/countdown_view.dart';
 import 'package:speed_of_play/ui/session/pause_overlay.dart';
 import 'package:speed_of_play/ui/styles/session_styles.dart';
 
@@ -61,18 +62,20 @@ Future<void> _pumpGolden(
 void main() {
   // Update goldens with:
   // flutter test --update-goldens test/session_golden_test.dart
-  testWidgets('Active view golden - bright stimulus', (tester) async {
+  testWidgets('Active view golden - normal size', (tester) async {
     final styles = SessionStyles.defaults(ThemeData.light());
     const background = Color(0xFFF6F069);
     final textColor = styles.textOnStimulus(background);
+    const size = Size(390, 844);
     final numberStyle = styles.numberTextStyle.copyWith(
+      fontSize: styles.bigNumberFontSizeFor(size, large: false),
       color: textColor,
       shadows: styles.numberShadowsForText(textColor),
     );
 
     await _pumpGolden(
       tester,
-      size: const Size(390, 844),
+      size: size,
       child: Container(
         color: background,
         alignment: Alignment.center,
@@ -86,22 +89,24 @@ void main() {
 
     await expectLater(
       find.byType(MaterialApp),
-      matchesGoldenFile('goldens/active_view_bright.png'),
+      matchesGoldenFile('goldens/active_view_normal.png'),
     );
   });
 
-  testWidgets('Active view golden - dark stimulus', (tester) async {
+  testWidgets('Active view golden - large size', (tester) async {
     final styles = SessionStyles.defaults(ThemeData.light());
-    const background = Color(0xFF0F2B1E);
+    const background = Color(0xFFF6F069);
     final textColor = styles.textOnStimulus(background);
+    const size = Size(390, 844);
     final numberStyle = styles.numberTextStyle.copyWith(
+      fontSize: styles.bigNumberFontSizeFor(size, large: true),
       color: textColor,
       shadows: styles.numberShadowsForText(textColor),
     );
 
     await _pumpGolden(
       tester,
-      size: const Size(390, 844),
+      size: size,
       child: Container(
         color: background,
         alignment: Alignment.center,
@@ -115,7 +120,69 @@ void main() {
 
     await expectLater(
       find.byType(MaterialApp),
-      matchesGoldenFile('goldens/active_view_dark.png'),
+      matchesGoldenFile('goldens/active_view_large.png'),
+    );
+  });
+
+  testWidgets('Countdown view golden - normal size', (tester) async {
+    final styles = SessionStyles.defaults(ThemeData.light());
+    const background = Color(0xFFF2F2F2);
+    final textColor = styles.textOnStimulus(background);
+    const size = Size(390, 844);
+    final numberStyle = styles.numberTextStyle.copyWith(
+      fontSize: styles.bigNumberFontSizeFor(size, large: false),
+      color: textColor,
+      shadows: styles.numberShadowsForText(textColor),
+    );
+
+    await _pumpGolden(
+      tester,
+      size: size,
+      child: Container(
+        color: background,
+        alignment: Alignment.center,
+        child: CountdownView(
+          remainingSeconds: 3,
+          textStyle: numberStyle,
+          sizingText: '-88',
+        ),
+      ),
+    );
+
+    await expectLater(
+      find.byType(MaterialApp),
+      matchesGoldenFile('goldens/countdown_view_normal.png'),
+    );
+  });
+
+  testWidgets('Countdown view golden - large size', (tester) async {
+    final styles = SessionStyles.defaults(ThemeData.light());
+    const background = Color(0xFFF2F2F2);
+    final textColor = styles.textOnStimulus(background);
+    const size = Size(390, 844);
+    final numberStyle = styles.numberTextStyle.copyWith(
+      fontSize: styles.bigNumberFontSizeFor(size, large: true),
+      color: textColor,
+      shadows: styles.numberShadowsForText(textColor),
+    );
+
+    await _pumpGolden(
+      tester,
+      size: size,
+      child: Container(
+        color: background,
+        alignment: Alignment.center,
+        child: CountdownView(
+          remainingSeconds: 3,
+          textStyle: numberStyle,
+          sizingText: '-88',
+        ),
+      ),
+    );
+
+    await expectLater(
+      find.byType(MaterialApp),
+      matchesGoldenFile('goldens/countdown_view_large.png'),
     );
   });
 

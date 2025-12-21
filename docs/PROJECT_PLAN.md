@@ -4,7 +4,7 @@ Prepared from: `SpeedOfPlay--Project_Proposal.md`, `Session_Flow_and_Behavior_wi
 Date: 2025-12-16
 
 ## Status Snapshot
-- Foundations and core UX are implemented in the app: scheduler, session controller, presets/history storage, and all screens (Launch/Main/Settings/Session/End/History).
+- Foundations and core UX are implemented in the app: scheduler, session controller, presets/history storage, and all screens (Native splash/Main/Settings/Session/End/History).
 - Reliability/polish improved: atomic history writes exist; audio assets now match expected format; UI mojibake fixed; Settings/Main preset refresh fixed; pause overlay now derives from controller state; skip-forward semantics cover countdown/active/rest; tick audio limited to countdown; results use real elapsed/per-round durations.
 - Launch now uses native OS splash (Android configured; iOS pending platform folder) with no in-app delay before Main renders.
 - Release prep not started.
