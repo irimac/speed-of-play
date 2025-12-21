@@ -32,6 +32,10 @@ Use this for manual sweeps; note device/OS and build flavor.
 - [ ] Session digits do not jitter; header/footer text remains readable on bright palettes.
 - [ ] Large session text scale remains within target size in both portrait and landscape.
 - [ ] Countdown and Active numerals use the same sizing policy in normal and large modes.
+- [ ] Countdown shows "GET READY" and countdown/rest ring numerals are visually consistent in size.
+- [ ] Rest shows a "RECOVER" label above the ring and remains readable across palettes.
+- [ ] Countdown/Rest ring geometry stays consistent across normal/large text modes.
+- [ ] Rest ring center always shows mm:ss (including under 60 seconds).
 - [ ] Main + Pause overlay buttons are visually consistent and meet minimum touch target size.
 - [ ] Buttons meet touch target size; semantics/labels read correctly with screen reader.
 

@@ -95,6 +95,10 @@ class _SessionScreenState extends State<SessionScreen>
             }
             final restTotal =
                 snapshot.secondsIntoPhase + snapshot.secondsRemainingInPhase;
+            final ringTextDigits = _maxDigitCount(
+              ctrl.preset.restDurationSec,
+              ctrl.preset.countdownSec,
+            );
             final maxAbsNumber =
                 ctrl.preset.numberMin.abs() > ctrl.preset.numberMax.abs()
                     ? ctrl.preset.numberMin.abs()
@@ -103,11 +107,6 @@ class _SessionScreenState extends State<SessionScreen>
             final needsNumberSign = ctrl.preset.numberMin < 0;
             final activeSizingText =
                 '${needsNumberSign ? '-' : ''}${_repeatChar('8', numberDigits)}';
-            final countdownDigits =
-                (ctrl.preset.countdownSec <= 0 ? 0 : ctrl.preset.countdownSec)
-                    .toString()
-                    .length;
-            final countdownSizingText = '-${_repeatChar('8', countdownDigits)}';
             final headerTextColor = styles.textOnStimulus(background);
             final scrimColor = styles.scrimColorForBackground(background);
             return Stack(
@@ -141,12 +140,12 @@ class _SessionScreenState extends State<SessionScreen>
                                     outdoorBoost: ctrl.preset.outdoorBoost,
                                     styles: styles,
                                     activeSizingText: activeSizingText,
-                                    countdownSizingText: countdownSizingText,
                                     availableSize: Size(
                                       constraints.maxWidth,
                                       constraints.maxHeight,
                                     ),
                                     useLargeText: ctrl.preset.largeSessionText,
+                                    ringTextDigits: ringTextDigits,
                                   ),
                                 );
                               },
@@ -194,9 +193,9 @@ class _SessionScreenState extends State<SessionScreen>
     required bool outdoorBoost,
     required SessionStyles styles,
     required String activeSizingText,
-    required String countdownSizingText,
     required Size availableSize,
     required bool useLargeText,
+    required int ringTextDigits,
   }) {
     final contrastColor = styles.textOnStimulus(backgroundColor);
     final targetFontSize =
@@ -209,26 +208,37 @@ class _SessionScreenState extends State<SessionScreen>
       color: contrastColor,
       shadows: numberShadows,
     );
+    final ringDiameter = styles.ringDiameterFor(availableSize.height);
+    final ringStrokeWidth = styles.ringStrokeWidthFor(ringDiameter);
+    final ringInnerPadding = styles.ringInnerPaddingFor(ringDiameter);
 
     if (snapshot.phase == SessionPhase.countdown) {
       return CountdownView(
         remainingSeconds: snapshot.secondsRemainingInPhase,
+        totalSeconds:
+            snapshot.secondsIntoPhase + snapshot.secondsRemainingInPhase,
+        indicatorSize: ringDiameter,
+        strokeWidth: ringStrokeWidth,
+        innerPadding: ringInnerPadding,
+        backgroundColor: styles.restIndicatorBackground,
         textStyle: primaryNumberStyle,
-        sizingText: countdownSizingText,
+        labelStyle: styles.phaseLabelTextStyle.copyWith(color: contrastColor),
+        labelGap: styles.phaseLabelGap,
+        minTextDigits: ringTextDigits,
       );
     }
     if (snapshot.phase == SessionPhase.rest) {
       return RestView(
         secondsRemaining: snapshot.secondsRemainingInPhase,
         totalSeconds: restTotal,
-        indicatorSize: styles.restIndicatorSize,
-        strokeWidth: styles.restStrokeWidth,
-        innerPadding: styles.restInnerPadding,
+        indicatorSize: ringDiameter,
+        strokeWidth: ringStrokeWidth,
+        innerPadding: ringInnerPadding,
         backgroundColor: styles.restIndicatorBackground,
-        textStyle: styles.restSecondsTextStyle.copyWith(
-          color: contrastColor,
-          shadows: numberShadows,
-        ),
+        textStyle: primaryNumberStyle,
+        labelStyle: styles.phaseLabelTextStyle.copyWith(color: contrastColor),
+        labelGap: styles.phaseLabelGap,
+        minTextDigits: ringTextDigits,
       );
     }
     return ActiveRoundView(
@@ -314,4 +324,9 @@ class _SessionFooter extends StatelessWidget {
 String _repeatChar(String char, int count) {
   if (count <= 0) return char;
   return List.filled(count, char).join();
+}
+
+int _maxDigitCount(int a, int b) {
+  final maxValue = a.abs() > b.abs() ? a.abs() : b.abs();
+  return maxValue.toString().length;
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'phase_ring_timer.dart';
+
 class RestView extends StatelessWidget {
   const RestView({
     super.key,
@@ -10,6 +12,9 @@ class RestView extends StatelessWidget {
     required this.innerPadding,
     required this.backgroundColor,
     required this.textStyle,
+    required this.minTextDigits,
+    required this.labelStyle,
+    required this.labelGap,
   });
 
   final int secondsRemaining;
@@ -19,65 +24,45 @@ class RestView extends StatelessWidget {
   final double innerPadding;
   final Color backgroundColor;
   final TextStyle textStyle;
+  final int minTextDigits;
+  final TextStyle labelStyle;
+  final double labelGap;
 
   @override
   Widget build(BuildContext context) {
-    final total = totalSeconds <= 0 ? 1 : totalSeconds;
-    final clampedRemaining = secondsRemaining.clamp(0, total);
-    final int remainingSeconds = clampedRemaining.toInt();
-    final progress = (remainingSeconds / total).clamp(0.0, 1.0).toDouble();
-    final strutSize = textStyle.fontSize ?? 72;
-    final innerSize = indicatorSize - (strokeWidth * 2) - (innerPadding * 2);
-    final safeInnerSize = innerSize > 0 ? innerSize : 0.0;
-
-    return SizedBox(
-      width: indicatorSize,
-      height: indicatorSize,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          SizedBox(
-            width: indicatorSize,
-            height: indicatorSize,
-            child: CircularProgressIndicator(
-              value: progress,
-              strokeWidth: strokeWidth,
-              backgroundColor: backgroundColor,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(strokeWidth + innerPadding),
-            child: SizedBox(
-              width: safeInnerSize,
-              height: safeInnerSize,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.center,
-                child: Text(
-                  '$remainingSeconds',
-                  style: textStyle,
-                  textAlign: TextAlign.center,
-                  softWrap: false,
-                  textWidthBasis: TextWidthBasis.longestLine,
-                  textHeightBehavior: const TextHeightBehavior(
-                    applyHeightToFirstAscent: false,
-                    applyHeightToLastDescent: false,
-                  ),
-                  strutStyle: StrutStyle(
-                    forceStrutHeight: true,
-                    fontSize: strutSize,
-                    height: textStyle.height ?? 1,
-                    leading: 0,
-                    fontFamily: textStyle.fontFamily,
-                    fontWeight: textStyle.fontWeight,
-                    fontStyle: textStyle.fontStyle,
-                  ),
-                ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: indicatorSize,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              'RECOVER',
+              style: labelStyle,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              softWrap: false,
+              textHeightBehavior: const TextHeightBehavior(
+                applyHeightToFirstAscent: false,
+                applyHeightToLastDescent: false,
               ),
             ),
           ),
-        ],
-      ),
+        ),
+        SizedBox(height: labelGap),
+        PhaseRingTimer(
+          totalSeconds: totalSeconds,
+          remainingSeconds: secondsRemaining,
+          diameter: indicatorSize,
+          strokeWidth: strokeWidth,
+          innerPadding: innerPadding,
+          textStyle: textStyle,
+          backgroundRingColor: backgroundColor,
+          minTextDigits: minTextDigits,
+          alwaysShowMinutes: true,
+        ),
+      ],
     );
   }
 }

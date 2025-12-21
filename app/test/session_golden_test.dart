@@ -7,6 +7,7 @@ import 'package:speed_of_play/services/session_scheduler.dart';
 import 'package:speed_of_play/ui/session/active_round_view.dart';
 import 'package:speed_of_play/ui/session/countdown_view.dart';
 import 'package:speed_of_play/ui/session/pause_overlay.dart';
+import 'package:speed_of_play/ui/session/rest_view.dart';
 import 'package:speed_of_play/ui/styles/session_styles.dart';
 
 class _NoopBackend implements AudioBackend {
@@ -57,6 +58,11 @@ Future<void> _pumpGolden(
     ),
   );
   await tester.pumpAndSettle();
+}
+
+int _maxDigitCount(int a, int b) {
+  final maxValue = a.abs() > b.abs() ? a.abs() : b.abs();
+  return maxValue.toString().length;
 }
 
 void main() {
@@ -129,11 +135,18 @@ void main() {
     const background = Color(0xFFF2F2F2);
     final textColor = styles.textOnStimulus(background);
     const size = Size(390, 844);
+    const countdownTotal = 5;
+    const restDurationSec = 15;
+    final minDigits = _maxDigitCount(countdownTotal, restDurationSec);
+    final ringDiameter = styles.ringDiameterFor(size.height);
+    final ringStrokeWidth = styles.ringStrokeWidthFor(ringDiameter);
+    final ringInnerPadding = styles.ringInnerPaddingFor(ringDiameter);
     final numberStyle = styles.numberTextStyle.copyWith(
       fontSize: styles.bigNumberFontSizeFor(size, large: false),
       color: textColor,
       shadows: styles.numberShadowsForText(textColor),
     );
+    final labelStyle = styles.phaseLabelTextStyle.copyWith(color: textColor);
 
     await _pumpGolden(
       tester,
@@ -143,8 +156,15 @@ void main() {
         alignment: Alignment.center,
         child: CountdownView(
           remainingSeconds: 3,
+          totalSeconds: countdownTotal,
+          indicatorSize: ringDiameter,
+          strokeWidth: ringStrokeWidth,
+          innerPadding: ringInnerPadding,
+          backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
           textStyle: numberStyle,
-          sizingText: '-88',
+          labelStyle: labelStyle,
+          labelGap: styles.phaseLabelGap,
+          minTextDigits: minDigits,
         ),
       ),
     );
@@ -160,11 +180,18 @@ void main() {
     const background = Color(0xFFF2F2F2);
     final textColor = styles.textOnStimulus(background);
     const size = Size(390, 844);
+    const countdownTotal = 5;
+    const restDurationSec = 15;
+    final minDigits = _maxDigitCount(countdownTotal, restDurationSec);
+    final ringDiameter = styles.ringDiameterFor(size.height);
+    final ringStrokeWidth = styles.ringStrokeWidthFor(ringDiameter);
+    final ringInnerPadding = styles.ringInnerPaddingFor(ringDiameter);
     final numberStyle = styles.numberTextStyle.copyWith(
       fontSize: styles.bigNumberFontSizeFor(size, large: true),
       color: textColor,
       shadows: styles.numberShadowsForText(textColor),
     );
+    final labelStyle = styles.phaseLabelTextStyle.copyWith(color: textColor);
 
     await _pumpGolden(
       tester,
@@ -174,8 +201,15 @@ void main() {
         alignment: Alignment.center,
         child: CountdownView(
           remainingSeconds: 3,
+          totalSeconds: countdownTotal,
+          indicatorSize: ringDiameter,
+          strokeWidth: ringStrokeWidth,
+          innerPadding: ringInnerPadding,
+          backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
           textStyle: numberStyle,
-          sizingText: '-88',
+          labelStyle: labelStyle,
+          labelGap: styles.phaseLabelGap,
+          minTextDigits: minDigits,
         ),
       ),
     );
@@ -184,6 +218,219 @@ void main() {
       find.byType(MaterialApp),
       matchesGoldenFile('goldens/countdown_view_large.png'),
     );
+  });
+
+  testWidgets('Countdown view golden - mm:ss', (tester) async {
+    final styles = SessionStyles.defaults(ThemeData.light());
+    const background = Color(0xFFF2F2F2);
+    final textColor = styles.textOnStimulus(background);
+    const size = Size(390, 844);
+    const countdownTotal = 120;
+    const restDurationSec = 15;
+    final minDigits = _maxDigitCount(countdownTotal, restDurationSec);
+    final ringDiameter = styles.ringDiameterFor(size.height);
+    final ringStrokeWidth = styles.ringStrokeWidthFor(ringDiameter);
+    final ringInnerPadding = styles.ringInnerPaddingFor(ringDiameter);
+    final numberStyle = styles.numberTextStyle.copyWith(
+      fontSize: styles.bigNumberFontSizeFor(size, large: false),
+      color: textColor,
+      shadows: styles.numberShadowsForText(textColor),
+    );
+    final labelStyle = styles.phaseLabelTextStyle.copyWith(color: textColor);
+
+    await _pumpGolden(
+      tester,
+      size: size,
+      child: Container(
+        color: background,
+        alignment: Alignment.center,
+        child: CountdownView(
+          remainingSeconds: 90,
+          totalSeconds: countdownTotal,
+          indicatorSize: ringDiameter,
+          strokeWidth: ringStrokeWidth,
+          innerPadding: ringInnerPadding,
+          backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
+          textStyle: numberStyle,
+          labelStyle: labelStyle,
+          labelGap: styles.phaseLabelGap,
+          minTextDigits: minDigits,
+        ),
+      ),
+    );
+
+    await expectLater(
+      find.byType(MaterialApp),
+      matchesGoldenFile('goldens/countdown_view_mmss.png'),
+    );
+  });
+
+  testWidgets('Rest view golden - normal size', (tester) async {
+    final styles = SessionStyles.defaults(ThemeData.light());
+    const background = Color(0xFFF2F2F2);
+    final textColor = styles.textOnStimulus(background);
+    const size = Size(390, 844);
+    const restTotal = 15;
+    const countdownTotal = 5;
+    final minDigits = _maxDigitCount(countdownTotal, restTotal);
+    final ringDiameter = styles.ringDiameterFor(size.height);
+    final ringStrokeWidth = styles.ringStrokeWidthFor(ringDiameter);
+    final ringInnerPadding = styles.ringInnerPaddingFor(ringDiameter);
+    final numberStyle = styles.numberTextStyle.copyWith(
+      fontSize: styles.bigNumberFontSizeFor(size, large: false),
+      color: textColor,
+      shadows: styles.numberShadowsForText(textColor),
+    );
+    final labelStyle = styles.phaseLabelTextStyle.copyWith(color: textColor);
+
+    await _pumpGolden(
+      tester,
+      size: size,
+      child: Container(
+        color: background,
+        alignment: Alignment.center,
+        child: RestView(
+          secondsRemaining: 15,
+          totalSeconds: restTotal,
+          indicatorSize: ringDiameter,
+          strokeWidth: ringStrokeWidth,
+          innerPadding: ringInnerPadding,
+          backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
+          textStyle: numberStyle,
+          labelStyle: labelStyle,
+          labelGap: styles.phaseLabelGap,
+          minTextDigits: minDigits,
+        ),
+      ),
+    );
+
+    await expectLater(
+      find.byType(MaterialApp),
+      matchesGoldenFile('goldens/rest_view_normal.png'),
+    );
+  });
+
+  testWidgets('Rest view golden - large size', (tester) async {
+    final styles = SessionStyles.defaults(ThemeData.light());
+    const background = Color(0xFFF2F2F2);
+    final textColor = styles.textOnStimulus(background);
+    const size = Size(390, 844);
+    const restTotal = 15;
+    const countdownTotal = 5;
+    final minDigits = _maxDigitCount(countdownTotal, restTotal);
+    final ringDiameter = styles.ringDiameterFor(size.height);
+    final ringStrokeWidth = styles.ringStrokeWidthFor(ringDiameter);
+    final ringInnerPadding = styles.ringInnerPaddingFor(ringDiameter);
+    final numberStyle = styles.numberTextStyle.copyWith(
+      fontSize: styles.bigNumberFontSizeFor(size, large: true),
+      color: textColor,
+      shadows: styles.numberShadowsForText(textColor),
+    );
+    final labelStyle = styles.phaseLabelTextStyle.copyWith(color: textColor);
+
+    await _pumpGolden(
+      tester,
+      size: size,
+      child: Container(
+        color: background,
+        alignment: Alignment.center,
+        child: RestView(
+          secondsRemaining: 15,
+          totalSeconds: restTotal,
+          indicatorSize: ringDiameter,
+          strokeWidth: ringStrokeWidth,
+          innerPadding: ringInnerPadding,
+          backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
+          textStyle: numberStyle,
+          labelStyle: labelStyle,
+          labelGap: styles.phaseLabelGap,
+          minTextDigits: minDigits,
+        ),
+      ),
+    );
+
+    await expectLater(
+      find.byType(MaterialApp),
+      matchesGoldenFile('goldens/rest_view_large.png'),
+    );
+  });
+
+  testWidgets('Rest view shows RECOVER label', (tester) async {
+    final styles = SessionStyles.defaults(ThemeData.light());
+    const background = Color(0xFFF2F2F2);
+    final textColor = styles.textOnStimulus(background);
+    const size = Size(390, 844);
+    final ringDiameter = styles.ringDiameterFor(size.height);
+    final ringStrokeWidth = styles.ringStrokeWidthFor(ringDiameter);
+    final ringInnerPadding = styles.ringInnerPaddingFor(ringDiameter);
+    final numberStyle = styles.numberTextStyle.copyWith(
+      fontSize: styles.bigNumberFontSizeFor(size, large: false),
+      color: textColor,
+      shadows: styles.numberShadowsForText(textColor),
+    );
+    final labelStyle = styles.phaseLabelTextStyle.copyWith(color: textColor);
+
+    await _pumpGolden(
+      tester,
+      size: size,
+      child: Container(
+        color: background,
+        alignment: Alignment.center,
+        child: RestView(
+          secondsRemaining: 15,
+          totalSeconds: 15,
+          indicatorSize: ringDiameter,
+          strokeWidth: ringStrokeWidth,
+          innerPadding: ringInnerPadding,
+          backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
+          textStyle: numberStyle,
+          labelStyle: labelStyle,
+          labelGap: styles.phaseLabelGap,
+          minTextDigits: 2,
+        ),
+      ),
+    );
+
+    expect(find.text('RECOVER'), findsOneWidget);
+  });
+
+  testWidgets('Countdown view shows GET READY label', (tester) async {
+    final styles = SessionStyles.defaults(ThemeData.light());
+    const background = Color(0xFFF2F2F2);
+    final textColor = styles.textOnStimulus(background);
+    const size = Size(390, 844);
+    final ringDiameter = styles.ringDiameterFor(size.height);
+    final ringStrokeWidth = styles.ringStrokeWidthFor(ringDiameter);
+    final ringInnerPadding = styles.ringInnerPaddingFor(ringDiameter);
+    final numberStyle = styles.numberTextStyle.copyWith(
+      fontSize: styles.bigNumberFontSizeFor(size, large: false),
+      color: textColor,
+      shadows: styles.numberShadowsForText(textColor),
+    );
+    final labelStyle = styles.phaseLabelTextStyle.copyWith(color: textColor);
+
+    await _pumpGolden(
+      tester,
+      size: size,
+      child: Container(
+        color: background,
+        alignment: Alignment.center,
+        child: CountdownView(
+          remainingSeconds: 5,
+          totalSeconds: 10,
+          indicatorSize: ringDiameter,
+          strokeWidth: ringStrokeWidth,
+          innerPadding: ringInnerPadding,
+          backgroundColor: const Color.fromRGBO(255, 255, 255, 0.3),
+          textStyle: numberStyle,
+          labelStyle: labelStyle,
+          labelGap: styles.phaseLabelGap,
+          minTextDigits: 2,
+        ),
+      ),
+    );
+
+    expect(find.text('GET READY'), findsOneWidget);
   });
 
   testWidgets('Pause overlay golden', (tester) async {

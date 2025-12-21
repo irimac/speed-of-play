@@ -21,11 +21,19 @@ class SessionStyles {
     required this.scrimLuminanceThreshold,
     required this.scrimLightOpacity,
     required this.scrimDarkOpacity,
-    required this.restIndicatorSize,
-    required this.restStrokeWidth,
-    required this.restInnerPadding,
+    required this.ringScale,
+    required this.ringMinDiameter,
+    required this.ringMaxDiameter,
+    required this.ringStrokeWidthFraction,
+    required this.ringStrokeWidthMin,
+    required this.ringStrokeWidthMax,
+    required this.ringInnerPaddingFraction,
+    required this.ringInnerPaddingMin,
+    required this.ringInnerPaddingMax,
     required this.restIndicatorBackground,
     required this.restSecondsTextStyle,
+    required this.phaseLabelTextStyle,
+    required this.phaseLabelGap,
     required this.overlayMaxWidth,
     required this.overlayCardColor,
     required this.overlayScrimColor,
@@ -55,11 +63,19 @@ class SessionStyles {
   final double scrimLuminanceThreshold;
   final double scrimLightOpacity;
   final double scrimDarkOpacity;
-  final double restIndicatorSize;
-  final double restStrokeWidth;
-  final double restInnerPadding;
+  final double ringScale;
+  final double ringMinDiameter;
+  final double ringMaxDiameter;
+  final double ringStrokeWidthFraction;
+  final double ringStrokeWidthMin;
+  final double ringStrokeWidthMax;
+  final double ringInnerPaddingFraction;
+  final double ringInnerPaddingMin;
+  final double ringInnerPaddingMax;
   final Color restIndicatorBackground;
   final TextStyle restSecondsTextStyle;
+  final TextStyle phaseLabelTextStyle;
+  final double phaseLabelGap;
   final double overlayMaxWidth;
   final Color overlayCardColor;
   final Color overlayScrimColor;
@@ -122,11 +138,24 @@ class SessionStyles {
       scrimLuminanceThreshold: 0.4,
       scrimLightOpacity: 0.18,
       scrimDarkOpacity: 0.08,
-      restIndicatorSize: 268,
-      restStrokeWidth: 28,
-      restInnerPadding: 12,
+      ringScale: 0.75,
+      ringMinDiameter: 220,
+      ringMaxDiameter: 360,
+      ringStrokeWidthFraction: 0.105,
+      ringStrokeWidthMin: 18,
+      ringStrokeWidthMax: 34,
+      ringInnerPaddingFraction: 0.045,
+      ringInnerPaddingMin: 8,
+      ringInnerPaddingMax: 18,
       restIndicatorBackground: const Color.fromRGBO(255, 255, 255, 0.3),
       restSecondsTextStyle: restTextStyle,
+      phaseLabelTextStyle: const TextStyle(
+        fontSize: 48,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 1.6,
+        height: 1.05,
+      ),
+      phaseLabelGap: AppTokens.spacingL,
       overlayMaxWidth: 420,
       overlayCardColor: Colors.grey.shade900,
       overlayScrimColor: const Color.fromRGBO(0, 0, 0, 0.75),
@@ -186,5 +215,20 @@ class SessionStyles {
         isLandscape ? size.width / size.height : size.height / size.width;
     final heightFraction = isLandscape ? fraction : fraction / ratio;
     return size.height * heightFraction;
+  }
+
+  double ringDiameterFor(double availableCenterHeight) {
+    final raw = availableCenterHeight * ringScale;
+    return raw.clamp(ringMinDiameter, ringMaxDiameter);
+  }
+
+  double ringStrokeWidthFor(double diameter) {
+    final raw = diameter * ringStrokeWidthFraction;
+    return raw.clamp(ringStrokeWidthMin, ringStrokeWidthMax);
+  }
+
+  double ringInnerPaddingFor(double diameter) {
+    final raw = diameter * ringInnerPaddingFraction;
+    return raw.clamp(ringInnerPaddingMin, ringInnerPaddingMax);
   }
 }

@@ -1,79 +1,68 @@
 import 'package:flutter/material.dart';
 
+import 'phase_ring_timer.dart';
+
 class CountdownView extends StatelessWidget {
   const CountdownView({
     super.key,
     required this.remainingSeconds,
+    required this.totalSeconds,
+    required this.indicatorSize,
+    required this.strokeWidth,
+    required this.innerPadding,
+    required this.backgroundColor,
     required this.textStyle,
-    required this.sizingText,
+    required this.labelStyle,
+    required this.minTextDigits,
+    required this.labelGap,
   });
 
   final int remainingSeconds;
+  final int totalSeconds;
+  final double indicatorSize;
+  final double strokeWidth;
+  final double innerPadding;
+  final Color backgroundColor;
   final TextStyle textStyle;
-  final String sizingText;
+  final TextStyle labelStyle;
+  final int minTextDigits;
+  final double labelGap;
 
   @override
   Widget build(BuildContext context) {
-    final safeRemaining = remainingSeconds < 0 ? 0 : remainingSeconds;
-    final strutSize = textStyle.fontSize ?? 180;
-    final strutStyle = StrutStyle(
-      forceStrutHeight: true,
-      fontSize: strutSize,
-      height: textStyle.height ?? 1,
-      leading: 0,
-      fontFamily: textStyle.fontFamily,
-      fontWeight: textStyle.fontWeight,
-      fontStyle: textStyle.fontStyle,
-    );
-    final textScaler = MediaQuery.textScalerOf(context);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final measured = _measureTextSize(
-          context,
-          sizingText,
-          textStyle,
-          strutStyle,
-          textScaler,
-        );
-        final sized = constraints.constrain(measured);
-        return SizedBox(
-          width: sized.width,
-          height: sized.height,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: indicatorSize,
           child: FittedBox(
             fit: BoxFit.scaleDown,
-            alignment: Alignment.center,
             child: Text(
-              '-$safeRemaining',
-              style: textStyle,
+              'GET READY',
+              style: labelStyle,
               textAlign: TextAlign.center,
+              maxLines: 1,
               softWrap: false,
-              textWidthBasis: TextWidthBasis.longestLine,
               textHeightBehavior: const TextHeightBehavior(
                 applyHeightToFirstAscent: false,
                 applyHeightToLastDescent: false,
               ),
-              strutStyle: strutStyle,
             ),
           ),
-        );
-      },
+        ),
+        SizedBox(height: labelGap),
+        PhaseRingTimer(
+          totalSeconds: totalSeconds,
+          remainingSeconds: remainingSeconds,
+          diameter: indicatorSize,
+          strokeWidth: strokeWidth,
+          innerPadding: innerPadding,
+          textStyle: textStyle,
+          backgroundRingColor: backgroundColor,
+          minTextDigits: minTextDigits,
+          alwaysShowMinutes: false,
+        ),
+      ],
     );
   }
-}
-
-Size _measureTextSize(
-  BuildContext context,
-  String text,
-  TextStyle style,
-  StrutStyle strutStyle,
-  TextScaler textScaler,
-) {
-  final painter = TextPainter(
-    text: TextSpan(text: text, style: style),
-    textDirection: Directionality.of(context),
-    textScaler: textScaler,
-    maxLines: 1,
-    strutStyle: strutStyle,
-  )..layout();
-  return painter.size;
 }

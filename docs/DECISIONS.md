@@ -30,6 +30,11 @@ Purpose: capture the "why" behind key design and implementation choices so futur
 - **Large number scaling**: Large session digits scale from available height using a landscape base fraction with a portrait adjustment via aspect ratio for consistent sizing.
 - **Unified big number policy**: Active and Countdown use the same height-based sizing logic for both normal and large modes; the toggle only adjusts the fraction.
 - **Session legibility polish**: Added luminance-based text colors, subtle header/footer scrims, and tabular figures with fixed sizing boxes to reduce digit jitter and improve outdoor readability without altering session logic.
+- **Countdown clarity**: Countdown uses the same ring-timer visual as Rest with a small "GET READY" label to reduce ambiguity during the pre-start phase.
+- **Ring numeral consistency**: Countdown/Rest ring numerals use a shared minimum digit width based on preset durations to prevent perceived size jumps across phases.
+- **Rest phase label**: Rest shows a subtle "RECOVER" label above the ring to align with countdown labeling and reduce phase ambiguity.
+- **Ring geometry policy**: Countdown/Rest ring diameter, stroke, and padding are derived from available center height with a single scale (independent of large session text) to keep the ring consistent across modes.
+- **Rest time format**: Rest ring center always uses mm:ss for consistency and quick scanning, even when remaining time is under 60 seconds.
 - **Active color selection**: Added optional `activeColorIds` to presets so coaches can constrain stimulus colors; when unset/empty, behavior remains the full palette. Selection is UI-driven and persists with the preset, keeping default behavior unchanged.
 - **Palette simplification**: Default palette is now `basic`, with a single alternative via the High Contrast toggle. Toggling high contrast clears `activeColorIds` to avoid mismatched color IDs.
 - **Settings simplification**: Palette picker removed to reduce choice overload; High Contrast toggle is co-located with Active Colors to make display control obvious.

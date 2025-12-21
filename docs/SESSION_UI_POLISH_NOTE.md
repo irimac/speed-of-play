@@ -24,3 +24,7 @@ Status: implemented
 - Goldens added for Active (bright/dark) and Pause overlay; tests updated to use `TextScaler`.
 - Pause overlay action buttons aligned to shared sizing tokens for consistent height and icon/text sizes with Main screen.
 - Active and Countdown now share a unified height-based sizing policy for normal/large numerals; countdown goldens added.
+- Countdown now uses a Rest-style ring with a "GET READY" label, and ring numerals are sized consistently across Countdown/Rest to prevent perceived size jumps.
+- Rest now displays a "RECOVER" label above the ring to mirror the countdown label pattern.
+- Countdown/Rest ring geometry now uses a single height-based scale (independent of the large text toggle) for predictable sizing.
+- Rest ring center now always renders mm:ss for consistent time reading across short and long rests.

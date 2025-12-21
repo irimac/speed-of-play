@@ -94,3 +94,10 @@ Chronological notes of meaningful changes. Update this log whenever progress is 
 
 ## 2025-12-19 (rotation policy)
 - Rotation no longer auto-pauses sessions (product decision) to avoid unintended interruptions; rationale and revisit criteria captured in `docs/DECISIONS.md`.
+
+## 2025-12-21 (countdown label + ring consistency)
+- Countdown now shows a "GET READY" label and uses the same ring-timer pattern as Rest.
+- Ring numerals are sized consistently across Countdown/Rest to avoid perceived size jumps between phases.
+- Rest now shows a "RECOVER" label above the ring to mirror Countdown’s phase label.
+- Countdown/Rest ring geometry now uses a single scale tied to available center height (independent of largeSessionText).
+- Rest ring center now always shows mm:ss (even under 60s) for consistent time readability.

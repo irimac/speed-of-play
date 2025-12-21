@@ -30,4 +30,16 @@ void main() {
     expect(landscapeLarge, greaterThan(landscapeNormal));
     expect(landscapeLarge, greaterThan(portraitLarge));
   });
+
+  test('ringDiameterFor scales with available height and clamps', () {
+    final styles = SessionStyles.defaults(ThemeData.light());
+
+    final small = styles.ringDiameterFor(100);
+    final medium = styles.ringDiameterFor(400);
+    final large = styles.ringDiameterFor(2000);
+
+    expect(medium, greaterThan(small));
+    expect(small, equals(styles.ringMinDiameter));
+    expect(large, equals(styles.ringMaxDiameter));
+  });
 }
